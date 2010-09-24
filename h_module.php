@@ -211,7 +211,7 @@ class Module
 	{
 		global $_d;
 
-		$q = $_d['q'];
+		$q = @$_d['q'];
 
 		if (@$q[0] == $name)
 		{

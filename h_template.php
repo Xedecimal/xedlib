@@ -854,4 +854,9 @@ function TagEach($t, $g, $a)
 
 function TagUpper($t, $g, $a) { return strtoupper($g); }
 
+function TagExists($t, $g, $a)
+{
+	if (file_exists($a['FILE'])) return $g;
+}
+
 ?>

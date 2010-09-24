@@ -1160,6 +1160,9 @@ function GetZips($ds, $zip, $range)
 	return $return;
 }
 
+define('PREG_FILES', 1);
+define('PREG_DIRS', 2);
+
 /**
  * Regular expression matches files located in $path using $pattern and $opts.
  *
