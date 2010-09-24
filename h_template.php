@@ -440,7 +440,7 @@ class Template extends LayeredOutput
 			$atrs = $vp->ParseVars($obj->attribs, $this->vars);
 			if (empty($atrs)) $atrs = array();
 
-			$objd->Out(call_user_func($rw, $this, $obj->Get(), $atrs,
+			$objd->Out(call_user_func($rw, &$this, $obj->Get(), $atrs,
 				$obj->tag, $this->rewriteargs[$tag]));
 
 			return;
@@ -544,7 +544,7 @@ class Template extends LayeredOutput
 		{
 			$this->vars = array_merge($this->vars, $var);
 		}
-		else if (@get_class($var) != null)
+		else if (is_object($var) != null)
 		{
 			$array = get_object_vars($var);
 			foreach ($array as $key => $val)

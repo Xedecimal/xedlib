@@ -88,7 +88,14 @@ class Module
 		if (!empty($_d['module.enable']) && empty($_d['module.enable'][$name]))
 			return;
 
-		$GLOBALS['mods'][$name] = new $name(file_exists('settings.ini'));
+		$mod = new $name(file_exists('settings.ini'));
+		if ($mod->Auth()) $GLOBALS['mods'][$name] = $mod;
+	}
+
+	static function TransPath($a, $t)
+	{
+		if (isset($a[$t[0]])) $a[$t[0]] = p($a[$t[0]]);
+		return $a;
 	}
 
 	static function Run($template)
@@ -126,14 +133,14 @@ class Module
 				if (is_array($ret))
 				{
 					foreach ($ret as $b => $d)
-						$_d['blocks'][$b] .= $d;
+						@$_d['blocks'][$b] .= $d;
 				}
 				else
 				{
 					if (@array_key_exists($mod->Block, $_d['blocks']))
-						$_d['blocks'][$mod->Block] .= $ret;
+						@$_d['blocks'][$mod->Block] .= $ret;
 					else
-						$_d['blocks']['default'] .= $ret;
+						@$_d['blocks']['default'] .= $ret;
 				}
 			}
 		}
@@ -220,6 +227,8 @@ class Module
 	*/
 	function __construct() { }
 
+	function Auth() { return true; }
+
 	/**
 	* New Availability: DataSet
 	* Overload Responsibility: Link your datasets with any other datasets.
@@ -248,12 +257,6 @@ class Module
 	 * the user.
 	 */
 	function InstallFields(&$frm) { }
-
-	static function TransPath($a, $t)
-	{
-		if (isset($a[$t[0]])) $a[$t[0]] = p($a[$t[0]]);
-		return $a;
-	}
 }
 
 ?>

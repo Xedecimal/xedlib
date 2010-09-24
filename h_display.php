@@ -1504,6 +1504,7 @@ class LoginManager
 			$template = dirname(__FILE__).'/temps/login_manager.xml';
 
 		$f = new Form($this->Name, array(null, 'width="100%"'));
+		$f->AddHidden($this->Name.'_action', 'login');
 		if (!empty($this->Behavior->Return))
 			$f->AddHidden($this->Name.'_return', $this->Behavior->Return);
 		if ($this->type != CONTROL_SIMPLE)
