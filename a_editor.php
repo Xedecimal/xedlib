@@ -876,7 +876,10 @@ class EditorData
 				if (is_numeric($col)) continue;
 
 				if (strpos($col, '.')) // Referencing a joined table.
-					$cols[$col] = $this->ds->StripTable($col);
+				{
+					$st = $this->ds->StripTable($col);
+					$cols[$st] = $st;
+				}
 				else // A table from this dataset.
 					$cols[$this->ds->table.'_'.$col] =
 						$this->ds->table.'.'.$col;
@@ -1686,8 +1689,7 @@ class DisplayData
 			$vars['text'] = $dc->text;
 			$vars['val'] = '';
 
-			// Sub Table
-			if (strpos($f, '.'))
+			if (strpos($f, '.')) // Sub Table
 			{
 				$vs = explode(',', $this->item[$this->ds->StripTable($f)]);
 

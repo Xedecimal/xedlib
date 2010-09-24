@@ -915,7 +915,9 @@ class DataSet
 
 	function StripTable($name)
 	{
-		return (!strpos($name, '.')?$name:substr($name, strpos($name, '.')+1));
+		return (!strpos($name, '.')
+			? $name
+			: substr($name, strpos($name, '.')+1));
 	}
 
 	/**
