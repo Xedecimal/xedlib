@@ -1,7 +1,12 @@
 <!-- Begin Login: {{form_name}} -->
 <form>
+<fieldset>
 <ul>
 <field><li><label for="">{{text}}</label>{{field}}</li></field>
 </ul>
+<a href="#">Forgot your password?</a>
+<a href="#">Forgot your username?</a>
+<a href="{{app_abs}}/{{Name}}/create">Create an account</a>
+</fieldset>
 </form>
 <!-- End Login: {{form_name}} -->

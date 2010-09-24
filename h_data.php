@@ -825,13 +825,17 @@ class DataSet
 
 		if (is_array($val))
 		{
-			if (isset($val['val']))
+			if (array_key_exists('val', $val))
 			{
 				if (isset($val['opt']) && $val['opt'] == SQLOPT_UNQUOTE)
 					return $val['val'];
 				else return $lq.$this->database->Escape($val['val']).$rq;
 			}
-			else { Error('Arrays are not allowed here.'); varinfo($val); }
+			else
+			{
+				Error('Arrays are not allowed here.');
+				varinfo($val);
+			}
 		}
 		else
 		{

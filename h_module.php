@@ -36,7 +36,9 @@ function l($path)
 	$ovrpath = @$_d['settings']['site_template'].'/'.$path;
 	if (file_exists($ovrpath)) return "{$_d['app_dir']}/{$ovrpath}";
 	$modpath = "{$_d['app_dir']}/modules/{$path}";
-	if (file_exists($modpath)) return "{$_d['app_dir']}/modules/{$path}";
+	if (file_exists($modpath)) return $modpath;
+	$xmodpath = dirname(__FILE__)."/modules/$path";
+	if (file_exists($xmodpath)) return $xmodpath;
 	$xedpath = dirname(__FILE__).'/'.$path;
 	if (file_exists($xedpath)) return $xedpath;
 	return $path;
@@ -120,10 +122,19 @@ class Module
 			foreach ($mods as $n => $mod) $mod->Prepare();
 			foreach ($mods as $n => $mod)
 			{
-				if (@array_key_exists($mod->Block, $_d['blocks']))
-					$_d['blocks'][$mod->Block] .= $mod->Get();
+				$ret = $mod->Get();
+				if (is_array($ret))
+				{
+					foreach ($ret as $b => $d)
+						$_d['blocks'][$b] .= $d;
+				}
 				else
-					$_d['blocks']['default'] .= $mod->Get();
+				{
+					if (@array_key_exists($mod->Block, $_d['blocks']))
+						$_d['blocks'][$mod->Block] .= $ret;
+					else
+						$_d['blocks']['default'] .= $ret;
+				}
 			}
 		}
 

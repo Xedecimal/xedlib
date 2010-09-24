@@ -8,8 +8,8 @@
 	<tr class="CalendarHead">
 		<td valign="top" colspan="7" class="calendar_head">
 			<form action="{{target}}" method="post">
-				<input type="year" name="calyear" value="{{year}}" />
 				<input type="month" name="calmonth" value="{{month}}" />
+				<input type="year" name="calyear" value="{{year}}" size="4" />
 				<input type="submit" value="Go" />
 			</form>
 		</td>

@@ -1,7 +1,5 @@
 <?php
 
-// Testing.
-
 /**
  * @package Calendar
  */
