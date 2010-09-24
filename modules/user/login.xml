@@ -1,20 +1,15 @@
-<form action="{{app_abs}}/user/login" method="post">
-
+<form action="{{app_abs}}/{{rw}}" method="post">
+<input type="hidden" name="{{name}}_action" value="login" />
 <fieldset>
 <ul>
-	<li><label for="user">Username</label><input type="text" class="text"
-		name="user" id="user" /></li>
+	<user><li><label for="user">Username</label><input type="text" class="text"
+		name="user" id="user" /></li></user>
 	<li><label for="pass">Password</label><input type="password" class="text"
 		name="pass" id="pass" /></li>
-	<li><input type="submit" src="{{app_abs}}/img/login.png"
-		value="Login" /></li>
+	<li><input type="submit" value="Login" /></li>
 </ul>
 
-<ul>
-	<li><a href="#">Forgot your password?</a></li>
-	<li><a href="#">Forgot your username?</a></li>
-	<li><a href="{{app_abs}}/user/signup">Create an account</a></li>
-</ul>
+<links />
 
 </fieldset>
 

@@ -13,12 +13,9 @@ class ModUser extends Module
 	public $UserVar = 'user_sessuser';
 	public $PassVar = 'user_sesspass';
 
-	public $DataSets = null;
+	public $DataSets = array();
 
-	/**
-	 * @var DataSet User dataset
-	 */
-	public $ds;
+	public $Name = 'user';
 
 	static function RequireAccess($level)
 	{
@@ -33,94 +30,33 @@ class ModUser extends Module
 
 	function __construct()
 	{
+		$this->Behavior = new ModUserBehavior();
+
 		global $_d;
 
 		require_once(dirname(__FILE__).'/../../h_data.php');
 
 		$this->CheckActive('user');
 
-		if (empty($this->ds))
-			$this->ds = new DataSet($_d['db'], 'user', 'usr_id');
 		$_d['template.rewrites']['access'] = array('ModUser', 'TagAccess');
 		$this->lm = new LoginManager('lmAdmin');
 		if (isset($_d['user.encrypt']) && !$_d['user.encrypt'])
 			$this->lm->Behavior->Encryption = false;
-
-		$this->DataSets[] = array($this->ds, 'usr_pass', 'usr_name');
-	}
-
-	function Prepare()
-	{
-		global $_d;
-
-		# Process state changes
-
-		$check_user = GetVar($this->UserVar);
-		$check_pass = GetVar($this->PassVar);
-
-		if ($_d['q'][0] == 'user')
-		{
-			if ($_d['q'][1] == 'login')
-			{
-				$check_user = SetVar($this->UserVar, GetVar('user'));
-				$check_pass = SetVar($this->PassVar, md5(GetVar('pass')));
-			}
-			if ($_d['q'][1] == 'logout')
-			{
-				$check_pass = null;
-				UnsetVar($this->PassVar);
-			}
-			if (@$_d['q'][1] == 'signup' && @$_d['q'][2] == 'complete')
-			{
-				$this->ds->Add(array(
-					'usr_name' => GetVar('su_user'),
-					'usr_pass' => md5(GetVar('su_pass'))
-				));
-			}
-		}
-
-		# Check existing data
-
-		foreach ($this->DataSets as $ds)
-		{
-			if (!isset($ds[0]))
-				Error("<br />What: Dataset is not set.
-				<br />Who: ModUser::Prepare()
-				<br />Why: You may have set an incorrect dataset in the
-				creation of this LoginManager.");
-
-			$query['match'] = array(
-				$ds[1] => $check_pass,
-				$ds[2] => SqlAnd($check_user)
-			);
-
-			if (!empty($queryAdd))
-				$query = array_merge_recursive($query, $queryAdd);
-
-			if (!empty($conditions))
-				$match = array_merge($query['match'], $conditions);
-
-			$item = $ds[0]->GetOne($query);
-			$this->User = $item;
-		}
-
-		if (!empty($this->User))
-		{
-			$q = GetVar('q');
-			$_d['nav.links']->AddChild(new TreeNode('Log Out', '{{app_abs}}/user/logout'));
-		}
 	}
 
 	function Link()
 	{
-		global $_d, $me;
+		global $_d;
 
-		if (ModUser::RequireAccess(1) && empty($_d['user.hide_logout']))
+		if (!empty($this->User))
 		{
-			varinfo($_d['user.hide_logout']);
-			$q = GetVar('q');
+			global $rw;
+
+			$url = http_build_query(array(
+				$this->Name.'_action' => 'logout'
+			));
 			$_d['nav.links']->AddChild(new TreeNode('Log Out',
-				"{{app_abs}}/{$this->lm->Name}/logout?{$this->lm->Name}_return=$q"));
+				"{$rw}?$url"));
 		}
 	}
 
@@ -139,7 +75,7 @@ class ModUser extends Module
 
 		# Presentation
 
-		if (@$_d['q'][1] == 'signup')
+		if (@$_d['q'][1] == 'create')
 		{
 			$t = new Template();
 			$ret['default'] = $t->ParseFile(l('user/signup.xml'));
@@ -147,13 +83,109 @@ class ModUser extends Module
 
 		# Nobody is logged in.
 
-		if (!empty($this->ds) && empty($this->User) && !empty($_d['user.login']))
+		if (empty($this->User) && !empty($_d['user.login']))
 		{
 			$t = new Template();
+			$t->ReWrite('links', array(&$this, 'TagLinks'));
+			$t->Rewrite('user', array(&$this, 'TagUser'));
+			$t->Set('name', $this->Name);
 			$ret['user'] = $t->ParseFile(l('user/login.xml'));
 		}
 
 		return $ret;
+	}
+
+	function TagUser($t, $g)
+	{
+		if (is_string($this->DataSets[0][0])) return;
+		return $g;
+	}
+
+	function TagLinks()
+	{
+		if (is_string($this->DataSets[0][0])) return;
+
+		$nav = new TreeNode();
+		if ($this->Behavior->CreateAccount) $nav->AddChild(new TreeNode(
+			'Create an account', '{{app_abs}}/user/create'));
+		if ($this->Behavior->ForgotPassword) $nav->AddChild(new TreeNode(
+			'Forgot your password?', '{{app_abs}}/user/forgot-password'));
+		if ($this->Behavior->ForgotUsername) $nav->AddChild(new TreeNode(
+			'Forgot your username?', '{{app_abs}}/user/forgot-username'));
+		return ModNav::GetLinks($nav);
+	}
+
+	function Authenticate()
+	{
+		global $_d;
+
+		# Process state changes
+
+		$check_user = GetVar($this->UserVar);
+		$check_pass = GetVar($this->PassVar);
+		$act = GetVar($this->Name.'_action');
+
+		if ($act == 'login')
+		{
+			$check_user = SetVar($this->UserVar, GetVar('user'));
+			$check_pass = SetVar($this->PassVar, md5(GetVar('pass')));
+		}
+		if ($act == 'logout')
+		{
+			$check_pass = null;
+			UnsetVar($this->PassVar);
+		}
+		if (@$_d['q'][1] == 'create' && @$_d['q'][2] == 'complete')
+		{
+			$this->ds->Add(array(
+				'usr_name' => GetVar('su_user'),
+				'usr_pass' => md5(GetVar('su_pass'))
+			));
+		}
+
+		# Check existing data sources
+
+		foreach ($this->DataSets as $ds)
+		{
+			if (!isset($ds[0]))
+				Error("<br />What: Dataset is not set.
+				<br />Who: ModUser::Prepare()
+				<br />Why: You may have set an incorrect dataset in the
+				creation of this LoginManager.");
+
+			# Simple login.
+
+			$item = null;
+
+			if (is_string($ds[0]))
+			{
+				if (strlen($ds[0]) != 32)
+					die('Plaintext pass, use: '.md5($ds[0]));
+				if ($ds[0] === $check_pass)
+					$item = $ds[1];
+			}
+
+			# Database login
+
+			else
+			{
+				$query['match'] = array(
+					$ds[1] => $check_pass,
+					$ds[2] => SqlAnd($check_user)
+				);
+
+				if (!empty($queryAdd))
+					$query = array_merge_recursive($query, $queryAdd);
+
+				if (!empty($conditions))
+					$match = array_merge($query['match'], $conditions);
+
+				$item = $ds[0]->GetOne($query);
+			}
+
+			$this->User = $item;
+		}
+
 	}
 
 	static function TagAccess($t, $g, $a)
@@ -162,6 +194,14 @@ class ModUser extends Module
 		if (isset($_d['cl']) && $a['REQUIRE'] > @$_d['cl']['usr_access']) return;
 		return $g;
 	}
+}
+
+class ModUserBehavior
+{
+	public $CreateAccount = true;
+	public $ForgotPassword = true;
+	public $ForgotUsername = true;
+	public $Password = true;
 }
 
 Module::Register('ModUser');
@@ -187,6 +227,8 @@ class ModUserAdmin extends Module
 
 		$this->edUser = new EditorData('user', $mods['ModUser']->ds);
 	}
+
+	function Auth() { return false; }
 
 	function Link()
 	{
