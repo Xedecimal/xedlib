@@ -16,9 +16,11 @@ class ModUser extends Module
 	public $DataSets = array();
 
 	public $Name = 'user';
+	public $User;
 
 	static function RequireAccess($level)
 	{
+		if (empty($GLOBALS['mods']['ModUser']->User)) return false;
 		if (@$GLOBALS['mods']['ModUser']->User['usr_access'] >= $level) return true;
 		return false;
 	}
@@ -77,13 +79,14 @@ class ModUser extends Module
 
 		if (@$_d['q'][1] == 'create')
 		{
+			if (!empty($_d['user.disable_signup'])) return;
 			$t = new Template();
 			$ret['default'] = $t->ParseFile(l('user/signup.xml'));
 		}
 
 		# Nobody is logged in.
 
-		if (empty($this->User) && !empty($_d['user.login']))
+		else if (empty($this->User) && !empty($_d['user.login']))
 		{
 			$t = new Template();
 			$t->ReWrite('links', array(&$this, 'TagLinks'));
@@ -97,12 +100,14 @@ class ModUser extends Module
 
 	function TagUser($t, $g)
 	{
+		if (!isset($this->DataSets[0])) return;
 		if (is_string($this->DataSets[0][0])) return;
 		return $g;
 	}
 
 	function TagLinks()
 	{
+		if (!isset($this->DataSets[0])) return;
 		if (is_string($this->DataSets[0][0])) return;
 
 		$nav = new TreeNode();
@@ -161,8 +166,7 @@ class ModUser extends Module
 			{
 				if (strlen($ds[0]) != 32)
 					die('Plaintext pass, use: '.md5($ds[0]));
-				if ($ds[0] === $check_pass)
-					$item = $ds[1];
+				if ($ds[0] === $check_pass) $item = $ds[1];
 			}
 
 			# Database login
@@ -186,6 +190,7 @@ class ModUser extends Module
 			$this->User = $item;
 		}
 
+		return $this->User;
 	}
 
 	static function TagAccess($t, $g, $a)

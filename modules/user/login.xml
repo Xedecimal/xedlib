@@ -8,9 +8,8 @@
 		name="pass" id="pass" /></li>
 	<li><input type="submit" value="Login" /></li>
 </ul>
+</fieldset>
 
 <links />
-
-</fieldset>
 
 </form>
