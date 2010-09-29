@@ -50,7 +50,7 @@ class ModUser extends Module
 	{
 		global $_d;
 
-		if (!empty($this->User))
+		if (!empty($this->User) && empty($_d['user.hide_logout']))
 		{
 			global $rw;
 
