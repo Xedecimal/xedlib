@@ -131,23 +131,26 @@ class Module
 			{
 				$ret = $mod->Get();
 				if (is_array($ret))
-				{
 					foreach ($ret as $b => $d)
-						@$_d['blocks'][$b] .= $d;
-				}
+						Module::AddToBlock($b, $d);
 				else
-				{
-					if (@array_key_exists($mod->Block, $_d['blocks']))
-						@$_d['blocks'][$mod->Block] .= $ret;
-					else
-						@$_d['blocks']['default'] .= $ret;
-				}
+					Module::AddToBlock($mod->Block, $ret);
 			}
 		}
 
 		$t = new Template($_d);
 		$t->ReWrite('block', array('Module', 'TagBlock'));
 		return $t->ParseFile($template);
+	}
+
+	static function AddToBlock($block, $data)
+	{
+		global $_d;
+
+		if (array_key_exists($block, $_d['blocks']))
+			$_d['blocks'][$block] .= $data;
+		else
+			$_d['blocks']['default'] .= $data;
 	}
 
 	static function cmp_mod($x, $y)
