@@ -1033,7 +1033,7 @@ class SelOption extends TreeNode
 		else
 		{
 			$valu = isset($this->valu) ? ' value="'.$this->valu.'"' : null;
-			return '<input type="checkbox" value="'.$this->valu.'"'.GetAttribs($atrs).' />'.htmlspecialchars($this->text).'<br/>';
+			return '<label><input type="checkbox" value="'.$this->valu.'"'.GetAttribs($atrs).' />'.htmlspecialchars($this->text).'</label>';
 		}
 	}
 
@@ -1984,16 +1984,18 @@ function GetTree($root, $text)
 {
 	$vp = new VarParser();
 
-	$ret = '<ul><li>'.$vp->ParseVars($text, $root->data);
+	$ret = null;
 	if (!empty($root->children))
 	{
+		$ret .= '<ul>';
 		foreach ($root->children as $c)
 		{
-			if ($c->id == $root->id) continue;
+			$ret .= '<li>'.$vp->ParseVars($text, $c->data);
 			$ret .= GetTree($c, $text);
+			$ret .= "</li>";
 		}
+		$ret .= '</ul>';
 	}
-	$ret .= "</li></ul>";
 	return $ret;
 }
 

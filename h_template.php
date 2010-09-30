@@ -621,7 +621,7 @@ class Template extends LayeredOutput
 		xml_set_character_data_handler($p, 'CData');
 		xml_set_default_handler($p, 'def');
 		xml_set_processing_instruction_handler($p, 'Process');
-		#xml_parser_set_option($p, XML_OPTION_TARGET_ENCODING, 'UTF-8');
+		xml_parser_set_option($p, XML_OPTION_TARGET_ENCODING, 'UTF-8');
 
 		if (!xml_parse($p, $nstr))
 		{

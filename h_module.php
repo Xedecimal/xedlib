@@ -220,13 +220,6 @@ class Module
 		}
 	}
 
-	/**
-	* New Availability: Database
-	* Overload Responsibility: Link up your datasets, make them available for
-	* other modules and any other initial construction.
-	*/
-	function __construct() { }
-
 	function Auth() { return true; }
 
 	/**
