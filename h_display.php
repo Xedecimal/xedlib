@@ -656,7 +656,7 @@ class FormInput
 	 * @param string $atrs
 	 * @param string $help
 	 */
-	function FormInput($text, $type = 'text', $name = null,
+	function __construct($text, $type = 'text', $name = null,
 		$valu = null, $atrs = null, $help = '')
 	{
 		$this->text = $text;
@@ -862,9 +862,7 @@ class FormInput
 			case 'select':
 			case 'selects':
 				if ($this->atrs['TYPE'] == 'selects')
-				{
 					$this->atrs['MULTIPLE'] = 'multiple';
-				}
 
 				$selAtrs = $this->atrs;
 				unset($selAtrs['TYPE'],$selAtrs['VALUE']);

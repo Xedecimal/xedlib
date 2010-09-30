@@ -141,7 +141,7 @@ class Template extends LayeredOutput
 	/**
 	 * Creates a new template parser.
 	 */
-	function Template()
+	function __construct()
 	{
 		$this->Behavior = new TemplateBehavior();
 		$args = func_get_args();

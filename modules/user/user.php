@@ -57,8 +57,7 @@ class ModUser extends Module
 			$url = http_build_query(array(
 				$this->Name.'_action' => 'logout'
 			));
-			$_d['nav.links']->AddChild(new TreeNode('Log Out',
-				"{$rw}?$url"));
+			$_d['nav.links']['Log Out'] = "{$rw}?$url";
 		}
 	}
 
@@ -239,7 +238,7 @@ class ModUserAdmin extends Module
 		global $_d;
 
 		if (ModUser::RequireAccess(2))
-			$_d['nav.links']->AddChild(new TreeNode('Users', '{{app_abs}}/user'));
+			$_d['nav.links']['Users'] = '{{app_abs}}/user';
 	}
 
 	function Prepare()
