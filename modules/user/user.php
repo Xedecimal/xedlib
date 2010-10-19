@@ -59,9 +59,10 @@ class ModUser extends Module
 		$this->CheckActive('user');
 
 		$_d['template.rewrites']['access'] = array('ModUser', 'TagAccess');
-		$this->lm = new LoginManager('lmAdmin');
-		if (isset($_d['user.encrypt']) && !$_d['user.encrypt'])
-			$this->lm->Behavior->Encryption = false;
+
+		#$this->lm = new LoginManager('lmAdmin');
+		#if (isset($_d['user.encrypt']) && !$_d['user.encrypt'])
+		#	$this->lm->Behavior->Encryption = false;
 	}
 
 	function Link()

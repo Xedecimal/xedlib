@@ -17,7 +17,7 @@ class ModNav extends Module
 		$ret = null;
 		if (!empty($link->children))
 		{
-			$ret .= '<ul>';
+			$ret .= '<ul class="nav">';
 			foreach ($link->children as $c)
 			{
 				$ret .= '<li>';
