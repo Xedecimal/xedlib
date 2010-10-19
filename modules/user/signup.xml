@@ -1,11 +1,11 @@
 <form action="{{app_abs}}/user/create/complete" method="post">
 <fieldset>
 <legend>Create Account</legend>
-<table>
-	<tr><td><label for="su_user">Username</label></td><td><input type="text" name="su_user" id="su_user" /></td></tr>
-	<tr><td><label for="su_pass">Password</label></td><td><input type="password" name="su_pass" id="su_pass" /></td></tr>
-	<tr><td><label for="su_pass2">Password (Again)</label></td><td><input type="password" name="su_pass2" id="su_pass2" /></td></tr>
-	<tr><td>&nbsp;</td><td><input type="submit" value="Create Account" /></td></tr>
-</table>
+<ul>
+	<field><li><label for="{{name}}">{{text}}</label>
+		<input type="{{itype}}" name="{{name}}" id="{{name}}" /></li></field>
+
+	<li><input type="submit" value="Create Account" /></li>
+</ul>
 </fieldset>
 </form>

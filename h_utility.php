@@ -428,6 +428,27 @@ function ChompString($text, $length)
 	return $text;
 }
 
+function strmatch($str1, $str2)
+{
+	return $str1 === $str2;
+}
+
+function random_string($chars = 15)
+{
+	$ret = null;
+	for ($ix = 0; $ix < $chars; $ix++)
+		$ret .= sprintf('%c',
+			rand(0, 1)
+			# 0 - 9
+			? rand(48, 57)
+			: rand(0, 1)
+			# a - z
+			? rand(97, 122)
+			# A - Z
+			: rand(65, 90));
+	return $ret;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //Date
 //

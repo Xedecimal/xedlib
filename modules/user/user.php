@@ -18,6 +18,24 @@ class ModUser extends Module
 	public $Name = 'user';
 	public $User;
 
+	public $fields = array(
+		'user' => array(
+			'column' => 'usr_user',
+			'text' => 'Username',
+			'type' => 'user'
+		),
+		'email' => array(
+			'column' => 'usr_email',
+			'text' => 'Email',
+			'type' => 'email'
+		),
+		'pass' => array(
+			'column' => 'usr_pass',
+			'text' => 'Password',
+			'type' => 'password'
+		)
+	);
+
 	static function RequireAccess($level)
 	{
 		if (empty($GLOBALS['mods']['ModUser']->User)) return false;
@@ -62,6 +80,40 @@ class ModUser extends Module
 		}
 	}
 
+	function Prepare()
+	{
+		global $_d;
+
+		# Create Account
+
+		if (@$_d['q'][1] == 'create' && @$_d['q'][2] == 'complete')
+		{
+			foreach ($this->fields as $f['name'] => $f)
+			{
+				$add[$f['column']] = GetVar($f['name'].'_create');
+				if (@$f['type'] == 'password') $add[$f['column']] = md5($add[$f['column']]);
+			}
+			$this->ds->Add($add);
+		}
+
+		# Forgot Password
+
+		if (@$_d['q'][1] == 'forgot-password' && @$_d['q'][2] == 'complete')
+		{
+			$em = GetVar('email');
+			$q['match']['usr_email'] = $em;
+			$act = $this->ds->Get($q);
+			if (!empty($act))
+			{
+				$pass = random_string();
+				$body = "Your new password is: $pass";
+				$this->ds->update(array('usr_email' => $em),
+					array('usr_pass' => md5($pass)));
+				mail($em, 'Forgotten Password', $body);
+			}
+		}
+	}
+
 	function Get()
 	{
 		global $_d;
@@ -75,13 +127,23 @@ class ModUser extends Module
 
 		$ret = array();
 
-		# Presentation
+		# Create Account
 
 		if (@$_d['q'][1] == 'create')
 		{
 			if (!empty($_d['user.disable_signup'])) return;
 			$t = new Template();
+			$t->ReWrite('field', array(&$this, 'TagFieldCreate'));
 			$ret['default'] = $t->ParseFile(l('user/signup.xml'));
+		}
+
+		# Forgot Password
+
+		if (@$_d['q'][1] == 'forgot-password')
+		{
+			$t = new Template();
+			$t->ReWrite('field', array(&$this, 'TagFieldForgot'));
+			$ret['default'] = $t->ParseFile(l('user/forgot.xml'));
 		}
 
 		# Nobody is logged in.
@@ -90,7 +152,7 @@ class ModUser extends Module
 		{
 			$t = new Template();
 			$t->ReWrite('links', array(&$this, 'TagLinks'));
-			$t->Rewrite('user', array(&$this, 'TagUser'));
+			$t->Rewrite('field', array(&$this, 'TagFieldLogin'));
 			$t->Set('name', $this->Name);
 			$ret['user'] = $t->ParseFile(l('user/login.xml'));
 		}
@@ -115,8 +177,6 @@ class ModUser extends Module
 			'Create an account', '{{app_abs}}/user/create'));
 		if ($this->Behavior->ForgotPassword) $nav->AddChild(new TreeNode(
 			'Forgot your password?', '{{app_abs}}/user/forgot-password'));
-		if ($this->Behavior->ForgotUsername) $nav->AddChild(new TreeNode(
-			'Forgot your username?', '{{app_abs}}/user/forgot-username'));
 		return ModNav::GetLinks($nav);
 	}
 
@@ -139,13 +199,6 @@ class ModUser extends Module
 		{
 			$check_pass = null;
 			UnsetVar($this->PassVar);
-		}
-		if (@$_d['q'][1] == 'create' && @$_d['q'][2] == 'complete')
-		{
-			$this->ds->Add(array(
-				'usr_name' => GetVar('su_user'),
-				'usr_pass' => md5(GetVar('su_pass'))
-			));
 		}
 
 		# Check existing data sources
@@ -191,6 +244,63 @@ class ModUser extends Module
 		}
 
 		return $this->User;
+	}
+
+	function TagFieldLogin($t, $g)
+	{
+		$vp = new VarParser();
+		$ret = null;
+		foreach ($this->fields as $v['name'] => $v)
+		{
+			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
+			else { $cmp = 'strmatch'; $v['itype'] = isset($v['type']) ? $v['type'] : 'text'; }
+
+			if ($cmp('user', @$v['type']))
+			{
+				$v['name'] = 'user';
+				$ret .= $vp->ParseVars($g, $v);
+			}
+			else if ($cmp('password', @$v['type'])) $ret .= $vp->ParseVars($g, $v);
+		}
+		return $ret;
+	}
+
+	function TagFieldCreate($t, $g)
+	{
+		$vp = new VarParser();
+
+		$ret = null;
+		foreach ($this->fields as $v['name'] => $v)
+		{
+			$v['name'] .= '_create';
+
+			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
+			else { $cmp = 'strmatch'; $v['itype'] = isset($v['type']) ? $v['type'] : 'text'; }
+
+			$ret .= $vp->ParseVars($g, $v);
+
+			if ($cmp('password', @$v['type']))
+			{
+				$v['itype'] = $v['type'];
+				$v['text'] = 'Repeat '.$v['text'];
+				$v['name'] .= '2';
+				$ret .= $vp->ParseVars($g, $v);
+			}
+		}
+		return $ret;
+	}
+
+	function TagFieldForgot($t, $g)
+	{
+		$vp = new VarParser();
+
+		foreach ($this->fields as $v['name'] => $v)
+		{
+			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
+			else { $cmp = 'strmatch'; $v['itype'] = isset($v['type']) ? $v['type'] : 'text'; }
+			if ($cmp('email', @$v['type'])) $ret = $vp->ParseVars($g, $v);
+		}
+		return $ret;
 	}
 
 	static function TagAccess($t, $g, $a)

@@ -1,0 +1,10 @@
+<form action="{{app_abs}}/user/forgot-password/complete" method="post">
+<fieldset>
+<legend>Forgot Password</legend>
+<ul>
+	<field><li><label for="{{name}}">{{text}}</label>
+		<input type="{{itype}}" name="{{name}}" id="{{name}}" /></li>
+	<li><input type="submit" value="Send Password" /></li></field>
+</ul>
+</fieldset>
+</form>

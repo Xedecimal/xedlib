@@ -2,10 +2,9 @@
 <input type="hidden" name="{{name}}_action" value="login" />
 <fieldset>
 <ul>
-	<user><li><label for="user">Username</label><input type="text" class="text"
-		name="user" id="user" /></li></user>
-	<li><label for="pass">Password</label><input type="password" class="text"
-		name="pass" id="pass" /></li>
+	<field><li><label for="{{name}}">{{text}}</label>
+		<input type="{{itype}}" name="{{name}}" id="{{name}}" /></li></field>
+
 	<li><input type="submit" value="Login" /></li>
 </ul>
 </fieldset>
