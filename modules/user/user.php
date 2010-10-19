@@ -172,12 +172,11 @@ class ModUser extends Module
 		if (!isset($this->_ds[0])) return;
 		if (is_string($this->_ds[0][0])) return;
 
-		$nav = new TreeNode();
-		if ($this->Behavior->CreateAccount) $nav->AddChild(new TreeNode(
-			'Create an account', '{{app_abs}}/user/create'));
-		if ($this->Behavior->ForgotPassword) $nav->AddChild(new TreeNode(
-			'Forgot your password?', '{{app_abs}}/user/forgot-password'));
-		return ModNav::GetLinks($nav);
+		if ($this->Behavior->CreateAccount)
+			$nav['Create an account'] = '{{app_abs}}/user/create';
+		if ($this->Behavior->ForgotPassword)
+			$nav['Forgot your password?'] = '{{app_abs}}/user/forgot-password';
+		return ModNav::GetLinks(ModNav::LinkTree($nav));
 	}
 
 	function AddDataset($ds, $passcol, $usercol)
