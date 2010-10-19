@@ -6,6 +6,9 @@ fieldset legend { font-weight: bold; }
 fieldset ul { list-style: none; padding: 0; margin: 0; }
 fieldset li { margin: 1em 0; border-top: 1px solid #CCC; }
 fieldset li label { display: block; font-size: large;  }
+fieldset li select { width: 100%; }
+fieldset li input { width: 100%; }
+fieldset li label input { width: auto; }
 
 /* Horizontal Table Style Forms */
 

@@ -137,7 +137,7 @@ class ModArticleAdmin extends Module
 		global $_d, $me;
 
 		if (!ModUser::RequireAccess(2)) return;
-		$_d['nav.links']->AddChild(new TreeNode('News', '{{app_abs}}/'.$this->Name));
+		$_d['nav.links']['News'] = '{{app_abs}}/'.$this->Name;
 	}
 
 	function Prepare()

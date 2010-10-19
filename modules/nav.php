@@ -12,40 +12,67 @@ class ModNav extends Module
 	*/
 	static function GetLinks($link, $depth = -1)
 	{
+		# Iterate Children, skip root node as it's just a container.
+
 		$ret = null;
-
-		// We have children to process.
-
-		if (!empty($link->data))
-		{
-			if (is_array($link->data))
-			{
-				$dat = $link->data;
-				$text = $dat['TEXT'];
-				unset($dat['TEXT']);
-				$atrs = GetAttribs($dat);
-				$ret .= '<li><a href="'.$link->id.'"'.$atrs.'>'.$text.
-					"</a>\n";
-			}
-			else $ret .= '<li><a href="'.$link->id.'">'.$link->data.
-				"</a>\n";
-		}
-
 		if (!empty($link->children))
 		{
-			$ret = null;
-
-			if (!empty($link->data))
-				$ret .= '<li><a href="#">'.$link->data."</a><ul>\n";
-			else $ret .= '<ul class="nav menu vertical">';
+			$ret .= '<ul>';
 			foreach ($link->children as $c)
+			{
+				$ret .= '<li>';
+				if (!empty($c->data)) $ret .= '<a href="'.$c->data.'">';
+				$ret .= $c->id;
+				if (!empty($c->data)) $ret .= '</a>';
 				$ret .= ModNav::GetLinks($c, $depth+1);
+				$ret .= '</li>';
+			}
 			$ret .= '</ul>';
 		}
 
-		if (!empty($link->data)) $ret .= '</li>';
-
 		return $ret;
+	}
+
+	static function LinkTree($nav)
+	{
+		$r = new TreeNode();
+		foreach ($nav as $p => $t)
+		{
+			$ep = explode('/', $p);
+			foreach ($ep as $ix => $d)
+			{
+				# Has Parent
+				if ($ix > 0)
+				{
+					# Find Parent
+					$tnp = $r->Find($ep[$ix - 1]);
+
+					# Find Child
+					$tn = $tnp->Find($d);
+					if (empty($tn))
+					{
+						# Add Child
+						$tn = new TreeNode(null, $d);
+						$tnp->AddChild($tn);
+					}
+				}
+				# Is Parent
+				else
+				{
+					$tnp = $r->Find($d);
+					if (empty($tnp))
+					{
+						# Add Child
+						$tn = new TreeNode(null, $d);
+						$r->AddChild($tn);
+					}
+				}
+			}
+
+			$tn->data = $t;
+		}
+
+		return $r;
 	}
 
 	function Get()
@@ -58,14 +85,11 @@ class ModNav extends Module
 			$t = new Template();
 			$t->ReWrite('link', array($this, 'TagLink'));
 			$t->ReWrite('head', array($this, 'TagHead'));
-			return ModNav::GetLinks($_d['nav.links']);
+			return ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']));
 		}
 	}
 }
 
 Module::Register('ModNav');
-
-require_once(l('h_display.php'));
-$_d['nav.links'] = new TreeNode();
 
 ?>

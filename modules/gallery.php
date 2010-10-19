@@ -48,7 +48,7 @@ class ModGalleryAdmin extends Module
 		if ($_d['q'][0] == 'admin') $_d['user.login'] = true;
 		if (!ModUser::RequireAccess(2)) return;
 
-		$_d['nav.links']->AddChild(new TreeNode('Gallery', '{{app_abs}}/gallery'));
+		$_d['nav.links']['Gallery'] = '{{app_abs}}/gallery';
 	}
 
 	function Prepare()

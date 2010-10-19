@@ -3,7 +3,7 @@
 <fieldset>
 <ul>
 	<field>
-		<li><label class="field_text" for="">{{text}}</label>
+		<li><label class="field_text">{{text}}</label>
 		{{field}}<error><span class="error">{{help}}</span></error>
 	</li></field>
 </ul>

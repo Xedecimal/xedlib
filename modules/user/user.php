@@ -8,12 +8,12 @@ class ModUser extends Module
 	 */
 	private $lm;
 
+	private $_ds = array();
+
 	public $Block = 'user';
 
 	public $UserVar = 'user_sessuser';
 	public $PassVar = 'user_sesspass';
-
-	public $DataSets = array();
 
 	public $Name = 'user';
 	public $User;
@@ -75,8 +75,7 @@ class ModUser extends Module
 			$url = http_build_query(array(
 				$this->Name.'_action' => 'logout'
 			));
-			$_d['nav.links']->AddChild(new TreeNode('Log Out',
-				"{$rw}?$url"));
+			$_d['nav.links']['Log Out'] = "{$rw}?$url";
 		}
 	}
 
@@ -162,15 +161,15 @@ class ModUser extends Module
 
 	function TagUser($t, $g)
 	{
-		if (!isset($this->DataSets[0])) return;
-		if (is_string($this->DataSets[0][0])) return;
+		if (!isset($this->_ds[0])) return;
+		if (is_string($this->_ds[0][0])) return;
 		return $g;
 	}
 
 	function TagLinks()
 	{
-		if (!isset($this->DataSets[0])) return;
-		if (is_string($this->DataSets[0][0])) return;
+		if (!isset($this->_ds[0])) return;
+		if (is_string($this->_ds[0][0])) return;
 
 		$nav = new TreeNode();
 		if ($this->Behavior->CreateAccount) $nav->AddChild(new TreeNode(
@@ -178,6 +177,11 @@ class ModUser extends Module
 		if ($this->Behavior->ForgotPassword) $nav->AddChild(new TreeNode(
 			'Forgot your password?', '{{app_abs}}/user/forgot-password'));
 		return ModNav::GetLinks($nav);
+	}
+
+	function AddDataset($ds, $passcol, $usercol)
+	{
+		$this->_ds[] = array($ds, $passcol, $usercol);
 	}
 
 	function Authenticate()
@@ -203,7 +207,7 @@ class ModUser extends Module
 
 		# Check existing data sources
 
-		foreach ($this->DataSets as $ds)
+		foreach ($this->_ds as $ds)
 		{
 			if (!isset($ds[0]))
 				Error("<br />What: Dataset is not set.
@@ -230,12 +234,6 @@ class ModUser extends Module
 					$ds[1] => $check_pass,
 					$ds[2] => SqlAnd($check_user)
 				);
-
-				if (!empty($queryAdd))
-					$query = array_merge_recursive($query, $queryAdd);
-
-				if (!empty($conditions))
-					$match = array_merge($query['match'], $conditions);
 
 				$item = $ds[0]->GetOne($query);
 			}
@@ -350,7 +348,7 @@ class ModUserAdmin extends Module
 		global $_d;
 
 		if (ModUser::RequireAccess(2))
-			$_d['nav.links']->AddChild(new TreeNode('Users', '{{app_abs}}/user'));
+			$_d['nav.links']['Users'] = '{{app_abs}}/user';
 	}
 
 	function Prepare()
