@@ -8,7 +8,7 @@ class ModUser extends Module
 	 */
 	private $lm;
 
-	private $_ds = array();
+	public $_ds = array();
 
 	public $Block = 'user';
 
@@ -93,7 +93,10 @@ class ModUser extends Module
 				$add[$f['column']] = GetVar($f['name'].'_create');
 				if (@$f['type'] == 'password') $add[$f['column']] = md5($add[$f['column']]);
 			}
-			$this->ds->Add($add);
+			foreach ($this->_ds as $ds)
+			{
+				$ds[0]->Add($add);
+			}
 		}
 
 		# Forgot Password
@@ -337,11 +340,9 @@ class ModUserAdmin extends Module
 
 		if (empty($_d['user.levels']))
 			$_d['user.levels'] = array(0 => 'Guest', 1 => 'User', 2 => 'Admin');
-
-		$this->edUser = new EditorData('user', $mods['ModUser']->ds);
 	}
 
-	function Auth() { return false; }
+	function Auth() { return ModUser::RequireAccess(2); }
 
 	function Link()
 	{
@@ -360,17 +361,19 @@ class ModUserAdmin extends Module
 		global $mods;
 		$modUser = $mods['ModUser'];
 
-		$modUser->ds->Description = 'User';
-		$modUser->ds->DisplayColumns = array(
-			'usr_name' => new DisplayColumn('Name'),
+		$modUser->_ds[0][0]->Description = 'User';
+		$modUser->_ds[0][0]->DisplayColumns = array(
+			'usr_email' => new DisplayColumn('Email'),
 			'usr_access' => new DisplayColumn('Access', 'socallback')
 		);
-		$modUser->ds->FieldInputs = array(
-			'usr_name' => new FormInput('Name'),
+		$modUser->_ds[0][0]->FieldInputs = array(
+			'usr_email' => new FormInput('Email'),
 			'usr_pass' => new FormInput('Password', 'password'),
 			'usr_access' => new FormInput('Access', 'select', null,
 				ArrayToSelOptions($_d['user.levels']))
 		);
+
+		$this->edUser = new EditorData('user', $mods['ModUser']->_ds[0][0]);
 		$this->edUser->Behavior->Search = false;
 		$this->edUser->Behavior->Target = $_d['app_abs'].$me.'/user';
 		$this->edUser->Prepare();
