@@ -93,10 +93,8 @@ class ModUser extends Module
 				$add[$f['column']] = GetVar($f['name'].'_create');
 				if (@$f['type'] == 'password') $add[$f['column']] = md5($add[$f['column']]);
 			}
-			foreach ($this->_ds as $ds)
-			{
-				$ds[0]->Add($add);
-			}
+			foreach ($this->_ds as $ds) $ds[0]->Add($add);
+			$this->User = $add;
 		}
 
 		# Forgot Password
@@ -136,8 +134,16 @@ class ModUser extends Module
 		{
 			if (!empty($_d['user.disable_signup'])) return;
 			$t = new Template();
-			$t->ReWrite('field', array(&$this, 'TagFieldCreate'));
-			$ret['default'] = $t->ParseFile(l('user/signup.xml'));
+			if ($_d['q'][2] == 'complete')
+			{
+				$t->Set($this->User);
+				$ret['default'] = $t->ParseFile(l('user/signup_complete.xml'));
+			}
+			else
+			{
+				$t->ReWrite('field', array(&$this, 'TagFieldCreate'));
+				$ret['default'] = $t->ParseFile(l('user/signup.xml'));
+			}
 		}
 
 		# Forgot Password

@@ -1,0 +1,3 @@
+<div id="signup_complete">
+You may now login as {{usr_name}} with the password you supplied.
+</div>
