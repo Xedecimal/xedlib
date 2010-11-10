@@ -123,7 +123,6 @@ class Module
 					unset($mods[$m]);
 
 			uksort($mods, array('Module', 'cmp_mod'));
-			varinfo(array_keys($mods));
 			RunCallbacks(@$_d['index.cb.prelink']);
 
 			foreach ($mods as $n => $mod) $mod->Link();
