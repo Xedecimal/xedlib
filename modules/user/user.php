@@ -369,11 +369,11 @@ class ModUserAdmin extends Module
 
 		$modUser->_ds[0][0]->Description = 'User';
 		$modUser->_ds[0][0]->DisplayColumns = array(
-			'usr_email' => new DisplayColumn('Email'),
+			'usr_name' => new DisplayColumn('Name'),
 			'usr_access' => new DisplayColumn('Access', 'socallback')
 		);
 		$modUser->_ds[0][0]->FieldInputs = array(
-			'usr_email' => new FormInput('Email'),
+			'usr_name' => new FormInput('Name'),
 			'usr_pass' => new FormInput('Password', 'password'),
 			'usr_access' => new FormInput('Access', 'select', null,
 				ArrayToSelOptions($_d['user.levels']))
@@ -381,7 +381,7 @@ class ModUserAdmin extends Module
 
 		$this->edUser = new EditorData('user', $mods['ModUser']->_ds[0][0]);
 		$this->edUser->Behavior->Search = false;
-		$this->edUser->Behavior->Target = $_d['app_abs'].$me.'/user';
+		$this->edUser->Behavior->Target = $_d['app_abs'].'/user';
 		$this->edUser->Prepare();
 	}
 
