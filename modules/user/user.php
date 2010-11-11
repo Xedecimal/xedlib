@@ -134,7 +134,7 @@ class ModUser extends Module
 		{
 			if (!empty($_d['user.disable_signup'])) return;
 			$t = new Template();
-			if ($_d['q'][2] == 'complete')
+			if (@$_d['q'][2] == 'complete')
 			{
 				$t->Set($this->User);
 				$ret['default'] = $t->ParseFile(l('user/signup_complete.xml'));
