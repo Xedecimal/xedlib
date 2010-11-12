@@ -800,7 +800,7 @@ class FormInput
 				$vp = new VarParser();
 				if (!empty($this->atrs['VALUE']))
 				{
-					@$this->atrs['CLASS'] .= ' checks';
+					@$this->atrs['CLASS'] .= 'checks';
 					$divAtrs = $this->atrs;
 					unset($divAtrs['TYPE'], $divAtrs['VALUE'], $divAtrs['NAME']);
 					$ret .= '<div'.GetAttribs($divAtrs).'>';
@@ -1023,7 +1023,7 @@ class SelOption extends TreeNode
 		if ($this->selected) $atrs['CHECKED'] = 'checked';
 		if (!empty($this->children))
 		{
-			$ret = '<p><b><i>'.$this->text.'</i></b><br />';
+			$ret = '<p class="group"><b><i>'.$this->text.'</i></b><br />';
 			foreach ($this->children as $c) $ret .= $c->RenderCheck($atrs);
 			$ret .= '</p>';
 			return $ret;
