@@ -2195,7 +2195,7 @@ class DataSearch
 		}
 		if ($fi->attr('TYPE') == 'checks')
 		{
-			$query['match'][$col] = SqlOr(SqlIn(implode(', ', $val)));
+			$query['match'][$col] = SqlOr(SqlIn($val));
 		}
 		else if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
 			foreach ($this->fs[$col] as $ix => $v)
