@@ -1,5 +1,8 @@
 <?php
 
+require_once(__DIR__.'/../Arr.php');
+require_once(__DIR__.'/../HTML.php');
+
 class FormInput
 {
 	/**
@@ -53,8 +56,8 @@ class FormInput
 
 		if (is_array($atrs))
 		{
-			$this->valid = Pull($atrs, 'VALID');
-			$this->invalid = Pull($atrs, 'INVALID');
+			$this->valid = Arr::Yank($atrs, 'VALID');
+			$this->invalid = Arr::Yank($atrs, 'INVALID');
 		}
 
 		// Propegate these attributes
@@ -62,7 +65,7 @@ class FormInput
 		if (is_array($atrs))
 			foreach ($atrs as $k => $v)
 				$this->atrs[strtoupper($k)] = $v;
-		else $this->atrs = ParseAtrs($atrs);
+		else $this->atrs = HTML::ParseAtrs($atrs);
 
 		// Analyze these attributes
 
@@ -235,7 +238,7 @@ class FormInput
 					'atrs' => $this->atrs
 				));
 			case 'month':
-				return GetMonthSelect($this->atrs['NAME'],
+				return FormInput::GetMonthSelect($this->atrs['NAME'],
 					@$this->atrs['VALUE']);
 
 			case 'label':
@@ -268,7 +271,7 @@ class FormInput
 		}
 
 		//$val = $this->GetValue($persist && $this->atrs['TYPE'] != 'radio');
-		$atrs = GetAttribs($this->atrs);
+		$atrs = HTML::GetAttribs($this->atrs);
 		return "<input {$atrs} />";
 	}
 
@@ -391,7 +394,7 @@ class FormInput
 	function GetMonthSelect($name, $default, $attribs = null)
 	{
 		$ret = "<select name=\"$name\"";
-		$ret .= GetAttribs($attribs);
+		$ret .= HTML::GetAttribs($attribs);
 		$ret .= ">";
 		for ($ix = 1; $ix <= 12; $ix++)
 		{
@@ -522,6 +525,33 @@ class FormInput
 		global $StateNames;
 		$vals = $short ? array_keys($StateNames) : $StateNames;
 		return MakeSelect($atrs, ArrayToSelOptions($vals, null, $keys));
+	}
+
+	/**
+	 * Converts any type of FormInput into a usable string, for example in text
+	 * only emails and suchs.
+	 *
+	 * @param FormInput $field
+	 * @return string Converted field.
+	 */
+	function InputToString($field)
+	{
+		$val = GetVar($field->name);
+
+		if ($field->type == 'time')
+			return "{$val[0]}:{$val[1]}".($val[2] == 0 ? ' AM' : ' PM');
+		else if ($field->type == 'checks')
+		{
+			$out = null;
+			if (!empty($val))
+			foreach (array_keys($val) as $ix)
+				$out .= ($ix > 0?', ':'').$field->valu[$ix]->text;
+			return $out;
+		}
+		else if ($field->type == 'radios') return $field->valu[$val]->text;
+		else if ($field->type == 'boolean') return $val == 1 ? 'yes' : 'no';
+		else if ($field->type == 'select') return $field->valu[$val]->text;
+		else Error("Unknown field type.");
 	}
 }
 

@@ -29,6 +29,18 @@ class Arr
 		foreach ($array as $ix) $ret |= $ix;
 		return $ret;
 	}
+
+	/**
+	 * Array Recursive Key Sort, sorting an array of any dimension by their keys.
+	 *
+	 * @param array $array Array to be sorted
+	 */
+	static function arksort(&$array)
+	{
+		ksort($array);
+		foreach ($array as $k => $v)
+			if (is_array($v)) arksort($array[$k]);
+	}
 }
 
 ?>

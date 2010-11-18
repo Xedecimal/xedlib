@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__.'/Server.php');
+
 class File
 {
 	function PregRename($glob, $preg_src, $preg_dst)
@@ -49,7 +51,7 @@ class File
 	 * @param string $name Name to strip the extension off.
 	 * @return string Stripped filename.
 	 */
-	static function file($name)
+	static function GetFile($name)
 	{
 		if (strpos($name, '.')) return substr($name, 0, strrpos($name, '.'));
 		return $name;
@@ -109,6 +111,78 @@ class File
 	{
 		$rpdst = realpath($dst);
 		return substr(realpath($src), 0, strlen($rpdst)) == $rpdst;
+	}
+
+	/**
+	 * Gets the webserver path for a given local filesystem directory.
+	 *
+	 * @param string $path
+	 * @return string Translated path.
+	 */
+	static function GetRelativePath($path)
+	{
+		$dr = $_SERVER['DOCUMENT_ROOT']; //Probably Apache situated
+
+		if (empty($dr)) //Probably IIS situated
+		{
+			//Get the document root from the translated path.
+			$pt = str_replace('\\\\', '/', Server::GetVar('PATH_TRANSLATED',
+				Server::GetVar('ORIG_PATH_TRANSLATED')));
+			$dr = substr($pt, 0, -strlen(Server::GetVar('SCRIPT_NAME')));
+		}
+
+		$dr = str_replace('\\\\', '/', $dr);
+
+		return substr(str_replace('\\', '/', str_replace('\\\\', '/', $path)), strlen($dr));
+	}
+
+	/**
+	 * Attempts to disable the ability to inject different paths to gain higher
+	 * level directories in urls or posts.
+	 *
+	 * @param string $path Path to secure from url hacks.
+	 * @return string Properly secured path.
+	 */
+	static function SecurePath($path)
+	{
+		$ret = preg_replace('#^\.#', '', $path);
+		$ret = preg_replace('#^/#', '', $ret);
+		return preg_replace('#\.\./#', '', $ret);
+	}
+
+	/**
+	 * Returns an array of all files located recursively in a given path, excluding
+	 * anything matching the regular expression of $exclude.
+	 *
+	 * @param string $path Path to recurse.
+	 * @param string $exclude Passed to preg_match to blacklist files.
+	 * @return array Series of non-directories that were not excluded.
+	 */
+	static function Comb($path, $exclude, $flags = 3)
+	{
+		if ($exclude != null && preg_match($exclude, $path)) return array();
+		// This is a file and unable to recurse.
+		if (is_file($path))
+		{
+			if (OPT_FILES & $flags) return array($path);
+			return array();
+		}
+
+		else if (is_dir($path))
+		{
+			// We will return ourselves if we're including directories.
+			$ret = ($flags & OPT_DIRS) ? array($path) : array();
+			$dp = opendir($path);
+			while ($f = readdir($dp))
+			{
+				if ($f[0] == '.') continue;
+				$ret = array_merge($ret, Comb($path.'/'.$f, $exclude, $flags));
+			}
+
+			return $ret;
+		}
+
+		return array();
 	}
 }
 

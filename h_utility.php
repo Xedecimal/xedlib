@@ -6,22 +6,6 @@
  */
 
 /**
- * Handles errors and tries to open them up more to strictly find problems.
- *
- * @param string $file Filename to output to silently.
- */
-function HandleErrors($file = null)
-{
-	if (!empty($file)) $GLOBALS['__err_file'] = $file;
-	else ini_set('display_errors', 1);
-	$ver = phpversion();
-	//if ($ver[0] == '5') ini_set('error_reporting', E_ALL | E_STRICT);
-	//else ini_set('error_reporting', E_ALL);
-	ini_set('error_log', 'errors_php.txt');
-	set_error_handler("ErrorHandler");
-}
-
-/**
  * Use this when you wish to output debug information only when $debug is
  * true.
  *
@@ -39,161 +23,9 @@ function Trace($msg)
 	if (!empty($GLOBALS['__debfile'])) file_put_contents('trace.txt', $msg."\r\n", FILE_APPEND);
 }
 
-/**
- * Triggers an error.
- *
- * @param string $msg Message to the user.
- * @param int $level How critical this error is.
- */
-function Error($msg, $level = E_USER_ERROR) { trigger_error($msg, $level); }
-
-/**
- * Callback for HandleErrors, used internally.
- *
- * @param int $errno Error number.
- * @param string $errmsg Error message.
- * @param string $filename Source filename of the problem.
- * @param int $linenum Source line of the problem.
- */
-function ErrorHandler($errno, $errmsg, $filename, $linenum)
-{
-	if (error_reporting() == 0) return;
-	$errortype = array (
-		E_ERROR           => "Error",
-		E_WARNING         => "Warning",
-		E_PARSE           => "Parsing Error",
-		E_NOTICE          => "Notice",
-		E_CORE_ERROR      => "Core Error",
-		E_CORE_WARNING    => "Core Warning",
-		E_COMPILE_ERROR   => "Compile Error",
-		E_COMPILE_WARNING => "Compile Warning",
-		E_USER_ERROR      => "User Error",
-		E_USER_WARNING    => "User Warning",
-		E_USER_NOTICE     => "User Notice",
-	);
-	$ver = phpversion();
-	if ($ver[0] >= 5) $errortype[E_STRICT] = 'Strict Error';
-	if ($ver[0] >= 5 && $ver[2] >= 2)
-		$errortype[E_RECOVERABLE_ERROR] = 'Recoverable Error';
-	if ($ver[0] >= 5 && $ver[2] >= 3)
-	{
-		$errortype[E_DEPRECATED] = 'Deprecated';
-		$errortype[E_USER_DEPRECATED] = 'User Deprecated';
-	}
-
-	$err = "[{$errortype[$errno]}] ".nl2br($errmsg)."<br/>";
-	$err .= "Error seems to be in one of these places...\n";
-
-	if (isset($GLOBALS['_trace']))
-		$err .= '<p>Template Trace</p><p>'.$GLOBALS['_trace'].'</p>';
-
-	$err .= GetCallstack($filename, $linenum);
-
-	if (isset($GLOBALS['__err_callback']))
-		call_user_func($GLOBALS['__err_callback'], $err);
-
-	if (!empty($GLOBALS['__err_file']))
-	{
-		$fp = fopen($GLOBALS['__err_file'], 'a+');
-		fwrite($fp, $err);
-		fclose($fp);
-	}
-	else echo $err;
-}
-
-/**
- * Returns a human readable callstack in html format.
- *
- * @param string $file Source of caller.
- * @param int $line Line of caller.
- * @return string Rendered callstack.
- */
-function GetCallstack($file = __FILE__, $line = __LINE__)
-{
-	$err = "<table><tr><td>File</td><td>#</td><td>Function</td>\n";
-	$err .= "<tr>\n\t<td>$file</td>\n\t<td>$line</td>\n";
-	$array = debug_backtrace();
-	$err .= "\t<td>{$array[1]['function']}</td>\n</tr>";
-	foreach ($array as $ix => $entry)
-	{
-		if ($ix < 1) continue;
-		$err .= "<tr>\n";
-		if (isset($entry['file']))
-		{ $err .= "\t<td>{$entry['file']}</td>\n"; }
-		if (isset($entry['line']))
-		{ $err .= "\t<td>{$entry['line']}</td>\n"; }
-		if (isset($entry['class']))
-		{ $err .= "\t<td>{$entry['class']}{$entry['type']}{$entry['function']}</td>\n"; }
-		else if (isset($entry['function']))
-		{ $err .= "\t<td>{$entry['function']}</td>\n"; }
-		$err .= "</tr>";
-	}
-	$err .= "</table>\n<hr size=\"1\">\n";
-	return $err;
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 //Session
 //
-
-/**
- * Attempts to set a variable using sessions.
- *
- * @param string $name Name of the value to set.
- * @param string $value Value to set.
- * @return mixed Passed $value
- */
-function SetVar($name, $value)
-{
-	global $HTTP_SESSION_VARS;
-	if (is_array(@$_SESSION)) $_SESSION[$name] = $value;
-	if (is_array($HTTP_SESSION_VARS)) $HTTP_SESSION_VARS[$name] = $value;
-	return $value;
-}
-
-/**
- * Returns a value from files, post, get, session, cookie and finally
- * server in that order.
- *
- * @param string $name Name of the value to get.
- * @param mixed $default Default value to return if not available.
- * @return mixed
- */
-function GetVar($name, $default = null)
-{
-	if (strlen($name) < 1) return $default;
-
-	global $HTTP_POST_FILES, $HTTP_POST_VARS, $HTTP_GET_VARS, $HTTP_SERVER_VARS,
-	$HTTP_SESSION_VARS, $HTTP_COOKIE_VARS;
-
-	if (isset($_FILES[$name])) return $_FILES[$name];
-	if (isset($_POST[$name])) return $_POST[$name];
-	if (isset($_GET[$name])) return $_GET[$name];
-	if (isset($_SESSION[$name])) return $_SESSION[$name];
-	if (isset($_COOKIE[$name])) return $_COOKIE[$name];
-	if (isset($_SERVER[$name])) return $_SERVER[$name];
-
-	if (isset($HTTP_POST_FILES[$name]) && strlen($HTTP_POST_FILES[$name]) > 0)
-		return $HTTP_POST_FILES[$name];
-	if (isset($HTTP_POST_VARS[$name]) && strlen($HTTP_POST_VARS[$name]) > 0)
-		return $HTTP_POST_VARS[$name];
-	if (isset($HTTP_GET_VARS[$name]) && strlen($HTTP_GET_VARS[$name]) > 0)
-		return $HTTP_GET_VARS[$name];
-	if (isset($HTTP_SESSION_VARS[$name]) && strlen($HTTP_SESSION_VARS[$name]) > 0)
-		return $HTTP_SESSION_VARS[$name];
-	if (isset($HTTP_COOKIE_VARS[$name]) && strlen($HTTP_COOKIE_VARS[$name]) > 0)
-		return $HTTP_COOKIE_VARS[$name];
-	if (isset($HTTP_SERVER_VARS[$name]) && strlen($HTTP_SERVER_VARS[$name]) > 0)
-		return $HTTP_SERVER_VARS[$name];
-
-	return $default;
-}
-
-function SanitizeEnvironment()
-{
-	if (ini_get('magic_quotes_gpc'))
-		foreach ($_POST as $k => $v) Sanitize($_POST[$k]);
-}
 
 function Sanitize(&$v)
 {
@@ -284,22 +116,6 @@ function UnsetVar($name)
 	}
 	if (isset($_SESSION)) unset($_SESSION[$name]);
 	if (isset($HTTP_SESSION_VARS)) unset($HTTP_SESSION_VARS[$name]);
-}
-
-/**
- * Returns information on a given variable in human readable form.
- *
- * @param mixed $var Variable to return information on.
- */
-function VarInfo($var, $return = false)
-{
-	$ret = "<div class=\"debug\"><pre>\n";
-	if (!isset($var)) $ret .= "[NULL VALUE]";
-	else if (is_string($var) && strlen($var) < 1) $ret .= '[EMPTY STRING]';
-	$ret .= str_replace("<", "&lt;", print_r($var, true));
-	$ret .= "</pre></div>\n";
-	if ($return) return $ret;
-	echo $ret;
 }
 
 /**
@@ -454,162 +270,9 @@ function GetDateOffset($ts)
 	return $ret.' ago';
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//File
-//
-
-/**
- * Gets the webserver path for a given local filesystem directory.
- *
- * @param string $path
- * @return string Translated path.
- */
-function GetRelativePath($path)
-{
-	$dr = GetVar('DOCUMENT_ROOT'); //Probably Apache situated
-
-	if (empty($dr)) //Probably IIS situated
-	{
-		//Get the document root from the translated path.
-		$pt = str_replace('\\\\', '/', GetVar('PATH_TRANSLATED', GetVar('ORIG_PATH_TRANSLATED')));
-		$dr = substr($pt, 0, -strlen(GetVar('SCRIPT_NAME')));
-	}
-
-	$dr = str_replace('\\\\', '/', $dr);
-
-	return substr(str_replace('\\', '/', str_replace('\\\\', '/', $path)), strlen($dr));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-//Array
-//
-
-/**
- * Returns a new array with the idcol into the keys of each item's idcol
- * set instead of numeric offset.
- *
- * @param array $rows
- * @param string $idcol
- * @return array
- */
-function DataToArray($rows, $idcol)
-{
-	$ret = array();
-	if (!empty($rows)) foreach ($rows as $row) $ret[$row[$idcol]] = $row;
-	return $ret;
-}
-
-/**
-* Converts a data result into a tree of joined children.
-*
-* @param array $rows Result of DataSet::Get
-* @param array $assocs Array of associations array('parent1' => 'child1',
-* 'parent2' => 'child2')
-* @param mixed $rootid Root identifier for top-most result.
-* @return TreeNode
-*/
-function DataToTree($rows, $assocs, $rootid = null)
-{
-	if (empty($rows)) return;
-
-	# Build Flats
-
-	foreach ($assocs as $p => $c)
-	foreach ($rows as $row)
-	{
-		$flats[$p][$row[$p]] = new TreeNode($row, $row[$p]);
-		$flats[$c[0]][$row[$c[0]]] = new TreeNode($row, $row[$c[0]]);
-	}
-
-	# Build Tree
-
-	if (!isset($rootid) || !isset($flats[$rootid])) $tnRoot = new TreeNode();
-	else $tnRoot = $flats[$rootid];
-
-	if (!empty($flats))
-	foreach ($assocs as $p => $c)
-	foreach ($rows as $row)
-	{
-		# if parent (p) id of child ($c[1]) in parent node exists
-
-		if (isset($flats[$p][$row[$p]]) && $row[$c[1]] != $rootid)
-			$flats[$p][$row[$p]]->AddChild($flats[$c[0]][$row[$c[0]]]);
-		else
-			$tnRoot->AddChild($flats[$p][$row[$p]]);
-	}
-
-	$pkeys = array_keys($assocs);
-	foreach ($flats[$pkeys[0]] as &$rn)
-		$tnRoot->AddChild($rn);
-
-	return $tnRoot;
-}
-
-/**
- * Array Recursive Key Sort, sorting an array of any dimension by their keys.
- *
- * @param array $array Array to be sorted
- */
-function arksort(&$array)
-{
-	ksort($array);
-	foreach ($array as $k => $v)
-		if (is_array($v)) arksort($array[$k]);
-}
-
 /////////////////
 // Organize Me!
 //
-
-/**
- * Runs multiple callbacks with given arguments.
- *
- * @return mixed Returns whatever the callbacks do.
- */
-function RunCallbacks()
-{
-	$args = func_get_args();
-	$target = array_shift($args);
-	$ret = null;
-	if (!empty($target))
-	foreach ($target as $cb)
-	{
-		$item = call_user_func_array($cb, $args);
-		if (is_array($item))
-		{
-			if (!isset($ret)) $ret = array();
-			$ret = array_merge($ret, $item);
-		}
-		else $ret .= $item;
-	}
-	return $ret;
-}
-
-/**
- * Returns a cleaned up string to work in an html id attribute without w3c
- * errors.
- *
- * @param string $id
- * @return string
- */
-function CleanID($id)
-{
-	return str_replace('[', '_', str_replace(']', '', str_replace(' ', '_', $id)));
-}
-
-/**
- * Attempts to disable the ability to inject different paths to gain higher
- * level directories in urls or posts.
- *
- * @param string $path Path to secure from url hacks.
- * @return string Properly secured path.
- */
-function SecurePath($path)
-{
-	$ret = preg_replace('#^\.#', '', $path);
-	$ret = preg_replace('#^/#', '', $ret);
-	return preg_replace('#\.\./#', '', $ret);
-}
 
 /**
  * Returns a single flat page.
@@ -730,17 +393,6 @@ function mkrdir($path, $mode = 0755)
 		$cp .= "/".$e[$i];
 	}
 	return @mkdir($path, $mode);
-}
-
-/**
- * Returns var if it is set, otherwise def.
- * @param mixed $var Variable to check and return if exists.
- * @param mixed $def Default to return if $var is not set.
- * @return mixed $var if it is set, otherwise $def.
- */
-function ifset($var, $def)
-{
-	if (isset($var)) return $var; return $def;
 }
 
 /**
@@ -907,8 +559,6 @@ function preg_file($pattern, $path, $opts = 3)
 	return !empty($ret) ? $ret[0] : null;
 }
 
-
-
 /**
  * Encrypts strings formatted for htaccess files for windows based Apache
  * installations as they work a bit differently than linux.
@@ -1022,86 +672,6 @@ define('OPT_FILES', 1);
 define('OPT_DIRS', 2);
 
 /**
- * Returns an array of all files located recursively in a given path, excluding
- * anything matching the regular expression of $exclude.
- *
- * @param string $path Path to recurse.
- * @param string $exclude Passed to preg_match to blacklist files.
- * @return array Series of non-directories that were not excluded.
- */
-function Comb($path, $exclude, $flags = 3)
-{
-	if ($exclude != null && preg_match($exclude, $path)) return array();
-	// This is a file and unable to recurse.
-	if (is_file($path))
-	{
-		if (OPT_FILES & $flags) return array($path);
-		return array();
-	}
-
-	else if (is_dir($path))
-	{
-		// We will return ourselves if we're including directories.
-		$ret = ($flags & OPT_DIRS) ? array($path) : array();
-		$dp = opendir($path);
-		while ($f = readdir($dp))
-		{
-			if ($f[0] == '.') continue;
-			$ret = array_merge($ret, Comb($path.'/'.$f, $exclude, $flags));
-		}
-
-		return $ret;
-	}
-
-	return array();
-}
-
-/**
- * Converts html style tag attributes into an xml array style.
- *
- * @param string $atrs Attributes to process.
- * @return array String indexed array of attributes.
- */
-function ParseAtrs($atrs)
-{
-	if (empty($atrs)) return;
-	$m = null;
-	preg_match_all('/([^= ]+)="([^"]+)"/', $atrs, $m);
-	for ($ix = 0; $ix < count($m[1]); $ix++) $ret[$m[1][$ix]] = $m[2][$ix];
-	return $ret;
-}
-
-/**
- * Will set a session variable to $name with the value of GetVar and return it.
- *
- * @param string $name Name of our state object.
- * @return mixed The GetVar value of $name.
- */
-function GetState($name, $def = null)
-{
-	return SetVar($name, GetVar($name, $def));
-}
-
-/**
- * Converts an array to a tree using TreeNode objects.
- *
- * @param TreeNode $n Node we are working with.
- * @param array $arr Array items to add to $n.
- * @return TreeNode Root of the tree.
- */
-function ArrayToTree($n, $arr)
-{
-	$root = new TreeNode($n);
-	foreach ($arr as $k => $v)
-	{
-		if (is_array($v)) $n = ArrayToTree($k, $v);
-		else $n = new TreeNode($v);
-		$root->AddChild($n);
-	}
-	return $root;
-}
-
-/**
  * Will let a variable be set only if it's not already set.
  *
  * @param mixed $var Variable to Let.
@@ -1110,11 +680,6 @@ function ArrayToTree($n, $arr)
 function Let(&$var, $val)
 {
 	if (!isset($var)) $var = $val;
-}
-
-function Ask(&$var, $default)
-{
-	return !empty($var) ? $var : $default;
 }
 
 function GetMonthName($month)

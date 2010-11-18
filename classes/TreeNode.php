@@ -112,6 +112,50 @@ class TreeNode
 		$ret .= "</li></ul>\n";
 		return $ret;
 	}
+
+	/**
+	 * put your comment there...
+	 *
+	 * @param TreeNode $root Root treenode item.
+	 * @param string $text VarParser capable text linked to treenode data items.
+	 */
+	function GetTree($root, $text)
+	{
+		$vp = new VarParser();
+
+		$ret = null;
+		if (!empty($root->children))
+		{
+			$ret .= '<ul>';
+			foreach ($root->children as $c)
+			{
+				$ret .= '<li>'.$vp->ParseVars($text, $c->data);
+				$ret .= GetTree($c, $text);
+				$ret .= "</li>";
+			}
+			$ret .= '</ul>';
+		}
+		return $ret;
+	}
+
+	/**
+	 * Converts an array to a tree using TreeNode objects.
+	 *
+	 * @param TreeNode $n Node we are working with.
+	 * @param array $arr Array items to add to $n.
+	 * @return TreeNode Root of the tree.
+	 */
+	static function FromArray($n, $arr)
+	{
+		$root = new TreeNode($n);
+		foreach ($arr as $k => $v)
+		{
+			if (is_array($v)) $n = ArrayToTree($k, $v);
+			else $n = new TreeNode($v);
+			$root->AddChild($n);
+		}
+		return $root;
+	}
 }
 
 ?>

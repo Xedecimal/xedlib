@@ -1,5 +1,9 @@
 <?php
 
+require_once(__DIR__.'/Template.php');
+require_once(__DIR__.'/../Str.php');
+require_once(__DIR__.'/Form.php');
+
 /**
  * @package Editor
  */
@@ -8,7 +12,11 @@ define('ED_SORT_NONE',   0);
 define('ED_SORT_MANUAL', 1);
 define('ED_SORT_TABLE',  2);
 
-require_once('h_data.php');
+define('CONTROL_SIMPLE', 0);
+define('CONTROL_BOUND', 1);
+
+define('STATE_CREATE', 0);
+define('STATE_EDIT', 1);
 
 class DisplayColumn
 {
@@ -367,9 +375,6 @@ class EditorData
 	 */
 	function EditorData($name, &$ds, $filter = null, $sort = null)
 	{
-		require_once('h_utility.php');
-		require_once('h_display.php');
-
 		$this->Name = $name;
 		$this->filter = $filter;
 		$this->ds = $ds;
@@ -406,10 +411,11 @@ class EditorData
 	 */
 	function Prepare()
 	{
-		$act = GetState($this->Name.'_action');
+		$act = Server::GetState($this->Name.'_action');
 
 		if ($this->sorting == ED_SORT_TABLE)
-			$this->sort = array(GetVar('sort', $this->ds->id) => GetVar('order', 'ASC'));
+			$this->sort = array(Server::GetVar('sort', $this->ds->id) =>
+				Server::GetVar('order', 'ASC'));
 
 		$this->state = $act == 'edit' ? STATE_EDIT : STATE_CREATE;
 
@@ -418,7 +424,7 @@ class EditorData
 		if ($act == 'Create')
 		{
 			$insert = array();
-			$child_id = GetVar('child');
+			$child_id = Server::GetVar('child');
 			$context = isset($child_id) ? $this->ds->children[$child_id] : $this;
 
 			$fields = $context->ds->FieldInputs;
@@ -426,7 +432,7 @@ class EditorData
 			{
 				if (is_object($in))
 				{
-					$value = GetVar($this->Name.'_'.$col);
+					$value = Server::GetVar($this->Name.'_'.$col);
 					if ($in->attr('TYPE') == 'date')
 					{
 						$insert[$col] = $value[2].'-'.$value[0].'-'.$value[1];
@@ -472,11 +478,11 @@ class EditorData
 				if (!$handler->Create($this, $insert)) { $this->Reset(); return; }
 			}
 
-			$parent = GetVar('parent');
+			$parent = Server::GetVar('parent');
 
 			if (isset($parent))
 			{
-				$child = $this->ds->children[GetVar('child')];
+				$child = $this->ds->children[Server::GetVar('child')];
 				$insert[$child->child_key] = $parent;
 			}
 
@@ -502,19 +508,19 @@ class EditorData
 
 		else if ($act == 'Update')
 		{
-			$ci = GetVar($this->Name.'_ci');
+			$ci = Server::GetVar($this->Name.'_ci');
 
 			if ($this->type == CONTROL_SIMPLE)
 			{
 				foreach (array_keys($this->ds->FieldInputs) as $name)
 				{
-					$vals[$name] = GetVar($name);
+					$vals[$name] = Server::GetVar($name);
 				}
 				$fp = fopen($ci, 'w+');
 				fwrite($fp, serialize($vals));
 				fclose($fp);
 			}
-			$child_id = GetVar('child');
+			$child_id = Server::GetVar('child');
 			$context = $child_id != null ? $this->ds->children[$child_id] : $this;
 			$update = array();
 			foreach ($context->ds->FieldInputs as $col => $in)
@@ -523,7 +529,7 @@ class EditorData
 				{
 					if (get_class($in) == 'FieldInput' && $in->type == 'label') continue;
 
-					$value = GetVar($this->Name.'_'.$col);
+					$value = Server::GetVar($this->Name.'_'.$col);
 
 					//TODO: Support editing custom fields.
 					#if ($in->type == 'custom')
@@ -597,9 +603,9 @@ class EditorData
 
 		else if ($act == 'delete')
 		{
-			$ci = GetState($this->Name.'_ci');
+			$ci = Server::GetState($this->Name.'_ci');
 
-			$child_id = GetVar('child');
+			$child_id = Server::GetVar('child');
 			$context = isset($child_id) ? $this->ds->children[$child_id] : $this;
 
 			$data = $context->ds->GetOne(array($context->ds->id => $ci));
@@ -683,16 +689,16 @@ class EditorData
 	{
 		$ret['name'] = $this->Name;
 
-		$act = GetVar($this->Name.'_action');
-		$sq = GetVar($this->Name.'_q');
+		$act = Server::GetVar($this->Name.'_action');
+		$sq = Server::GetVar($this->Name.'_q');
 
 		$ret['ds'] = $this->ds;
 		if ($act != 'edit' && !empty($this->ds->DisplayColumns)
 			&& ($this->Behavior->Search && isset($sq)))
 			$ret['table'] = $this->GetTable($this->Behavior->Target, $act, $sq);
 		else $ret['table'] = null;
-		$ret['forms'] = $this->GetForms(GetVar($assoc) == $this->Name ?
-			GetVar('child') : null);
+		$ret['forms'] = $this->GetForms(Server::GetVar($assoc) == $this->Name ?
+			Server::GetVar('child') : null);
 		return $ret;
 	}
 
@@ -855,7 +861,7 @@ class EditorData
 	{
 		if ($this->Behavior->Search)
 		{
-			$sq = GetVar($this->Name.'_q');
+			$sq = Server::GetVar($this->Name.'_q');
 			if (!isset($sq)) return;
 		}
 
@@ -1099,7 +1105,7 @@ class EditorData
 
 		$fullname = $this->Name;
 		if ($curchild != null) $fullname .= '_'.$curchild;
-		$ci = GetState($this->Name.'_ci');
+		$ci = Server::GetState($this->Name.'_ci');
 
 		if ($this->type == CONTROL_BOUND)
 		{
@@ -1276,8 +1282,8 @@ class EditorData
 		$ret = null;
 		$context = $curchild != null ? $this->ds->children[$curchild] : $this;
 
-		$ci = GetState($this->Name.'_ci');
-		$ca = GetVar($this->Name.'_ca');
+		$ci = Server::GetState($this->Name.'_ci');
+		$ca = Server::GetVar($this->Name.'_ca');
 
 		$frm = $this->GetForm($this->state, $curchild);
 		if ($frm != null) $ret[] = $frm;
@@ -1328,8 +1334,6 @@ class EditorData
 	 */
 	function GetUI($assoc = 'editor')
 	{
-		require_once('h_template.php');
-
 		$this->assoc = $assoc;
 
 		$t = new Template();
@@ -1337,18 +1341,18 @@ class EditorData
 		$t->ReWrite('search', array(&$this, 'TagSearch'));
 		$t->Set('target', $this->Behavior->Target);
 		$t->Set('name', $this->Name);
-		$t->Set('plural', Plural($this->ds->Description));
+		$t->Set('plural', Str::Plural($this->ds->Description));
 
 		if (!empty($this->ds))
-			$t->Set('table_title', Plural($this->ds->Description));
+			$t->Set('table_title', Str::Plural($this->ds->Description));
 
 		$t->Set('table', $this->GetTable($this->Behavior->Target,
-			GetState($this->Name.'_ci')));
+			Server::GetState($this->Name.'_ci')));
 
 		$t->Set($this->View);
 		$t->Set('assoc', $assoc);
 
-		return $t->ParseFile(dirname(__FILE__).'/temps/editor.xml');
+		return $t->ParseFile(__DIR__.'/../../temps/editor.xml');
 	}
 
 	function Reset()

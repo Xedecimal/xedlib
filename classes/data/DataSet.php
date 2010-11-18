@@ -105,7 +105,7 @@ class DataSet
 	 * @param string $table Specifies the name of the table in $db to bind to.
 	 * @param string $id Name of the column with the primary key on this table.
 	 */
-	function DataSet($db, $table, $id = 'id')
+	function __construct($db, $table, $id = 'id')
 	{
 		if (empty($db)) return;
 		switch ($db->type)
@@ -932,6 +932,67 @@ class DataSet
 			}
 		}
 		return $ret;
+	}
+
+	/**
+	 * Returns a new array with the idcol into the keys of each item's idcol
+	 * set instead of numeric offset.
+	 *
+	 * @param array $rows
+	 * @param string $idcol
+	 * @return array
+	 */
+	static function DataToArray($rows, $idcol)
+	{
+		$ret = array();
+		if (!empty($rows)) foreach ($rows as $row) $ret[$row[$idcol]] = $row;
+		return $ret;
+	}
+
+	/**
+	* Converts a data result into a tree of joined children.
+	*
+	* @param array $rows Result of DataSet::Get
+	* @param array $assocs Array of associations array('parent1' => 'child1',
+	* 'parent2' => 'child2')
+	* @param mixed $rootid Root identifier for top-most result.
+	* @return TreeNode
+	*/
+	static function DataToTree($rows, $assocs, $rootid = null)
+	{
+		if (empty($rows)) return;
+
+		# Build Flats
+
+		foreach ($assocs as $p => $c)
+		foreach ($rows as $row)
+		{
+			$flats[$p][$row[$p]] = new TreeNode($row, $row[$p]);
+			$flats[$c[0]][$row[$c[0]]] = new TreeNode($row, $row[$c[0]]);
+		}
+
+		# Build Tree
+
+		if (!isset($rootid) || !isset($flats[$rootid])) $tnRoot = new TreeNode();
+		else $tnRoot = $flats[$rootid];
+
+		if (!empty($flats))
+		foreach ($assocs as $p => $c)
+		foreach ($rows as $row)
+		{
+			# if parent (p) id of child ($c[1]) in parent node exists
+
+			if (isset($flats[$p][$row[$p]]) && $row[$c[1]] != $rootid)
+				$flats[$p][$row[$p]]->AddChild($flats[$c[0]][$row[$c[0]]]);
+			else
+				$tnRoot->AddChild($flats[$p][$row[$p]]);
+		}
+
+		$pkeys = array_keys($assocs);
+		foreach ($flats[$pkeys[0]] as &$rn)
+			$tnRoot->AddChild($rn);
+
+		return $tnRoot;
 	}
 }
 

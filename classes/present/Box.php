@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__.'/../U.php');
+
 /**
  * A simple themed box.
  */
@@ -41,7 +43,7 @@ class Box
 		$this->title = "";
 		$this->out = "";
 		$this->name = "";
-		$this->template = ifset(@$GLOBALS['__xedlib_box_template'],
+		$this->template = U::ifset(@$GLOBALS['__xedlib_box_template'],
 			'template_box.html');
 	}
 

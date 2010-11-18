@@ -157,6 +157,14 @@ class FormOption extends TreeNode
 
 		return $strout;
 	}
+
+	function ArrayToSelText($array, $sel)
+	{
+		$ret = array();
+		foreach ($array as $ix => $v)
+			$ret[] = $sel[$v]->text;
+		return implode(', ', $ret);
+	}
 }
 
 ?>

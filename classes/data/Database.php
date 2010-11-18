@@ -114,8 +114,8 @@ class Database
 			if (isset($this->Handlers[mysql_errno($this->link)]))
 				if (call_user_func($this->Handlers[mysql_errno($this->link)])) return;
 
-			Error('MySQL Error ['.mysql_errno($this->link).']: '.mysql_error($this->link).
-				"<br/>\nQuery: {$query}<br/>\n");
+			Server::Error('MySQL Error ['.mysql_errno($this->link).']: '
+				.mysql_error($this->link)."<br/>\nQuery: {$query}<br/>\n");
 		}
 	}
 

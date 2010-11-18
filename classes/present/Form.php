@@ -1,5 +1,9 @@
 <?php
 
+require_once(__DIR__.'/../HTML.php');
+require_once(__DIR__.'/../LayeredOutput.php');
+require_once(__DIR__.'/FormInput.php');
+
 /**
  * A web page form, with functions for easy field creation and layout.
  * @todo Create sub classes for each input type.
@@ -115,7 +119,7 @@ class Form extends LayeredOutput
 		$this->name = $name;
 		$this->attribs = array();
 		$this->Persist = $persist;
-		$this->Template = file_get_contents(dirname(__FILE__).'/temps/form.xml');
+		$this->Template = file_get_contents(__DIR__.'/../../temps/form.xml');
 	}
 
 	/**
@@ -216,7 +220,7 @@ class Form extends LayeredOutput
 			($start ? $this->FirstEnd : $this->CellEnd);
 	}
 
-	function TagForm($t, $g, $a)
+	/*function TagForm($t, $g, $a)
 	{
 		global $PERSISTS;
 		$atrs = GetAttribs($a);
@@ -239,7 +243,7 @@ class Form extends LayeredOutput
 		}
 
 		return $ret.$g.'</form>';
-	}
+	}*/
 
 	function TagField($t, $g)
 	{
@@ -288,7 +292,6 @@ class Form extends LayeredOutput
 	*/
 	function Get($formAttribs = null)
 	{
-		require_once('h_template.php');
 		$this->formAttribs = $formAttribs;
 		$t = new Template($GLOBALS['_d']);
 		$t->Set('form_name', $this->name);
@@ -311,6 +314,103 @@ class Form extends LayeredOutput
 		if (isset($this->Validation))
 			$ret .= " onclick=\"return {$this->name}_check(1);\"";
 		return $ret.' />';
+	}
+
+	/**
+	 * Rewrites inputs into FormInputs for further processing.
+	 *
+	 * @param Template $t
+	 * @param string $guts
+	 * @param array $attribs
+	 * @param string $tag
+	 * @param mixed $args
+	 * @return string
+	 */
+	static function TagInput($t, $guts, $attribs, $tag, $args)
+	{
+		// Handle Persistent Values
+
+		if ($args['persist'])
+		{
+			switch (strtolower($attribs['TYPE']))
+			{
+				case 'radio':
+					if (GetVar($attribs['NAME']) == $attribs['VALUE'])
+						$attribs['CHECKED'] = 'checked';
+					break;
+				default:
+					if (!isset($attribs['VALUE']))
+					$attribs['VALUE'] = GetVar($attribs['NAME']);
+					break;
+			}
+		}
+
+		$searchable =
+			$attribs['TYPE'] != 'hidden' &&
+			$attribs['TYPE'] != 'radio' &&
+			$attribs['TYPE'] != 'checkbox' &&
+			$attribs['TYPE'] != 'submit';
+
+		if (!empty($attribs['TYPE']))
+		{
+			$fi = new FormInput(null, @$attribs['TYPE'], @$attribs['NAME'],
+				@$attribs['VALUE'], $attribs);
+			if (get_class($t->GetCurrentObject()) == 'Form')
+				$t->GetCurrentObject()->AddInput($fi);
+			return $fi->Get(null, false);
+		}
+
+		$ret = '';
+
+		if ($args == 'search' && $searchable)
+		{
+			if (!isset($attribs['ID'])) $attribs['ID'] = 'in'.$attribs['NAME'];
+
+			$ret .= "<input name=\"search[{$attribs['NAME']}]\" type=\"checkbox\"
+				onclick=\"$('#div{$attribs['ID']}').toggle('slow');\" />";
+			$ret .= '<div id="div'.$attribs['ID'].'" style="display: none">';
+		}
+
+		$ret .= $field;
+
+		if ($args == 'search' && $searchable) $ret .= '</div>';
+		return $ret;
+	}
+
+	/**
+	* Rewriting form tag to add additional functionality.
+	*
+	* @param Template $t
+	* @param string $g
+	* @param array $a
+	*/
+	static function TagForm($t, $g, $a)
+	{
+		global $PERSISTS;
+		$frm = new Form(@$a['ID']);
+		$t->Push($frm);
+		$ret = '<form'.HTML::GetAttribs($a).'>';
+		if (is_array($PERSISTS))
+		foreach ($PERSISTS as $n => $v)
+			$ret .= '<input type="hidden" name="'.$n.'" value="'.$v.'" />';
+		$t->ReWrite('input', array('Form', 'TagInput'));
+		$ret .= $t->GetString('<null>'.$g.'</null>');
+		$obj = $t->Pop();
+		$ret .= $obj->outs[0];
+		$ret .= '</form>';
+
+		if (!empty($frm->inputs))
+		foreach ($frm->inputs as $in)
+		{
+			if (!empty($in->valid))
+			{
+				require_once('a_validation.php');
+				$ret .= Validation::GetJS($frm);
+				break;
+			}
+		}
+
+		return $ret;
 	}
 }
 
