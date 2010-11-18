@@ -105,12 +105,12 @@ class ModUser extends Module
 			$q['match']['usr_email'] = $em;
 			foreach ($this->_ds as $ds)
 			{
-				$act = $ds->Get($q);
+				$act = $ds[0]->Get($q);
 				if (!empty($act))
 				{
 					$pass = random_string();
 					$body = "Your new password is: $pass";
-					$this->ds->update(array('usr_email' => $em),
+					$ds[0]->update(array('usr_email' => $em),
 						array('usr_pass' => md5($pass)));
 					mail($em, 'Forgotten Password', $body);
 					break;
