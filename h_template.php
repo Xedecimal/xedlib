@@ -1,5 +1,7 @@
 <?php
 
+require_once('h_utility.php');
+
 /**
  * @package Presentation
  */
