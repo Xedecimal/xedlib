@@ -5,25 +5,6 @@
  *
  */
 
-/**
- * Whether the files should be checked for reformatting.
- * @var bool
- */
-global $__checked;
-
-if (!isset($__checked) && substr(phpversion(), 0, 1) != '5')
-{
-	echo "Library has not been synched, doing so now...<br/>\n";
-	$files = glob(dirname(__FILE__).'/*.php');
-	$files = array_merge($files, glob(dirname(__FILE__).'/3rd/*.php'));
-	foreach ($files as $file)
-	{
-		echo "Reformatting: {$file}<br/>\n";
-		chmod($file, 0666);
-		Reformat($file);
-	}
-}
-
 function null() {}
 
 /**
@@ -782,9 +763,9 @@ function arksort(&$array)
 /**
  * Resizes an image bicubicly and constrains proportions.
  *
- * @param resource $image Use imagecreate*
- * @param int $newWidth
- * @param int $newHeight
+ * @param resource $image Result of imagecreate* functions.
+ * @param int $newWidth Horizontal pixel size you wish the result to meet.
+ * @param int $newHeight Vertical pixel size you wish the result to meet.
  * @return resource Resized/sampled image.
  */
 function ResizeImage($image, $newWidth, $newHeight)
@@ -842,20 +823,6 @@ function RunCallbacks()
 function CleanID($id)
 {
 	return str_replace('[', '_', str_replace(']', '', str_replace(' ', '_', $id)));
-}
-
-/**
- * Pluralizes a string, eg User -> Users
- *
- * @param string $str String to pluralize.
- * @return string Properly pluralized string.
- */
-function Plural($str)
-{
-	if (strlen($str) < 1) return null;
-	if (substr($str, -1) == 'y') return substr($str, 0, -1).'ies';
-	if (substr($str, -1) != 's') return "{$str}s";
-	return $str;
 }
 
 /**
@@ -1550,14 +1517,6 @@ function GetMonthName($month)
 	return date('F', strtotime($month.'/1/'.date('Y')));
 }
 
-function strtoval($val, $def)
-{
-	if (is_numeric($val)) $ret = (int)$val;
-	else $ret = @eval('return '.$val.';');
-	if (!isset($ret)) return $def;
-	return $ret;
-}
-
 function SendDownloadStart($filename, $size = null)
 {
 	//Caching
@@ -1574,63 +1533,10 @@ function SendDownloadStart($filename, $size = null)
 	if (isset($size)) header("Content-Length: {$size}");
 }
 
-function TagNEmpty($t, $g, $a)
-{
-	$n = $a['VAR'];
-	global $$n;
-	if (empty($a['INDEX']) && !empty($$n)) return $g;
-	$var = $$n;
-	if (!empty($var) && !empty($var[$a['INDEX']])) return $g;
-}
-
 function GetQ()
 {
 	$pi = GetVar('q', '/home');
 	if (!empty($pi)) return explode('/', substr($pi, 1));
-}
-
-function Pull(&$arr, $key)
-{
-	$ret = @$arr[$key];
-	unset($arr[$key]);
-	return $ret;
-}
-
-function array_lower_keys($array)
-{
-	if (!is_array($array)) return null;
-	$ret = array();
-	foreach ($array as $k => $v) $ret[strtolower($k)] = $v;
-	return $ret;
-}
-
-function preg_rename($glob, $preg_src, $preg_dst)
-{
-	foreach (glob($glob) as $f)
-	{
-		if (preg_match($preg_src, $f))
-		{
-			$dst = preg_replace($preg_src, $preg_dst, $f);
-			rename($f, $dst);
-		}
-	}
-}
-
-function get_relative_sizes($arr, $min_size = 12, $max_size = 32)
-{
-	$max_qty = max(array_values($arr));
-	$min_qty = min(array_values($arr));
-
-	$spread = max(1, $max_qty - $min_qty);
-
-	$step = ($max_size - $min_size) / ($spread);
-
-	foreach ($arr as $key => $value)
-	{
-		$size = round($min_size + (($value - $min_qty) * $step));
-		$ret[$key] = $size;
-    }
-    return $ret;
 }
 
 ?>
