@@ -1,0 +1,317 @@
+<?php
+
+/**
+ * A web page form, with functions for easy field creation and layout.
+ * @todo Create sub classes for each input type.
+ */
+class Form extends LayeredOutput
+{
+	/**
+	 * Unique name of this form (used in html / js / identifying).
+	 *
+	 * @var string
+	 */
+	public $name;
+
+	/**
+	 * Hidden fields stored from AddHidden()
+	 *
+	 * @var array
+	 */
+	private $hiddens;
+
+	/**
+	 * Form tag attributes, "name" => "value" pairs.
+	 *
+	 * @var array
+	 */
+	public $attribs;
+
+	/**
+	 * Actual output.
+	 *
+	 * @var string
+	 */
+	public $out;
+
+	/**
+	 * Whether to use persistant vars or not.
+	 *
+	 * @var bool
+	 */
+	public $Persist;
+
+	/**
+	 * Associated validator. Make sure you set this BEFORE you use AddInput or
+	 * they will not be prepared for validation. You can also specify an array
+	 * as $form->Validation = array($val1, $val2, $val3);
+	 * @var Validation
+	 */
+	public $Validation;
+
+	/**
+	 * Associated errors that are previously gotten with FormValidate().
+	 *
+	 * @var array
+	 */
+	public $Errors;
+
+	/**
+	 * @var string
+	 */
+	public $FormStart = '<table>';
+
+	/**
+	 * @var string
+	 */
+	public $RowStart = array('<tr class="even">', '<tr class="odd">');
+
+	public $FirstStart = '<td align="right">';
+
+	public $FirstEnd = '</td>';
+
+	public $StringStart = '<td colspan="2">';
+
+	/**
+	 * @var string
+	 */
+	public $CellStart = '<td>';
+
+	/**
+	 * @var string
+	 */
+	public $CellEnd = '</td>';
+
+	/**
+	 * @var string
+	 */
+	public $RowEnd = '</tr>';
+
+	/**
+	 * @var string
+	 */
+	public $FormEnd = '</table>';
+
+	/**
+	 * @var array
+	 */
+	public $words = array(
+		'complete', 'finish', 'end', 'information'
+	);
+
+	public $rowx = 0;
+
+	private $multipart = false;
+
+	/**
+	* Instantiates this form with a unique name.
+	* @param string $name Unique name only used in Html comments for identification.
+	* @param array $colAttribs Array of table's column attributes.
+	* @param bool $persist Whether or not to persist the values in this form.
+	*/
+	function __construct($name, $persist = true)
+	{
+		parent::__construct();
+		$this->name = $name;
+		$this->attribs = array();
+		$this->Persist = $persist;
+		$this->Template = file_get_contents(dirname(__FILE__).'/temps/form.xml');
+	}
+
+	/**
+	* Adds a hidden field to this form.
+	* @param string $name The name attribute of the html field.
+	* @param mixed $value The value attribute of the html field.
+	* @param string $attribs Attributes to append on this field.
+	* @param bool $general Whether this is a general name. It will not
+	* have the form name prefixed on it.
+	*/
+	function AddHidden($name, $value, $attribs = null, $general = false)
+	{
+		$this->hiddens[] = array($name, $value, $attribs, $general);
+	}
+
+	/**
+	 * Adds an input item to this form. You can use a single FormInput object,
+	 * a string, an array or a series of arguments of strings and FormInputs and
+	 * this will try to sort it all out vertically or horizontally.
+	 */
+	function AddInput()
+	{
+		if (func_num_args() < 1) Error("Not enough arguments.");
+		$args = func_get_args();
+
+		if (!empty($args))
+		{
+			$this->out .= $this->RowStart[$this->rowx++%2];
+			foreach ($args as $ix => $item)
+				$this->out .= $this->IterateInput($ix == 0, $item);
+			$this->out .= $this->RowEnd;
+		}
+	}
+
+	/**
+	 * @param mixed $input FormInput, multiple FormInputs, arrays, whatever.
+	 * @return string Rendered input field.
+	 */
+	function IterateInput($start, $input)
+	{
+		if (is_array($input))
+		{
+			if (empty($input)) return;
+			$out = null;
+			foreach ($input as $item)
+			{
+				$out .= $this->IterateInput($start, $item);
+				$start = false;
+			}
+			return $out;
+		}
+
+		$helptext = null;
+
+		if (is_string($input))
+		{
+			$this->inputs[] = $input;
+			return $this->StringStart.$input.
+				($start ? $this->FirstEnd : $this->CellEnd);
+		}
+
+		if (!is_object($input)) Error("Form input is not an object.");
+
+		$this->inputs[] = $input;
+
+		if ($input->attr('TYPE') == 'submit' && isset($this->Validation))
+			$input->atrs['ONCLICK'] = "return {$this->name}_check(1);";
+		if ($input->attr('TYPE') == 'file') $this->multipart = true;
+
+		$right = false;
+		if ($input->attr('TYPE') == 'checkbox') $right = true;
+		if ($input->attr('TYPE') == 'spamblock')
+		{
+			//This form has been submitted.
+			$b = GetVar('block_'.$input->name);
+			if (isset($b) && GetVar($input->name) != $this->words[$b])
+				$this->Errors[$input->name] = ' '.GetImg('error.png', 'Error',
+					'style="vertical-align: text-bottom"').
+					"<span class=\"error\"> Invalid phrase.</span>";
+			$rand = rand(0, count($this->words)-1);
+			$input->valu = $this->words[$rand];
+			$this->AddHidden('block_'.$input->name, $rand);
+		}
+
+		$out = !empty($input->text)?$input->text:null;
+
+		$helptext = $input->help;
+		if (isset($this->Errors[$input->name]))
+			$helptext .= $this->Errors[$input->name];
+
+		return ($start ? $this->FirstStart : $this->CellStart).
+			($input->labl ? '<label for="'.CleanID($this->name, $input)
+			.'">' : null).
+			($right ? null : $out).
+			($input->labl ? '</label>' : null).$this->CellEnd.
+			$this->CellStart.$input->Get($this->name, $this->Persist).
+			($right ? $out : null).$helptext.
+			($start ? $this->FirstEnd : $this->CellEnd);
+	}
+
+	function TagForm($t, $g, $a)
+	{
+		global $PERSISTS;
+		$atrs = GetAttribs($a);
+		$ret = "<form {$this->formAttribs}{$atrs}";
+		if ($this->multipart) $ret .= ' enctype="multipart/form-data"';
+		$ret .= ">\n";
+
+		if ($this->Persist && !empty($PERSISTS))
+		foreach ($PERSISTS as $name => $value)
+			$this->AddHidden($name, $value);
+
+		if (!empty($this->hiddens))
+		foreach ($this->hiddens as $hidden)
+		{
+			$fname = $hidden[3] ? $hidden[0] : $this->name.'_'.$hidden[0];
+			$ret .= "<input type=\"hidden\" id=\"".CleanID($fname)."\"
+				name=\"{$hidden[0]}\" value=\"{$hidden[1]}\"";
+			if (isset($hidden[2])) $ret .= ' '.$hidden[2];
+			$ret .= " />\n";
+		}
+
+		return $ret.$g.'</form>';
+	}
+
+	function TagField($t, $g)
+	{
+		$ret = '';
+		$tt = new Template();
+		$tt->ReWrite('error', array(&$this, 'TagError'));
+
+		$ix = 0;
+		if (!empty($this->inputs))
+		foreach ($this->inputs as $in)
+		{
+			$d['even_odd'] = ($ix++ % 2) ? 'even' : 'odd';
+			$d['text'] = !empty($in->text) ? $in->text : '';
+			if (is_object($in) && strtolower(get_class($in)) == 'forminput')
+			{
+				$d['field'] = $in->Get($this->name);
+				$d['help'] = $in->help;
+			}
+			else
+			{
+				$d['field'] = $in;
+				$d['help'] = '';
+			}
+
+			$this->d = $d;
+			$tt->Set($d);
+			$ret .= $tt->GetString($g);
+		}
+		return $ret;
+	}
+
+	function TagError($t, $g)
+	{
+		if (!empty($this->d['help']))
+		{
+			$vp = new VarParser();
+			return $vp->ParseVars($g, $this->d);
+		}
+	}
+
+	/**
+	* Returns the complete html rendered form for output purposes.
+	* @param string $formAttribs Additional form attributes (method, class, action, etc)
+	* @param string $tblAttribs To be passed to Table::GetTable()
+	* @return string The complete html rendered form.
+	*/
+	function Get($formAttribs = null)
+	{
+		require_once('h_template.php');
+		$this->formAttribs = $formAttribs;
+		$t = new Template($GLOBALS['_d']);
+		$t->Set('form_name', $this->name);
+		$t->ReWrite('form', array(&$this, 'TagForm'));
+		$t->ReWrite('field', array(&$this, 'TagField'));
+		return $t->GetString($this->Template);
+	}
+
+	/**
+	 * Returns the properly scripted up submit button, should be used in place
+	 * of AddInput(null, 'submit').
+	 *
+	 * @param string $name Name of this button.
+	 * @param string $text Text displayed on this button.
+	 * @return string
+	 */
+	function GetSubmitButton($name, $text)
+	{
+		$ret = '<input type="submit" name="'.$name.'" value="'.$text.'"';
+		if (isset($this->Validation))
+			$ret .= " onclick=\"return {$this->name}_check(1);\"";
+		return $ret.' />';
+	}
+}
+
+?>

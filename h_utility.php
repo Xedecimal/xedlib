@@ -5,8 +5,6 @@
  *
  */
 
-function null() {}
-
 /**
  * Handles errors and tries to open them up more to strictly find problems.
  *
@@ -388,49 +386,6 @@ function Redirect($url, $getvars = NULL)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//String
-//
-
-/**
- * Returns the start of a larger string trimmed down to the length you specify
- * without chomping words.
- * @param string $text Text to chomp.
- * @param int $length Maximum length you're going for.
- * @return string Chomped text.
- */
-function ChompString($text, $length)
-{
-	if (strlen($text) > $length)
-	{
-		$ret = substr($text, 0, $length);
-		while ($ret[strlen($ret)-1] != ' ' && strlen($ret) > 1) $ret = substr($ret, 0, count($ret)-2);
-		return $ret . "...";
-	}
-	return $text;
-}
-
-function strmatch($str1, $str2)
-{
-	return $str1 === $str2;
-}
-
-function random_string($chars = 15)
-{
-	$ret = null;
-	for ($ix = 0; $ix < $chars; $ix++)
-		$ret .= sprintf('%c',
-			rand(0, 1)
-			# 0 - 9
-			? rand(48, 57)
-			: rand(0, 1)
-			# a - z
-			? rand(97, 122)
-			# A - Z
-			: rand(65, 90));
-	return $ret;
-}
-
-////////////////////////////////////////////////////////////////////////////////
 //Date
 //
 
@@ -458,37 +413,6 @@ function TimestampToMySql($ts, $time = true)
 function TimestampToMsSql($ts)
 {
 	return date("m/d/y h:i:s A", $ts);
-}
-
-/**
- * Converts a mysql date to a timestamp.
- *
- * @param string $date MySql Date/DateTime
- * @param bool $include_time Whether hours, minutes and seconds are included.
- * @return int Timestamp
- */
-function MyDateTimestamp($date, $include_time = false)
-{
-	if ($include_time) {
-		return mktime(
-			substr($date, 11, 2), //hh
-			substr($date, 14, 2), //mm
-			substr($date, 17, 2), //ss
-			substr($date, 5, 2), //m
-			substr($date, 8, 2), //d
-			substr($date, 0, 4) //y
-		);
-	}
-	else
-	{
-		$match = null;
-		if (!preg_match('/([0-9]+)-([0-9]+)-([0-9]+)/', $date, $match)) return null;
-		return mktime(0, 0, 0,
-			$match[2], //m
-			$match[3], //d
-			$match[1] //y
-		);
-	}
 }
 
 /**
@@ -535,85 +459,6 @@ function GetDateOffset($ts)
 //
 
 /**
- * Returns the filename portion of path without the extension applied.
- *
- * @param string $name Name of the file to return the extension from.
- * @return string File extension.
- */
-function fileext($name)
-{
-	return substr(strrchr($name, '.'), 1);
-}
-
-/**
- * Returns a filename without the extension.
- *
- * @param string $name Name to strip the extension off.
- * @return string Stripped filename.
- */
-function filenoext($name)
-{
-	if (strpos($name, '.')) return substr($name, 0, strrpos($name, '.'));
-	return $name;
-}
-
-/**
- * Careful with this sucker.
- *
- * @param string $dir Directory to obliterate.
- */
-function DelTree($dir)
-{
-	if (!file_exists($dir)) return;
-	$dh = @opendir($dir);
-	if (!$dh) return;
-	while (($obj = readdir($dh)))
-	{
-		if ($obj == '.' || $obj == '..') continue;
-		$target = "{$dir}/{$obj}";
-		if (is_dir($target)) DelTree($target);
-		else unlink($target);
-	}
-	closedir($dh);
-	@rmdir($dir);
-}
-
-/**
- * Recursively deletes empty folders in the direction of the parent.
- *
- * @param string $dir Deepest level directory to empty.
- */
-function DelEmpty($dir)
-{
-	$files = glob($dir.'/*');
-	if (count($files) < 1) { @rmdir($dir); DelEmpty(dirname($dir)); }
-}
-
-/**
- * Reformats a file to be compatible with the current installation of php.
- *
- * @param string $file Filename to reformat.
- */
-function Reformat($file)
-{
-	$c = file_get_contents($file);
-	$c = preg_replace("/\tprivate|\tprotected|\tpublic/", "\tvar", $c);
-	$c = preg_replace("/\tstatic /", "\t", $c);
-	$c = "<?php \$__checked = true; ?>\n".$c;
-	if (!$fp = fopen($file, 'w+'))
-	{
-		echo "Couldn't open file for writing, attempting to set
-			permissions...<br/>\n";
-		if (!chmod($file, 0666))
-			echo "Couldn't set the permissions, giving up.<br/>\n";
-		else
-			$fp = fopen($file, 'w+');
-	}
-	fwrite ($fp, $c);
-	fclose($fp);
-}
-
-/**
  * Gets the webserver path for a given local filesystem directory.
  *
  * @param string $path
@@ -633,39 +478,6 @@ function GetRelativePath($path)
 	$dr = str_replace('\\\\', '/', $dr);
 
 	return substr(str_replace('\\', '/', str_replace('\\\\', '/', $path)), strlen($dr));
-}
-
-/**
- * Returns an image from the RelativePath location.
- *
- * @param string $img Image filename.
- * @param string $title For the alt/title/alttitle attributes.
- * @param string $attribs Additional attributes.
- * @return string
- */
-function GetImg($img, $title = 'unnamed', $attribs = null)
-{
-	$p = GetRelativePath(dirname(__FILE__));
-	return "<img src=\"{$p}/images/{$img}\" alt=\"{$title}\" {$attribs}/>";
-}
-
-/**
- * Gets an image button.
- *
- * @param string $target Name of script to attach the anchor to.
- * @param string $img Name of the image, '/images' will already be included.
- * @param string $alt Alternate text for missing image or tooltip.
- * @param string $attribs Attributes to attach to the <img> tag.
- * @return string
- */
-function GetButton($target, $img, $alt, $attribs = null)
-{
-	$path = GetRelativePath(dirname(__FILE__));
-
-	return '<a href="'.URL($target).'">'.
-		"<img src=\"{$path}/images/{$img}\"".
-		" alt=\"{$alt}\" title=\"{$alt}\"".
-		' '.$attribs.' style="vertical-align: text-bottom" /></a>';
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -734,17 +546,6 @@ function DataToTree($rows, $assocs, $rootid = null)
 }
 
 /**
- * Returns the last item on the array, without popping it.
- *
- * @param array $array Array to grab the last item off from.
- * @return mixed Last item on the array.
- */
-function &array_get($array)
-{
-	return $array[count($array)-1];
-}
-
-/**
  * Array Recursive Key Sort, sorting an array of any dimension by their keys.
  *
  * @param array $array Array to be sorted
@@ -759,35 +560,6 @@ function arksort(&$array)
 /////////////////
 // Organize Me!
 //
-
-/**
- * Resizes an image bicubicly and constrains proportions.
- *
- * @param resource $image Result of imagecreate* functions.
- * @param int $newWidth Horizontal pixel size you wish the result to meet.
- * @param int $newHeight Vertical pixel size you wish the result to meet.
- * @return resource Resized/sampled image.
- */
-function ResizeImage($image, $newWidth, $newHeight)
-{
-	$srcWidth  = imagesx($image);
-	$srcHeight = imagesy($image);
-	if ($srcWidth < $newWidth && $srcHeight < $newHeight) return $image;
-
-	if ($srcWidth < $srcHeight)
-	{
-		$destWidth  = $newWidth * $srcWidth/$srcHeight;
-		$destHeight = $newHeight;
-	}
-	else
-	{
-		$destWidth  = $newWidth;
-		$destHeight = $newHeight * $srcHeight/$srcWidth;
-	}
-	$destImage = imagecreatetruecolor($destWidth, $destHeight);
-	ImageCopyResampled($destImage, $image, 0, 0, 0, 0, $destWidth, $destHeight, $srcWidth, $srcHeight);
-	return $destImage;
-}
 
 /**
  * Runs multiple callbacks with given arguments.
@@ -918,42 +690,6 @@ function GetPages($total, $count, $args = null)
 }
 
 /**
- * Converts a data size string to proper digits.
- *
- * @param string $str String to convert into proper size.
- * @return int String converted to proper size.
- */
-function GetStringSize($str)
-{
-	$num = (int)substr($str, 0, -1);
-	switch (strtoupper(substr($str, -1)))
-	{
-		case 'Y': $num *= 1024;
-		case 'Z': $num *= 1024;
-		case 'E': $num *= 1024;
-		case 'P': $num *= 1024;
-		case 'T': $num *= 1024;
-		case 'G': $num *= 1024;
-		case 'M': $num *= 1024;
-		case 'K': $num *= 1024;
-	}
-	return $num;
-}
-
-/**
- * Converts a string from digits to proper data size string.
- *
- * @param int $size Size to convert into proper string.
- * @return string Size converted to a string.
- */
-function GetSizeString($size)
-{
-	$units = explode(' ','B KB MB GB TB');
-	for ($i = 0; $size > 1024; $i++) { $size /= 1024; }
-	return round($size, 2).' '.$units[$i];
-}
-
-/**
  * PHP4 compatible array clone.
  *
  * @param mixed $arr Item to properly clone in php5 without references.
@@ -1054,18 +790,6 @@ function linkup($tree, $target, $text)
 	return $ret;
 }
 
-/**
- * Converts an array to a BitMask.
- *
- * @param array $array Array to bitmask.
- * @return int Bitwise combined values.
- */
-function GetMask($array)
-{
-	$ret = 0;
-	foreach ($array as $ix) $ret |= $ix;
-	return $ret;
-}
 
 /**
  * Get a single result of a zip code location and information.
@@ -1183,18 +907,7 @@ function preg_file($pattern, $path, $opts = 3)
 	return !empty($ret) ? $ret[0] : null;
 }
 
-/**
- * Returns true if $src path is inside $dst path.
- *
- * @param string $src Source pathname.
- * @param string $dst Destination pathname.
- * @return bool True if the source exists inside the destination.
- */
-function is_in($src, $dst)
-{
-	$rpdst = realpath($dst);
-	return substr(realpath($src), 0, strlen($rpdst)) == $rpdst;
-}
+
 
 /**
  * Encrypts strings formatted for htaccess files for windows based Apache
@@ -1386,114 +1099,6 @@ function ArrayToTree($n, $arr)
 		$root->AddChild($n);
 	}
 	return $root;
-}
-
-if (!function_exists('money_format'))
-{
-	function money_format($format, $number)
-	{
-		$regex  = array(
-			'/%((?:[\^!\-]|\+|\(|\=.)*)([0-9]+)?(?:#([0-9]+))?',
-			'(?:\.([0-9]+))?([in%])/'
-		);
-		$regex = implode('', $regex);
-		if (setlocale(LC_MONETARY, null) == '') setlocale(LC_MONETARY, '');
-		$locale = localeconv();
-		$number = floatval($number);
-		$fmatch = $match = null;
-		if (!preg_match($regex, $format, $fmatch))
-		{
-			trigger_error("No format specified or invalid format", E_USER_WARNING);
-			return $number;
-		}
-		$flags = array(
-			'fillchar'  => preg_match('/\=(.)/', $fmatch[1], $match) ? $match[1] : ' ',
-			'nogroup'   => preg_match('/\^/', $fmatch[1]) > 0,
-			'usesignal' => preg_match('/\+|\(/', $fmatch[1], $match) ? $match[0] : '+',
-			'nosimbol'  => preg_match('/\!/', $fmatch[1]) > 0,
-			'isleft'    => preg_match('/\-/', $fmatch[1]) > 0
-		);
-		$width = trim($fmatch[2]) ? (int)$fmatch[2] : 0;
-		$left = trim($fmatch[3]) ? (int)$fmatch[3] : 0;
-		$right = trim($fmatch[4]) ? (int)$fmatch[4] :
-		$locale['int_frac_digits'];
-		$conversion = $fmatch[5];
-		$positive = true;
-		if ($number < 0)
-		{
-			$positive = false;
-			$number *= -1;
-		}
-		$letter = $positive ? 'p' : 'n';
-		$prefix = $suffix = $cprefix = $csuffix = $signal = '';
-		if (!$positive)
-		{
-			$signal = $locale['negative_sign'];
-			switch (true)
-			{
-				case $locale['n_sign_posn'] == 0 || $flags['signal'] == '(':
-					$prefix = '(';
-					$suffix = ')';
-					break;
-				case $locale['n_sign_posn'] == 1:
-					$prefix = $signal;
-					break;
-				case $locale['n_sign_posn'] == 2:
-					$suffix = $signal;
-					break;
-				case $locale['n_sign_posn'] == 3:
-					$cprefix = $signal;
-					break;
-				case $locale['n_sign_posn'] == 4:
-					$csuffix = $signal;
-					break;
-			}
-		}
-		if (!$flags['nosimbol'])
-		{
-			$currency  = $cprefix;
-			$currency .= (
-				$conversion == 'i' ?
-				$locale['int_curr_symbol'] :
-				$locale['currency_symbol']
-			);
-			$currency .= $csuffix;
-		}
-		else $currency = '';
-		$space = $locale["{$letter}_sep_by_space"] ? ' ' : '';
-
-		$number = number_format($number, $right, $locale['mon_decimal_point'], $flags['nogroup'] ? '' : $locale['mon_thousands_sep']);
-		$number = explode($locale['mon_decimal_point'], $number);
-
-		$n = strlen($prefix) + strlen($currency);
-		if ($left > 0 && $left > $n)
-		{
-			if ($flags['isleft'])
-			{
-				$number[0] .= str_repeat($flags['fillchar'], $left - $n);
-			}
-			else
-			{
-				$number[0] = str_repeat($flags['fillchar'], $left - $n) . $number[0];
-			}
-		}
-		$number = implode($locale['mon_decimal_point'], $number);
-		if ($locale["{$letter}_cs_precedes"])
-			$number = $prefix.$currency.$space.$number.$suffix;
-		else $number = $prefix.$number.$space.$currency.$suffix;
-		if ($width > 0)
-			$number = str_pad($number, $width, $flags['fillchar'],
-				$flags['isleft'] ? STR_PAD_RIGHT : STR_PAD_LEFT);
-		$format = str_replace($fmatch[0], $number, $format);
-		return $format;
-	}
-}
-
-function get_csv($str)
-{
-	$arr = preg_split('/,(?=(?:[^"]*"[^"]*")*(?![^"]*"))/', trim($str));
-	foreach ($arr as $k => $v) $arr[$k] = trim($v, '"');
-	return $arr;
 }
 
 /**

@@ -43,12 +43,11 @@ class DisplayObject
 {
 	/**
 	 * Creates a new display object.
-	 *
 	 */
-	function DisplayObject() { }
+	function __construct() { }
 
 	/**
-	 * Gets name of this page.
+	 * Gets the content of this object.
 	 * @param array $data Context data.
 	 * @return string The name of this page for the browser's titlebar.
 	 */
@@ -66,112 +65,25 @@ class DisplayObject
 
 //Form Functions
 
-/**
- * Returns a rendered <select> for a series of months.
- * @param string $name Name of the input.
- * @param int $default Default month.
- * @param string $attribs Additional attributes for the <select> field.
- * @return string Rendered month selection.
- */
-function GetMonthSelect($name, $default, $attribs = null)
-{
-	$ret = "<select name=\"$name\"";
-	$ret .= GetAttribs($attribs);
-	$ret .= ">";
-	for ($ix = 1; $ix <= 12; $ix++)
-	{
-		$ts = mktime(0, 0, 0, $ix, 1);
-		if ($ix == $default) $sel = " selected=\"selected\"";
-		else $sel = "";
-		$ret .= "<option value=\"$ix\"$sel> " . date('F', $ts) . "</option>\n";
-	}
-	$ret .= "</select>\n";
-	return $ret;
-}
-
-/**
- * Returns a rendered selection for picking years.
- * @param string $name Name of this inputs.
- * @param int $year Default selection.
- * @return string Rendered year selection.
- */
-function GetYearSelect($name, $attribs)
-{
-	// Handle Attributes
-
-	$year = strtoval(@$attribs['VALUE'], date('Y'));
-	$shownav = strtoval(@$attribs['SHOWNAV'], true);
-	$step = strtoval(@$attribs['STEP'], 5);
-	$shownext = strtoval(@$attribs['SHOWNEXT'], true);
-	$showprev = strtoval(@$attribs['SHOWPREV'], true);
-
-	$from = $showprev ? $year-$step : $year;
-	$next = $shownext ? $year+$step : $year;
-
-	$ret = "<select name=\"$name\">";
-	if ($shownav)
-		$ret .= "<option value=\"".($from-1)."\"> &laquo; </option>\n";
-
-	for ($ix = $from; $ix < $next; $ix++)
-	{
-		if ($ix == $year) $sel = " selected=\"selected\"";
-		else $sel = "";
-		$ret .= "<option value=\"$ix\"$sel>$ix</option>\n";
-	}
-	if ($shownav)
-		$ret .= "<option value=\"".($next+1)."\"> &raquo; </option>\n";
-	$ret .= "</select>\n";
-	return $ret;
-}
-
-/**
- * @param array $atrs Default state number.
- * @return string Rendered <select> box.
- */
-function GetInputState($atrs = null, $keys = true)
-{
-	global $StateNames;
-	return MakeSelect($atrs, ArrayToSelOptions($StateNames, null, $keys));
-}
-
-/**
- * @param array $atrs Default state number.
- * @return string Rendered <select> box.
- */
-function GetInputSState($atrs = null, $keys = true)
-{
-	global $StateSNames;
-	return MakeSelect($atrs, ArrayToSelOptions($StateSNames, null, $keys));
-}
-
-$StateNames = array(0 => 'None', 1 => 'Alabama', 2 => 'Alaska', 3 => 'Arizona',
-	4 => 'Arkansas', 5 => 'California', 6 => 'Colorado', 7 => 'Connecticut',
-	8 => 'Delaware', 9 => 'Florida', 10 => 'Georgia', 11 => 'Hawaii',
-	12 => 'Idaho', 13 => 'Illinois', 14 => 'Indiana', 15 => 'Iowa',
-	16 => 'Kansas', 17 => 'Kentucky', 18 => 'Louisiana', 19 => 'Maine',
-	20 => 'Maryland', 21 => 'Massachusetts', 22 => 'Michigan',
-	23 => 'Minnesota', 24 => 'Mississippi', 25 => 'Missouri', 26 => 'Montana',
-	27 => 'Nebraska', 28 => 'Nevada', 29 => 'New Hampshire', 30 => 'New Jersey',
-	31 => 'New Mexico', 32 => 'New York', 33 => 'North Carolina',
-	34 => 'North Dakota', 35 => 'Ohio', 36 => 'Oklahoma', 37 => 'Oregon',
-	38 => 'Pennsylvania', 39 => 'Rhode Island', 40 => 'South Carolina',
-	41 => 'South Dakota', 42 => 'Tennessee', 43 => 'Texas', 44 => 'Utah',
-	45 => 'Vermont', 46 => 'Virginia', 47 => 'Washington',
-	48 => 'West Virginia', 49 => 'Wisconsin', 50 => 'Wyoming',
-	51 => 'District of Columbia', 52 => 'Canada',
-	3 => 'Armed Forces Africa / Canada / Europe / Middle East'
-);
-
-$StateSNames = array(
-	0 => 'NA', 1 => 'AL', 2 => 'AK', 3 => 'AZ', 4 => 'AR', 5 => 'CA',
-	6 => 'CO', 7 => 'CT', 8 => 'DE', 9 => 'FL', 10 => 'GA', 11 => 'HI',
-	12 => 'ID', 13 => 'IL', 14 => 'IN', 15 => 'IA', 16 => 'KS', 17 => 'KY',
-	18 => 'LA', 19 => 'ME', 20 => 'MD', 21 => 'MA', 22 => 'MI', 23 => 'MN',
-	24 => 'MS', 25 => 'MO', 26 => 'MT', 27 => 'NE', 28 => 'NV', 29 => 'NH',
-	30 => 'NJ', 31 => 'NM', 32 => 'NY', 33 => 'NC', 34 => 'ND', 35 => 'OH',
-	36 => 'OK', 37 => 'OR', 38 => 'PA', 39 => 'RI', 40 => 'SC', 41 => 'SD',
-	42 => 'TN', 43 => 'TX', 44 => 'UT', 45 => 'VT', 46 => 'VA', 47 => 'WA',
-	48 => 'WV', 49 => 'WI', 50 => 'WY', 51 => 'DC', 52 => 'CN', 52 => 'AE'
+$StateNames = array(
+	'NA' => 'None', 'AL' => 'Alabama', 'AK' => 'Alaska', 'AZ' => 'Arizona',
+	'AR' => 'Arkansas', 'CA' => 'California', 'CO' => 'Colorado',
+	'CT' => 'Connecticut', 'DE' => 'Delaware', 'FL' => 'Florida',
+	'GA' => 'Georgia', 'HI' => 'Hawaii', 'ID' => 'Idaho', 'IL' => 'Illinois',
+	'IN' => 'Indiana', 'IA' => 'Iowa', 'KS' => 'Kansas', 'KY' => 'Kentucky',
+	'LA' => 'Louisiana', 'ME' => 'Maine', 'MD' => 'Maryland',
+	'MA' => 'Massachusetts', 'MI' => 'Michigan', 'MN' => 'Minnesota',
+	'MS' => 'Mississippi', 'MO' => 'Missouri', 'MT' => 'Montana',
+	'NE' => 'Nebraska', 'NV' => 'Nevada', 'NH' => 'New Hampshire',
+	'NJ' => 'New Jersey', 'NM' => 'New Mexico', 'NY' => 'New York',
+	'NC' => 'North Carolina', 'ND' => 'North Dakota', 'OH' => 'Ohio',
+	'OK' => 'Oklahoma', 'OR' => 'Oregon', 'PA' => 'Pennsylvania',
+	'RI' => 'Rhode Island', 'SC' => 'South Carolina', 'SD' => 'South Dakota',
+	'TN' => 'Tennessee', 'TX' => 'Texas', 'UT' => 'Utah', 'VT' => 'Vermont',
+	'VA' => 'Virginia', 'WA' => 'Washington', 'WV' => 'West Virginia',
+	'WI' => 'Wisconsin', 'WY' => 'Wyoming', 'DC' => 'District of Columbia',
+	'CN' => 'Canada',
+	'AE' => 'Armed Forces Africa / Canada / Europe / Middle East'
 );
 
 function StateCallback($ds, $data, $col)
