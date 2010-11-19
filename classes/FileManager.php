@@ -1,11 +1,11 @@
 <?php
 
+require_once(__DIR__.'/File.php');
+require_once(__DIR__.'/HTML.php');
+
 /**
  * @package File Management
  */
-
-require_once('h_utility.php');
-require_once('h_display.php');
 
 define('FM_SORT_MANUAL', -1);
 define('FM_SORT_TABLE', -2);
@@ -100,9 +100,10 @@ class FileManager
 	 * @param string $root Highlest folder level allowed.
 	 * @param array $filters Directory filters allowed.
 	 */
-	function FileManager($name, $root, $filters = null)
+	function __construct($name, $root, $filters = null)
 	{
-		$this->Name = CleanID($name);
+		# TODO: Don't run cleanID here!
+		$this->Name = HTML::CleanID($name);
 		$this->Root = $root;
 		$this->filters = $filters;
 
@@ -117,7 +118,7 @@ class FileManager
 
 		//Append trailing slash.
 		if (substr($this->Root, -1) != '/') $this->Root .= '/';
-		$this->cf = SecurePath(GetState($this->Name.'_cf'));
+		$this->cf = File::SecurePath(Server::GetState($this->Name.'_cf'));
 		if (!file_exists($this->Root.$this->cf))
 		{
 			Error('Directory does not exist:'.$this->cf);
@@ -129,7 +130,7 @@ class FileManager
 			&& substr($this->cf, -1) != '/')
 			$this->cf .= '/';
 
-		$rp = GetRelativePath(dirname(__FILE__));
+		$rp = File::GetRelativePath(dirname(__FILE__));
 	}
 
 	/**
@@ -1526,7 +1527,7 @@ class FileInfo
 
 		while (is_file($ft->path) || empty($ft->info['type']))
 		{
-			if (is_in($ft->dir, $root)) $ft = new FileInfo($ft->dir);
+			if (File::IsIn($ft->dir, $root)) $ft = new FileInfo($ft->dir);
 			else
 			{
 				if (isset($defaults[0]))

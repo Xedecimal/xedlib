@@ -1,7 +1,9 @@
 <?php
 
+require_once(__DIR__.'/../U.php');
 require_once(__DIR__.'/../Arr.php');
 require_once(__DIR__.'/../HTML.php');
+require_once(__DIR__.'/FormOption.php');
 
 class FormInput
 {
@@ -65,7 +67,7 @@ class FormInput
 		if (is_array($atrs))
 			foreach ($atrs as $k => $v)
 				$this->atrs[strtoupper($k)] = $v;
-		else $this->atrs = HTML::ParseAtrs($atrs);
+		else $this->atrs = HTML::ParseAttribs($atrs);
 
 		// Analyze these attributes
 
@@ -79,13 +81,13 @@ class FormInput
 		{
 			case 'state':
 				$this->atrs['TYPE'] = 'select';
-				$this->atrs['VALUE'] = ArrayToSelOptions($GLOBALS['StateNames'],
+				$this->atrs['VALUE'] = FormOption::FromArray(U::StateNames(),
 					$this->attr('VALUE'));
 				break;
 			case 'fullstate':
-				return GetInputState($this->atrs, @$this->valu, false);
+				return FormInput::GetState($this->atrs, @$this->valu, false);
 			case 'shortstate':
-				return GetInputSState($this->atrs, @$this->valu);
+				return FormInput::GetState($this->atrs, @$this->valu, true);
 		}
 	}
 
@@ -377,7 +379,7 @@ class FormInput
 		if (isset($atrs['VALUE'])) $selvalue = $atrs['VALUE'];
 		if (is_array($atrs)) unset($atrs['VALUE']);
 
-		$ret = '<select'.GetAttribs($atrs).">\n";
+		$ret = '<select'.HTML::GetAttribs($atrs).">\n";
 		foreach ($value as $id => $option)
 			$ret .= $option->Render($id == $selvalue);
 		$ret .= "</select>\n";
@@ -520,11 +522,11 @@ class FormInput
 	 * @param array $atrs Default state number.
 	 * @return string Rendered <select> box.
 	 */
-	static function GetInputState($atrs = null, $keys = true, $short = false)
+	static function GetState($atrs = array(), $keys = true, $short = false)
 	{
-		global $StateNames;
-		$vals = $short ? array_keys($StateNames) : $StateNames;
-		return MakeSelect($atrs, ArrayToSelOptions($vals, null, $keys));
+		$vals = $short ? array_keys(U::StateNames()) : U::StateNames();
+		return FormInput::GetSelect($atrs,
+			FormOption::FromArray($vals, null, $keys));
 	}
 
 	/**

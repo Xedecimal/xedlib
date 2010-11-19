@@ -35,11 +35,11 @@ class Arr
 	 *
 	 * @param array $array Array to be sorted
 	 */
-	static function arksort(&$array)
+	static function ARKSort(&$array)
 	{
 		ksort($array);
 		foreach ($array as $k => $v)
-			if (is_array($v)) arksort($array[$k]);
+			if (is_array($v)) Arr::ARKSort($array[$k]);
 	}
 }
 

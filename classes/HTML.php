@@ -30,7 +30,7 @@ class HTML
 	 * @param string $atrs Attributes to process.
 	 * @return array String indexed array of attributes.
 	 */
-	static function ParseAtrs($atrs)
+	static function ParseAttribs($atrs)
 	{
 		if (empty($atrs)) return;
 		$m = null;

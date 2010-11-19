@@ -147,6 +147,7 @@ class HandlerFile extends EditorHandler
 	/**
 	 * Creates a new file handler.
 	 *
+	 * @param FileManager $fm Associated file manager.
 	 * @param string $target VarParsed string of associated database columns.
 	 * @param array $conditions Conditions to consider enabling folder
 	 * management.

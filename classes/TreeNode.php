@@ -24,6 +24,7 @@ class TreeNode
 	 */
 	public $children;
 
+	/** @var TreeNode TreeNode that this was passed to AddChild on. */
 	public $parent;
 
 	/**
@@ -31,7 +32,7 @@ class TreeNode
 	 *
 	 * @param mixed $data Data to associate with this node.
 	 */
-	function TreeNode($data = null, $id = null)
+		function __construct($data = null, $id = null)
 	{
 		$this->data = $data;
 		$this->id = $id;

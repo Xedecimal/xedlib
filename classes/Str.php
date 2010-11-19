@@ -25,7 +25,7 @@ class Str
 	 * @param int $size Size to convert into proper string.
 	 * @return string Size converted to a string.
 	 */
-	function SizeString($size)
+	static function SizeString($size)
 	{
 		$units = explode(' ','B KB MB GB TB');
 		for ($i = 0; $size > 1024; $i++) { $size /= 1024; }

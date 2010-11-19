@@ -1,7 +1,9 @@
 <?php
 
+require_once(__DIR__.'/../TreeNode.php');
+
 /**
- * Enter description here...
+ * A select box, multiple select boxes, checkboxes, etc.
  */
 class FormOption extends TreeNode
 {
@@ -88,16 +90,18 @@ class FormOption extends TreeNode
 	 */
 	static function FromArray($array, $default = null, $use_keys = true)
 	{
+		if (!is_array($array)) Server::Error("Attempted to create FormOptions
+			from invalid array: {$array}");
 		$opts = array();
 		foreach ($array as $ix => $item)
 		{
 			if (is_array($item))
 			{
-				$o = new SelOption($ix, $default == $item);
+				$o = new FormOption($ix, $default == $item);
 				$o->children = ArrayToSelOptions($item, $default, $use_keys);
 				$o->group = true;
 			}
-			else $o = new SelOption($item, $default == $item);
+			else $o = new FormOption($item, $default == $item);
 
 			if ($use_keys) $o->valu = $o->id = $ix;
 			$opts[$use_keys ? $ix : $item] = $o;

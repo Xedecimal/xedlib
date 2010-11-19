@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__.'/../Server.php');
+
 /**
  * on our way to the storage phase! We shall support the following!
  *
@@ -166,7 +168,7 @@ class Database
 	{
 		$m = null;
 		if (!preg_match('#([^:]+)://(([^:]*):*(.*)@|)([^/]*)/*(.*)#', $url, $m))
-			Error("Invalid url for database.");
+			Server::Error("Invalid url for database.");
 
 		switch ($m[1])
 		{
@@ -354,17 +356,11 @@ class Database
 	 * @param bool $include_time Whether hours, minutes and seconds are included.
 	 * @return int Timestamp
 	 */
-	function MyDateTimestamp($date, $include_time = false)
+	static function MyDateTimestamp($date, $include_time = false)
 	{
 		if ($include_time) {
-			return mktime(
-				substr($date, 11, 2), //hh
-				substr($date, 14, 2), //mm
-				substr($date, 17, 2), //ss
-				substr($date, 5, 2), //m
-				substr($date, 8, 2), //d
-				substr($date, 0, 4) //y
-			);
+			if (preg_match('/(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/', $date, $m))
+			return mktime($m[4], $m[5], $m[6], $m[2], $m[3], $m[1]);
 		}
 		else
 		{
