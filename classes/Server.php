@@ -110,6 +110,24 @@ class Server
 	static function Error($msg, $level = E_USER_ERROR) { trigger_error($msg, $level); }
 
 	/**
+	 * Use this when you wish to output debug information only when $debug is
+	 * true.
+	 *
+	 * @param string $msg The message to output.
+	 * @version 1.0
+	 * @see Error, ErrorHandler, HandleErrors
+	 * @since 1.0
+	 * @todo Alternative output locations.
+	 * @todo Alternative verbosity levels.
+	 * @example test_utility.php
+	 */
+	static function Trace($msg)
+	{
+		if (!empty($GLOBALS['debug'])) varinfo($msg);
+		if (!empty($GLOBALS['__debfile'])) file_put_contents('trace.txt', $msg."\r\n", FILE_APPEND);
+	}
+
+	/**
 	 * Attempts to set a variable using sessions.
 	 *
 	 * @param string $name Name of the value to set.
@@ -177,6 +195,29 @@ class Server
 	static function GetState($name, $def = null)
 	{
 		return Server::SetVar($name, Server::GetVar($name, $def));
+	}
+
+	/**
+	 * Gets the webserver path for a given local filesystem directory.
+	 *
+	 * @param string $path
+	 * @return string Translated path.
+	 */
+	static function GetRelativePath($path)
+	{
+		$dr = $_SERVER['DOCUMENT_ROOT']; //Probably Apache situated
+
+		if (empty($dr)) //Probably IIS situated
+		{
+			//Get the document root from the translated path.
+			$pt = str_replace('\\\\', '/', Server::GetVar('PATH_TRANSLATED',
+				Server::GetVar('ORIG_PATH_TRANSLATED')));
+			$dr = substr($pt, 0, -strlen(Server::GetVar('SCRIPT_NAME')));
+		}
+
+		$dr = str_replace('\\\\', '/', $dr);
+
+		return substr(str_replace('\\', '/', str_replace('\\\\', '/', $path)), strlen($dr));
 	}
 }
 

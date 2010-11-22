@@ -1,5 +1,6 @@
 <?php
 
+require_once(__DIR__.'/../U.php');
 require_once(__DIR__.'/../File.php');
 require_once(__DIR__.'/../LayeredOutput.php');
 require_once(__DIR__.'/../VarParser.php');
@@ -94,7 +95,7 @@ class Template extends LayeredOutput
 		$this->objs = array();
 		$this->vars = array();
 		$this->use_getvar = false;
-		$this->vars['relpath'] = File::GetRelativePath(dirname(__FILE__));
+		$this->vars['relpath'] = Server::GetRelativePath(dirname(__FILE__));
 
 		if (!empty($GLOBALS['_d']['template.rewrites']))
 			foreach ($GLOBALS['_d']['template.rewrites'] as $tag => $rw)
@@ -171,7 +172,7 @@ class Template extends LayeredOutput
 
 		if (isset($this->transforms[$tag]))
 		{
-			$ret = RunCallbacks($this->transforms[$tag], $attribs, $this->transformargs[$tag]);
+			$ret = U::RunCallbacks($this->transforms[$tag], $attribs, $this->transformargs[$tag]);
 			$attribs = array_merge($attribs, $ret);
 		}
 
@@ -206,21 +207,10 @@ class Template extends LayeredOutput
 			$this->Push($box);
 			$show = false;
 		}
-		else if ($tag == 'BR') $close = ' /';
-		else if ($tag == 'COPY') $output .= '&copy;';
-		else if ($tag == 'DOCTYPE')
-		{
-			$show = false;
-			if (isset($attribs['TYPE']))
-			{
-				if ($attribs['TYPE'] == 'strict')
-					$this->Out('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-						"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">');
-				if ($attribs['TYPE'] == 'trans')
-					$this->Out('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-						"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">');
-			}
-		}
+		else if ($tag == 'BR')
+			$close = ' /';
+		else if ($tag == 'COPY')
+			$output .= '&copy;';
 		else if ($tag == 'FORM' && $this->Behavior->MakeDynamic)
 			$this->start .= $this->ProcessForm($parser, $tag, $attribs);
 
@@ -492,11 +482,6 @@ class Template extends LayeredOutput
 		return $ret;
 	}
 
-	function Get()
-	{
-		Error('Please do not call Get on Template.');
-	}
-
 	/**
 	 * Processes an entire template as string, good for file_get_contents().
 	 *
@@ -506,27 +491,6 @@ class Template extends LayeredOutput
 	function GetString($str)
 	{
 		$nstr = $this->PreProcess($str);
-
-		if ($this->Behavior->MakeDynamic)
-		{
-			if (!file_exists('temp_cache')) mkdir('temp_cache');
-
-			$md5 = md5($nstr);
-
-			if (file_exists('temp_cache/'.$md5))
-				$this->config = unserialize(file_get_contents('temp_cache/'.$md5));
-
-			if (GetVar('ca') == 'template_config')
-			{
-				$this->config['db_host'] = GetVar('host');
-				$this->config['db_user'] = GetVar('user');
-				$this->config['db_pass'] = GetVar('pass');
-				$this->config['db_data'] = GetVar('data');
-				$fp = fopen('temp_cache/'.$md5, 'w');
-				fwrite($fp, serialize($this->config));
-				fclose($fp);
-			}
-		}
 
 		$this->CreateBuffer(); //Create a layer of output.
 
@@ -545,9 +509,9 @@ class Template extends LayeredOutput
 			$err = "XML Error: " . xml_error_string(xml_get_error_code($p)) .
 			" on line " . xml_get_current_line_number($p);
 			$err .= "<br/>Inside the following template ...<br/>\n";
-			$err .= varinfo($str, true);
+			$err .= U::VarInfo($str, true);
 			$err .= "<br/>\n";
-			Error($err);
+			Server::Error($err);
 		}
 		xml_parser_free($p);
 
@@ -581,21 +545,7 @@ class Template extends LayeredOutput
 	 */
 	function PreProcess($str)
 	{
-		$nret = preg_replace_callback('/(<\?php|<\?)(.+?)\?>/s', array(&$this, 'CodeCallback'), $str);
-		return str_replace('&', '&amp;', $nret);
-	}
-
-	/**
-	 * Internal Use
-	 *
-	 * @param array $m preg_replace_callback default argument.
-	 * @return string Replacement string.
-	 */
-	function CodeCallback($m)
-	{
-		ob_start();
-		eval($m[2]);
-		return ob_get_clean();
+		return str_replace('&', '&amp;', $str);
 	}
 
 	static function TagRepeat($t, $g, $a)

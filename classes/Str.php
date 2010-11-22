@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__.'/U.php');
+
 /**
  * String manipulation.
  */
@@ -38,7 +40,7 @@ class Str
 	 * @param string $str String to convert into proper size.
 	 * @return int String converted to proper size.
 	 */
-	function GetStringSize($str)
+	static function GetStringSize($str)
 	{
 		$num = (int)substr($str, 0, -1);
 		switch (strtoupper(substr($str, -1)))

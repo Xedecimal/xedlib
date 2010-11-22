@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/../HTML.php');
+require_once(__DIR__.'/../HM.php');
 require_once(__DIR__.'/../LayeredOutput.php');
 require_once(__DIR__.'/FormInput.php');
 
@@ -389,7 +389,7 @@ class Form extends LayeredOutput
 		global $PERSISTS;
 		$frm = new Form(@$a['ID']);
 		$t->Push($frm);
-		$ret = '<form'.HTML::GetAttribs($a).'>';
+		$ret = '<form'.HM::GetAttribs($a).'>';
 		if (is_array($PERSISTS))
 		foreach ($PERSISTS as $n => $v)
 			$ret .= '<input type="hidden" name="'.$n.'" value="'.$v.'" />';

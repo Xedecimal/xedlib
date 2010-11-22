@@ -714,10 +714,11 @@ class EditorData
 	{
 		if (!empty($items))
 		{
-			//Columns
-			//* Gather all columns required for display and relation.
-			//Children
-			//* Map child names to child index.
+			# Columns
+			# * Gather all columns required for display and relation.
+			# Children
+			# * Map child names to child index.
+
 			$cols[$this->ds->table] = array($this->ds->id => 1);
 			if (!empty($this->ds->DisplayColumns))
 			foreach (array_keys($this->ds->DisplayColumns) as $col)
@@ -736,35 +737,35 @@ class EditorData
 				}
 			}
 
-			//Flats
-			// * Convert each item into separated TreeNodes
-			// * Associate all indexes by table, then id
+			# Flats
+			# * Convert each item into separated TreeNodes
+			# * Associate all indexes by table, then id
 
 			$flats = array();
 
-			//Iterate all the resulting database rows.
+			# Iterate all the resulting database rows.
 			foreach ($items as $ix => $item)
 			{
 
-				//Iterate the columns that were created in step 1.
+				# Iterate the columns that were created in step 1.
 				foreach ($cols as $table => $columns)
 				{
-					//This will store all the associated data in the treenode
-					//for the editor to reference while processing the treee.
+					# This will store all the associated data in the treenode
+					# for the editor to reference while processing the tree.
 					$data = array();
 					$skip = false;
 
-					//Now we're iterating the display columns.
+					# Now we're iterating the display columns.
 					foreach ($columns as $column => $id)
 					{
-						//This column is not associated with a database row.
+						# This column is not associated with a database row.
 						if (is_numeric($column)) continue;
 
-						//Table names are included to avoid ambiguity.
+						# Table names are included to avoid ambiguity.
 						$colname = $table.'_'.$column;
 
-						//ID would be specified if this is specified as a keyed
-						//value.
+						# ID would be specified if this is specified as a keyed
+						# value.
 						if ($id)
 						{
 							if (empty($item[$colname]))
@@ -785,8 +786,8 @@ class EditorData
 				}
 			}
 
-			//Tree
-			// * Construct tree out of all items and children.
+			# Tree
+			# * Construct tree out of all items and children.
 
 			$tree = new TreeNode('Root');
 
@@ -811,8 +812,8 @@ class EditorData
 						$tree->children[] = $node;
 				}
 			}
-			//Put child table children above related
-			//children, helps to understand the display.
+			# Put child table children above related children, helps to
+			# understand the display.
 			if (count($this->ds->children) > 0) $this->FixTree($tree);
 			return $tree;
 		}

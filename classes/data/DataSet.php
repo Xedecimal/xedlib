@@ -1,5 +1,9 @@
 <?php
 
+require_once(__DIR__.'/Database.php');
+require_once(__DIR__.'/Relation.php');
+require_once(__DIR__.'/Join.php');
+
 /**
  * A general dataset, good for binding to a database's table.
  * Used to generically retrieve, store, update and delete
@@ -17,7 +21,7 @@ class DataSet
 	 *
 	 * @var Database
 	 */
-	private $database;
+	public $database;
 
 	/**
 	 * Name of the table that this DataSet is associated with.
@@ -562,7 +566,7 @@ class DataSet
 		//Error handling
 		if (!isset($this->database))
 		{
-			Error("<br />What: The database is not set.
+			Server::Error("<br />What: The database is not set.
 			<br />Who: DataSet::Get() on {$this->table}
 			<br />Why: You may have specified an incorrect database in
 			construction.");

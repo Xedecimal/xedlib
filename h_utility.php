@@ -1,28 +1,5 @@
 <?php
 
-/**
- * @package Utility
- *
- */
-
-/**
- * Use this when you wish to output debug information only when $debug is
- * true.
- *
- * @param string $msg The message to output.
- * @version 1.0
- * @see Error, ErrorHandler, HandleErrors
- * @since 1.0
- * @todo Alternative output locations.
- * @todo Alternative verbosity levels.
- * @example test_utility.php
- */
-function Trace($msg)
-{
-	if (!empty($GLOBALS['debug'])) varinfo($msg);
-	if (!empty($GLOBALS['__debfile'])) file_put_contents('trace.txt', $msg."\r\n", FILE_APPEND);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 //Session
 //
@@ -131,59 +108,6 @@ function Persist($name, $value)
 	global $PERSISTS;
 	$PERSISTS[$name] = $value;
 	return $value;
-}
-
-/**
- * Returns a clean URI.
- *
- * @param string $url URL to clean.
- * @param array $uri URI appended on URL and cleaned.
- * @return string Cleaned URI+URL
- */
-function URL($url, $uri = null)
-{
-	$ret = $url; # This should be encoded elsewhere and not here.
-
-	global $PERSISTS;
-	$nuri = array();
-	if (!empty($uri)) $nuri = $uri;
-	if (!empty($PERSISTS)) $nuri = array_merge($PERSISTS, $nuri);
-
-	if (!empty($nuri))
-	{
-		$start = (strpos($ret, "?") < 1);
-		foreach ($nuri as $key => $val)
-		{
-			if (isset($val))
-			{
-				$ret .= URLParse($key, $val, $start);
-				$start = false;
-			}
-		}
-	}
-	return $ret;
-}
-
-/**
- * Parses an object or array for serialization to a uri.
- *
- * @param string $key Parent key for the current series to iterate.
- * @param mixed $val Object or array to iterate.
- * @param bool $start Whether or not this is the first item being parsed.
- * @return string Rendered url string.
- */
-function URLParse($key, $val, $start = false)
-{
-	$ret = null;
-	if (is_array($val))
-		foreach ($val as $akey => $aval)
-			$ret .= URLParse($key.'['.$akey.']', $aval, $start);
-	else
-	{
-		//$nval = str_replace(' ', '%20', $val);
-		$ret .= ($start ? '?' : '&amp;').$key.'='.urlencode($val);
-	}
-	return $ret;
 }
 
 /**
@@ -666,20 +590,6 @@ function dir_get($path = '.')
 		if (is_dir($path.'/'.$f)) $ret[] = $f;
 	}
 	return $ret;
-}
-
-define('OPT_FILES', 1);
-define('OPT_DIRS', 2);
-
-/**
- * Will let a variable be set only if it's not already set.
- *
- * @param mixed $var Variable to Let.
- * @param mixed $val Value to set to $var.
- */
-function Let(&$var, $val)
-{
-	if (!isset($var)) $var = $val;
 }
 
 function GetMonthName($month)

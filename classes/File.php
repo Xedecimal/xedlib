@@ -2,6 +2,9 @@
 
 require_once(__DIR__.'/Server.php');
 
+define('SCAN_FILES', 1);
+define('SCAN_DIRS', 2);
+
 class File
 {
 	function PregRename($glob, $preg_src, $preg_dst)
@@ -109,31 +112,9 @@ class File
 	 */
 	static function IsIn($src, $dst)
 	{
+		if (!isset($src) || !isset($dst)) return false;
 		$rpdst = realpath($dst);
 		return substr(realpath($src), 0, strlen($rpdst)) == $rpdst;
-	}
-
-	/**
-	 * Gets the webserver path for a given local filesystem directory.
-	 *
-	 * @param string $path
-	 * @return string Translated path.
-	 */
-	static function GetRelativePath($path)
-	{
-		$dr = $_SERVER['DOCUMENT_ROOT']; //Probably Apache situated
-
-		if (empty($dr)) //Probably IIS situated
-		{
-			//Get the document root from the translated path.
-			$pt = str_replace('\\\\', '/', Server::GetVar('PATH_TRANSLATED',
-				Server::GetVar('ORIG_PATH_TRANSLATED')));
-			$dr = substr($pt, 0, -strlen(Server::GetVar('SCRIPT_NAME')));
-		}
-
-		$dr = str_replace('\\\\', '/', $dr);
-
-		return substr(str_replace('\\', '/', str_replace('\\\\', '/', $path)), strlen($dr));
 	}
 
 	/**
@@ -164,19 +145,20 @@ class File
 		// This is a file and unable to recurse.
 		if (is_file($path))
 		{
-			if (OPT_FILES & $flags) return array($path);
+			if (SCAN_FILES & $flags) return array($path);
 			return array();
 		}
 
 		else if (is_dir($path))
 		{
 			// We will return ourselves if we're including directories.
-			$ret = ($flags & OPT_DIRS) ? array($path) : array();
+			$ret = ($flags & SCAN_DIRS) ? array($path) : array();
 			$dp = opendir($path);
 			while ($f = readdir($dp))
 			{
 				if ($f[0] == '.') continue;
-				$ret = array_merge($ret, Comb($path.'/'.$f, $exclude, $flags));
+				$ret = array_merge($ret,
+					File::Comb($path.'/'.$f, $exclude, $flags));
 			}
 
 			return $ret;

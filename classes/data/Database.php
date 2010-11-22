@@ -1,6 +1,7 @@
 <?php
 
 require_once(__DIR__.'/../Server.php');
+require_once(__DIR__.'/../U.php');
 
 /**
  * on our way to the storage phase! We shall support the following!
@@ -97,7 +98,7 @@ class Database
 				if (call_user_func($handler, mysqli_errno($this->link))) return;
 			if (isset($this->Handlers[mysqli_errno($this->link)]))
 				if (call_user_func($this->Handlers[mysqli_errno($this->link)])) return;
-			Error('MySQLi Error ['.mysqli_errno($this->link).']: '
+			Server::Error('MySQLi Error ['.mysqli_errno($this->link).']: '
 				.mysqli_error($this->link)."<br />\nQuery: {$query}<br/>\n");
 		}
 	}
@@ -138,13 +139,6 @@ class Database
 		}
 	}
 
-	/**
-	 * Instantiates a new Database object.
-	 */
-	function Database()
-	{
-	}
-
 	function Escape($val)
 	{
 		switch ($this->type)
@@ -164,29 +158,38 @@ class Database
 	 * Opens a connection to a database.
 	 * @param string $url Example: mysql://user:pass@host/database
 	 */
-	function Open($url)
+	function Open($url, $create = false)
 	{
 		$m = null;
-		if (!preg_match('#([^:]+)://(([^:]*):*(.*)@|)([^/]*)/*(.*)#', $url, $m))
+		if (!$m = parse_url($url))
 			Server::Error("Invalid url for database.");
 
-		switch ($m[1])
+		if (!empty($m['path']))
+			$this->name = str_replace('/', '', $m['path']);
+
+		switch ($m['scheme'])
 		{
 			case 'mysqli':
 				$this->ErrorHandler = array($this, 'CheckMiError');
 				$this->func_aff = 'mysqli_affected_rows';
-				$this->link = mysqli_connect($m[5], $m[3], $m[4]);
-				mysqli_select_db($this->link, $m[6]);
+				$this->link = mysqli_connect($m['host'], $m['user'], $m['pass']);
 				$this->type = DB_MI;
+
+				if (!empty($this->name))
+				{
+					if ($create) $this->Create();
+					mysqli_select_db($this->link, $this->name);
+				}
 				$this->lq = $this->rq = '`';
 				break;
 			case 'mysql':
 				$this->ErrorHandler = array($this, 'CheckMyError');
 				$this->func_aff = 'mysql_affected_rows';
+				$this->type = DB_MY;
+
 				if (!$this->link = mysql_connect($m[5], $m[3], $m[4], true))
 					return false;
 				mysql_select_db($m[6], $this->link);
-				$this->type = DB_MY;
 				$this->lq = $this->rq = '`';
 				break;
 			case 'odbc':
@@ -203,11 +206,10 @@ class Database
 				$this->type = DB_SL;
 				break;
 			default:
-				Error("Invalid database type.");
+				Server::Error("Invalid database type.");
 				break;
 		}
 		call_user_func($this->ErrorHandler, null, null);
-		$this->name = $m[6];
 	}
 
 	/**
@@ -220,8 +222,8 @@ class Database
 	 */
 	function Query($query, $handler = null)
 	{
-		if (!isset($this->type)) Error("Database has not been opened.");
-		Trace($query);
+		if (!isset($this->type)) Server::Error("Database has not been opened.");
+		Server::Trace($query);
 		switch ($this->type)
 		{
 			case DB_MI:
@@ -251,8 +253,7 @@ class Database
 	*/
 	function Create()
 	{
-		mysql_query("CREATE DATABASE {$this->name}", $this->link);
-		if (mysql_error($this->link)) echo "Create(): " . mysql_error($this->link) . "<br>\n";
+		$this->Query("CREATE DATABASE {$this->name}");
 	}
 
 	/**
@@ -270,8 +271,7 @@ class Database
 	*/
 	function Drop()
 	{
-		mysql_query("DROP DATABASE {$this->name}", $this->link);
-		if (mysql_error($this->link)) echo "Drop(): " . mysql_error($this->link) . "<br>\n";
+		$this->Query("DROP DATABASE {$this->name}");
 	}
 
 	/**
@@ -307,22 +307,23 @@ class Database
  * @param string $data Information that will not be quited.
  * @return array specifying that this string shouldn't be quoted.
  */
-	function SqlUnquote($data) { return array('val' => $data, 'opt' => SQLOPT_UNQUOTE); }
-	function SqlBetween($from, $to) { return array('cmp' => 'BETWEEN', 'opt' => SQLOPT_UNQUOTE, 'val' => "'$from' AND '$to'"); }
-	function SqlIs($val) { return array('cmp' => 'IS', 'opt' => SQLOPT_UNQUOTE, 'val' => $val); }
-	function SqlNot($val) { return array('cmp' => '!=', 'val' => $val); }
-	function SqlAnd($val) { return array('inc' => 'AND', 'val' => $val); }
-	function SqlOr($val)
+	static function SqlUnquote($data) { return array('val' => $data, 'opt' => SQLOPT_UNQUOTE); }
+	static function SqlBetween($from, $to) { return array('cmp' => 'BETWEEN', 'opt' => SQLOPT_UNQUOTE, 'val' => "'$from' AND '$to'"); }
+	static function SqlIs($val) { return array('cmp' => 'IS', 'opt' => SQLOPT_UNQUOTE, 'val' => $val); }
+	static function SqlNot($val) { return array('cmp' => '!=', 'val' => $val); }
+	static function SqlAnd($val) { return array('inc' => 'AND', 'val' => $val); }
+	static function SqlOr($val)
 	{
 		if (is_array($val)) { $val['inc'] = 'OR'; return $val; }
 		else return array('inc' => 'OR', 'val' => $val);
 	}
-	function SqlLess($val) { return array('cmp' => '<', 'val' => $val); }
-	function SqlMore($val) { return array('cmp' => '>', 'val' => $val); }
-	function SqlDistinct($val) { return array('cmp' => 'DISTINCT', 'val' => $val); }
-	function SqlCount($val) { return array('val' => 'COUNT('.$val.')', 'opt' => SQLOPT_UNQUOTE); }
-	function SqlLike($val) { return array('val' => $val, 'cmp' => 'LIKE'); }
-	function SqlIn($vals)
+	static function SqlLess($val) { return array('cmp' => '<', 'val' => $val); }
+	static function SqlGreater($val) { return array('cmp' => '>', 'val' => $val); }
+	static function SqlMore($val) { return array('cmp' => '>', 'val' => $val); }
+	static function SqlDistinct($val) { return array('cmp' => 'DISTINCT', 'val' => $val); }
+	static function SqlCount($val) { return array('val' => 'COUNT('.$val.')', 'opt' => SQLOPT_UNQUOTE); }
+	static function SqlLike($val) { return array('val' => $val, 'cmp' => 'LIKE'); }
+	static function SqlIn($vals)
 	{
 		$ix = 0; $nv = '';
 		if (!empty($vals))
@@ -333,7 +334,7 @@ class Database
 	 * Returns the proper format for DataSet to generate the current time.
 	 * @return array This column will get translated into the current time.
 	 */
-	function SqlNow() { return array("now"); }
+	static function SqlNow() { return array("now"); }
 
 	/**
 	 * Convert a mysql date to a regular readable date.

@@ -34,7 +34,7 @@ class Relation
 	 * @param string $child_key Column that references the parent.
 	 * @example doc\examples\dataset.php
 	 */
-	function Relation($ds, $parent_key, $child_key)
+	function __construct($ds, $parent_key, $child_key)
 	{
 		$this->ds = $ds;
 		$this->parent_key = $parent_key;

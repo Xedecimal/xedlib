@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__.'/VarParser.php');
+
 /**
  * A node holds children.
  */
@@ -102,14 +104,12 @@ class TreeNode
 		return $ret;
 	}
 
-	function GetUL($tree, $display = 'name')
+	static function GetUL($tree, $display = 'name')
 	{
 		$ret = '<ul><li>'.$tree->data[$display];
 		if (!empty($tree->children))
 		foreach ($tree->children as $child)
-		{
-			$ret .= TreeToUL($child, $display);
-		}
+			$ret .= TreeNode::GetUL($child, $display);
 		$ret .= "</li></ul>\n";
 		return $ret;
 	}
@@ -120,7 +120,7 @@ class TreeNode
 	 * @param TreeNode $root Root treenode item.
 	 * @param string $text VarParser capable text linked to treenode data items.
 	 */
-	function GetTree($root, $text)
+	static function GetTree($root, $text)
 	{
 		$vp = new VarParser();
 
@@ -131,7 +131,7 @@ class TreeNode
 			foreach ($root->children as $c)
 			{
 				$ret .= '<li>'.$vp->ParseVars($text, $c->data);
-				$ret .= GetTree($c, $text);
+				$ret .= TreeNode::GetTree($c, $text);
 				$ret .= "</li>";
 			}
 			$ret .= '</ul>';
@@ -151,7 +151,7 @@ class TreeNode
 		$root = new TreeNode($n);
 		foreach ($arr as $k => $v)
 		{
-			if (is_array($v)) $n = ArrayToTree($k, $v);
+			if (is_array($v)) $n = TreeNode::FromArray($k, $v);
 			else $n = new TreeNode($v);
 			$root->AddChild($n);
 		}

@@ -2,7 +2,7 @@
 
 require_once(__DIR__.'/../U.php');
 require_once(__DIR__.'/../Arr.php');
-require_once(__DIR__.'/../HTML.php');
+require_once(__DIR__.'/../HM.php');
 require_once(__DIR__.'/FormOption.php');
 
 class FormInput
@@ -67,7 +67,7 @@ class FormInput
 		if (is_array($atrs))
 			foreach ($atrs as $k => $v)
 				$this->atrs[strtoupper($k)] = $v;
-		else $this->atrs = HTML::ParseAttribs($atrs);
+		else $this->atrs = HM::ParseAttribs($atrs);
 
 		// Analyze these attributes
 
@@ -273,7 +273,7 @@ class FormInput
 		}
 
 		//$val = $this->GetValue($persist && $this->atrs['TYPE'] != 'radio');
-		$atrs = HTML::GetAttribs($this->atrs);
+		$atrs = HM::GetAttribs($this->atrs);
 		return "<input {$atrs} />";
 	}
 
@@ -379,7 +379,7 @@ class FormInput
 		if (isset($atrs['VALUE'])) $selvalue = $atrs['VALUE'];
 		if (is_array($atrs)) unset($atrs['VALUE']);
 
-		$ret = '<select'.HTML::GetAttribs($atrs).">\n";
+		$ret = '<select'.HM::GetAttribs($atrs).">\n";
 		foreach ($value as $id => $option)
 			$ret .= $option->Render($id == $selvalue);
 		$ret .= "</select>\n";
@@ -396,7 +396,7 @@ class FormInput
 	function GetMonthSelect($name, $default, $attribs = null)
 	{
 		$ret = "<select name=\"$name\"";
-		$ret .= HTML::GetAttribs($attribs);
+		$ret .= HM::GetAttribs($attribs);
 		$ret .= ">";
 		for ($ix = 1; $ix <= 12; $ix++)
 		{

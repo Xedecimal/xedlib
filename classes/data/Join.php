@@ -50,7 +50,7 @@ class Join
 	 * @param string $shortcut Specify an easier name for this joining table.
 	 * @see DataSet.Get
 	 */
-	function Join($dataset, $condition, $type = 'JOIN', $shortcut = null)
+	function __construct($dataset, $condition, $type = 'JOIN', $shortcut = null)
 	{
 		$this->DataSet = $dataset;
 		$this->Condition = $condition;

@@ -1,7 +1,14 @@
 <?php
 
 require_once(__DIR__.'/File.php');
-require_once(__DIR__.'/HTML.php');
+require_once(__DIR__.'/FileInfo.php');
+require_once(__DIR__.'/FilterDefault.php');
+require_once(__DIR__.'/FilterGallery.php');
+require_once(__DIR__.'/HM.php');
+require_once(__DIR__.'/Module.php');
+require_once(__DIR__.'/U.php');
+require_once(__DIR__.'/present/Form.php');
+require_once(__DIR__.'/present/Template.php');
 
 /**
  * @package File Management
@@ -103,14 +110,14 @@ class FileManager
 	function __construct($name, $root, $filters = null)
 	{
 		# TODO: Don't run cleanID here!
-		$this->Name = HTML::CleanID($name);
+		$this->Name = HM::CleanID($name);
 		$this->Root = $root;
 		$this->filters = $filters;
 
 		$this->Behavior = new FileManagerBehavior();
 		$this->View = new FileManagerView();
 
-		$this->Template = dirname(__FILE__).'/temps/file.xml';
+		$this->Template = __DIR__.'/../temps/file.xml';
 
 		if (!file_exists($root))
 			die("FileManager::FileManager(): Root ($root) directory does
@@ -130,7 +137,7 @@ class FileManager
 			&& substr($this->cf, -1) != '/')
 			$this->cf .= '/';
 
-		$rp = File::GetRelativePath(dirname(__FILE__));
+		$rp = Server::GetRelativePath(dirname(__FILE__));
 	}
 
 	/**
@@ -140,7 +147,7 @@ class FileManager
 	 */
 	function Prepare()
 	{
-		$act = GetVar($this->Name.'_action');
+		$act = Server::GetVar($this->Name.'_action');
 
 		//Don't allow renaming the root or the file manager will throw errors
 		//ever after.
@@ -391,16 +398,16 @@ class FileManager
 	static function GetIcon($f)
 	{
 		$icons = array(
-			'folder' => p('images/icons/folder.png'),
-			'png' => p('images/icons/image.png'),
-			'jpg' => p('images/icons/image.png'),
-			'jpeg' => p('images/icons/image.png'),
-			'gif' => p('images/icons/image.png'),
-			'pdf' => p('images/icons/acrobat.png'),
-			'sql' => p('images/icons/db.png'),
-			'xls' => p('images/icons/excel.png'),
-			'doc' => p('images/icons/word.png'),
-			'docx' => p('images/icons/word.png')
+			'folder' => Module::P('images/icons/folder.png'),
+			'png' => Module::P('images/icons/image.png'),
+			'jpg' => Module::P('images/icons/image.png'),
+			'jpeg' => Module::P('images/icons/image.png'),
+			'gif' => Module::P('images/icons/image.png'),
+			'pdf' => Module::P('images/icons/acrobat.png'),
+			'sql' => Module::P('images/icons/db.png'),
+			'xls' => Module::P('images/icons/excel.png'),
+			'doc' => Module::P('images/icons/word.png'),
+			'docx' => Module::P('images/icons/word.png')
 		);
 		if (!empty($f->vars['icon']))
 			return $f->vars['icon'];
@@ -439,7 +446,7 @@ class FileManager
 
 		if (isset($this->cf))
 		{
-			$d['uri'] = URL($this->Behavior->Target,
+			$d['uri'] = HM::URL($this->Behavior->Target,
 				array($this->Name.'_cf' => ''));
 			$d['name'] = $attribs['ROOT'];
 			$ret .= $vp->ParseVars($guts, $d);
@@ -513,10 +520,10 @@ class FileManager
 					unset($vars[$k]);
 				}
 				global $me;
-				$this->vars['url'] = URL($me, $vars);
+				$this->vars['url'] = HM::URL($me, $vars);
 			}
 			else
-				$this->vars['url'] = URL($this->Behavior->Target,
+				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' =>
 					"{$this->cf}{$f->filename}"));
 
@@ -764,9 +771,7 @@ class FileManager
 		if (!file_exists($this->Root.$this->cf))
 			return "FileManager::Get(): File doesn't exist ({$this->Root}{$this->cf}).<br/>\n";
 
-		require_once('h_template.php');
-
-		$relpath = GetRelativePath(dirname(__FILE__));
+		$relpath = Server::GetRelativePath(dirname(__FILE__));
 
 		if (!isset($GLOBALS['page_head'])) $GLOBALS['page_head'] = '';
 		$GLOBALS['page_head'] .= <<<EOF
@@ -791,8 +796,8 @@ EOF;
 		$this->vars['path'] = $this->Root.$this->cf;
 		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
 		$this->vars['relpath'] = $relpath;
-		$this->vars['host'] = GetVar('HTTP_HOST');
-		$this->vars['sid'] = GetVar('PHPSESSID');
+		$this->vars['host'] = Server::GetVar('HTTP_HOST');
+		$this->vars['sid'] = Server::GetVar('PHPSESSID');
 		$this->vars['behavior'] = $this->Behavior;
 
 		$this->vars['folders'] = count($this->files['folders']);
@@ -801,7 +806,7 @@ EOF;
 		$t = new Template();
 		$t->Set($this->vars);
 
-		$t->ReWrite('form', 'TagForm');
+		$t->ReWrite('form', array('Form', 'TagForm'));
 		$t->ReWrite('header', array(&$this, 'TagHeader'));
 		$t->ReWrite('path', array(&$this, 'TagPath'));
 		$t->ReWrite('download', array(&$this, 'TagDownload'));
@@ -838,7 +843,7 @@ EOF;
 	function GetDirectorySelect($name)
 	{
 		$ret = "<select name=\"{$name}\">";
-		$dirs = Comb($this->Root, null, OPT_DIRS);
+		$dirs = File::Comb($this->Root, null, SCAN_DIRS);
 		sort($dirs);
 		foreach ($dirs as $d) $ret .= "<option value=\"{$d}\">{$d}</option>";
 		$ret .= '</select>';
@@ -1015,13 +1020,13 @@ EOF;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
 			{
 				if ($this->Behavior->ShowFolders) $ret['folders'][] = $newfi;
-				let($newfi->info['index'], $foidx++);
+				U::Let($newfi->info['index'], $foidx++);
 				$newfi->SaveInfo();
 			}
 			else
 			{
 				$ret['files'][] = $newfi;
-				let($newfi->info['index'], $fiidx++);
+				U::Let($newfi->info['index'], $fiidx++);
 			}
 		}
 
@@ -1404,181 +1409,6 @@ class FileManagerBehavior
 			foreach ($info['access'] as $id) $na[$id] = 1;
 			$info['access'] = $na;
 		}
-	}
-}
-
-/**
- * Collects information for a SINGLE file OR folder.
- */
-class FileInfo
-{
-	/**
-	 * Path of this file, including the filename.
-	 *
-	 * @var string
-	 */
-	public $path;
-	/**
-	 * Directory of this file excluding filename.
-	 *
-	 * @var string
-	 */
-	public $dir;
-	/**
-	 * Position of the current forward slash.
-	 *
-	 * @var int
-	 */
-	public $bitpos;
-	/**
-	 * Name of this file, excluding path.
-	 *
-	 * @var string
-	 */
-	public $filename;
-
-	/**
-	 * Name of the associated filter, hopefully depricated.
-	 *
-	 * @var string
-	 */
-	public $filtername;
-	/**
-	 * Whether or not the current users owns this object.
-	 *
-	 * @var bool
-	 */
-	public $owned;
-	/**
-	 * Array of serializable information on this file, including but not limited
-	 * to, index and title.
-	 *
-	 * @var array
-	 */
-	public $info;
-	/**
-	 * Extension of this filename, used for collecting icon information.
-	 *
-	 * @var string
-	 */
-	public $type;
-	/**
-	 * Icon of this item, this should be depricated as it only applies
-	 * to FilterGallery.
-	 *
-	 * @var string
-	 */
-	public $icon;
-	/**
-	 * Whether or not this file should be shown.
-	 *
-	 * @var bool
-	 */
-	public $show;
-
-	function __toString()
-	{
-		return $this->filename;
-	}
-
-	/**
-	 * Creates a new FileInfo from an existing file. Filter manages how this
-	 * information will be handled, manipulated or displayed.
-	 *
-	 * @param string $source Filename to gather information on.
-	 * @param array $filters Array of available filters.
-	 */
-	function FileInfo($source)
-	{
-		global $user_root;
-		if (!file_exists($source))
-			Error("FileInfo: File/Directory does not exist. ({$source})<br/>\n");
-
-		if (!empty($user_root))
-			$this->owned = strlen(strstr($source, $user_root)) > 0;
-
-		$this->bitpos = 0;
-		$this->path = $source;
-		$this->dir = dirname($source);
-		$this->filename = basename($source);
-		$this->show = true;
-
-		$finfo = $this->dir.'/.'.$this->filename;
-		if (is_file($finfo) && file_exists($finfo))
-		{
-			$this->info = unserialize(file_get_contents($finfo));
-			if (!isset($this->info))
-				Error("Failed to unserialize: {$finfo}<br/>\n");
-		}
-		else $this->info = array();
-	}
-
-	/**
-	 * Returns the filter that was explicitely set on this object, object's
-	 * directory, or fall back on the default filter.
-	 *
-	 * @param string $path Path to file to get filter of.
-	 * @param string $default Default filter to fall back on.
-	 * @return FilterDefault Or a derivitive.
-	 */
-	static function GetFilter(&$fi, $root, $defaults)
-	{
-		$ft = $fi;
-
-		while (is_file($ft->path) || empty($ft->info['type']))
-		{
-			if (File::IsIn($ft->dir, $root)) $ft = new FileInfo($ft->dir);
-			else
-			{
-				if (isset($defaults[0]))
-					$fname = 'Filter'.$defaults[0];
-				else
-					$fname = 'FilterDefault';
-				$f = new $fname();
-				$f->GetInfo($fi);
-				return $f;
-			}
-		}
-
-		if (in_array($ft->info['type'], $defaults))
-			$fname = 'Filter'.$ft->info['type'];
-		else $fname = 'Filter'.$defaults[0];
-
-		$f = new $fname();
-		$f->GetInfo($fi);
-		return $f;
-	}
-
-	/**
-	 * Gets a bit of a path, a bit is anything between the path separators
-	 * ('/').
-	 *
-	 * @param int $off Which bit to return
-	 * @return string
-	 */
-	function GetBit($off)
-	{
-		$items = explode('/', $this->path);
-		if ($off < count($items)) return $items[$off];
-		return null;
-	}
-
-	/**
-	 * Serializes the information of this file to the filesystem for later
-	 * reuse.
-	 *
-	 */
-	function SaveInfo()
-	{
-		//Access is not stored in files, just directories.
-		if (is_file($this->path)) unset($this->info['access']);
-		$info = $this->dir.'/.'.$this->filename;
-		$fp = fopen($info, 'w+');
-		fwrite($fp, serialize($this->info));
-		fclose($fp);
-		//This can cause issues if trying to chmod in the root. If the webserver
-		//created the file, it should already be writeable.
-		//chmod($info, 0777);
 	}
 }
 
