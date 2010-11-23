@@ -10,7 +10,7 @@ class ModArticles extends Module
 	function __construct()
 	{
 		global $_d;
-		$this->_template = l('temps/mod_articles.xml');
+		$this->_template = Module::L('temps/mod_articles.xml');
 	}
 
 	function TagArticle($t, $g)

@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__.'/present/Template.php');
+
 class Module
 {
 	static function Initialize($repath = false)
@@ -56,14 +58,16 @@ class Module
 
 	static function Run($template)
 	{
-		require_once('h_utility.php');
-		require_once('h_template.php');
+		Module::RunString(file_get_contents($template));
+	}
 
+	static function RunString($string)
+	{
 		global $_d;
 
 		$tprep = new Template($_d);
 		$tprep->ReWrite('block', array('Module', 'TagPrepBlock'));
-		$tprep->ParseFile($template);
+		$tprep->GetString($string);
 		$_d['blocks']['hidden'] = null;
 
 		$t = new Template($_d);
@@ -79,7 +83,7 @@ class Module
 					unset($mods[$m]);
 
 			uksort($mods, array('Module', 'cmp_mod'));
-			RunCallbacks(@$_d['index.cb.prelink']);
+			U::RunCallbacks(@$_d['index.cb.prelink']);
 
 			foreach ($mods as $n => $mod) $mod->Link();
 			foreach ($mods as $n => $mod) $mod->Prepare();
@@ -96,7 +100,7 @@ class Module
 
 		$t = new Template($_d);
 		$t->ReWrite('block', array('Module', 'TagBlock'));
-		return $t->ParseFile($template);
+		return $t->GetString($string);
 	}
 
 	static function AddToBlock($block, $data)
