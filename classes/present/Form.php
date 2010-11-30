@@ -3,6 +3,7 @@
 require_once(__DIR__.'/../HM.php');
 require_once(__DIR__.'/../LayeredOutput.php');
 require_once(__DIR__.'/FormInput.php');
+require_once(__DIR__.'/Template.php');
 
 /**
  * A web page form, with functions for easy field creation and layout.
@@ -292,8 +293,10 @@ class Form extends LayeredOutput
 	*/
 	function Get($formAttribs = null)
 	{
+		global $_d;
+
 		$this->formAttribs = $formAttribs;
-		$t = new Template($GLOBALS['_d']);
+		$t = new Template($_d);
 		$t->Set('form_name', $this->name);
 		$t->ReWrite('form', array(&$this, 'TagForm'));
 		$t->ReWrite('field', array(&$this, 'TagField'));

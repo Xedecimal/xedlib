@@ -277,27 +277,6 @@ function GetPages($total, $count, $args = null)
 }
 
 /**
- * PHP4 compatible array clone.
- *
- * @param mixed $arr Item to properly clone in php5 without references.
- * @return mixed Cloned copy of whatever you throw at it.
- */
-function array_clone($arr)
-{
-	if (substr(phpversion(), 0, 1) != '5') { $copy = $arr; return $copy; }
-	$ret = array();
-
-	foreach ($arr as $id => $val)
-	{
-		if (is_array($val)) $ret[$id] = array_clone($val);
-		else if (is_object($val)) $ret[$id] = clone($val);
-		else $ret[$id] = $val;
-	}
-
-	return $ret;
-}
-
-/**
  * Create a directory recursively supporting php4.
  *
  * @param string $path Complete path to recursively create.

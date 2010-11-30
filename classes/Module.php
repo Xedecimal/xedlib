@@ -25,7 +25,7 @@ class Module
 			if ($f[0] == '.') continue;
 			if (is_dir($p) && file_exists($p.'/'.$f.'.php'))
 				require_once($p.'/'.$f.'.php');
-			else if (fileext($p) == 'php') require_once($p);
+			else if (File::ext($p) == 'php') require_once($p);
 		}
 		closedir($dp);
 	}
@@ -52,13 +52,13 @@ class Module
 
 	static function TransPath($a, $t)
 	{
-		if (isset($a[$t[0]])) $a[$t[0]] = p($a[$t[0]]);
+		if (isset($a[$t[0]])) $a[$t[0]] = Module::p($a[$t[0]]);
 		return $a;
 	}
 
 	static function Run($template)
 	{
-		Module::RunString(file_get_contents($template));
+		return Module::RunString(file_get_contents($template));
 	}
 
 	static function RunString($string)
@@ -251,9 +251,9 @@ class Module
 		if (file_exists($ovrpath)) return "{$_d['app_dir']}/{$ovrpath}";
 		$modpath = "{$_d['app_dir']}/modules/{$path}";
 		if (file_exists($modpath)) return $modpath;
-		$xmodpath = dirname(__FILE__)."/modules/$path";
+		$xmodpath = dirname(__FILE__)."/../modules/$path";
 		if (file_exists($xmodpath)) return $xmodpath;
-		$xedpath = dirname(__FILE__).'/'.$path;
+		$xedpath = dirname(__FILE__).'/../'.$path;
 		if (file_exists($xedpath)) return $xedpath;
 		return $path;
 	}

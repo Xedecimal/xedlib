@@ -41,6 +41,27 @@ class Arr
 		foreach ($array as $k => $v)
 			if (is_array($v)) Arr::ARKSort($array[$k]);
 	}
+
+	/**
+	 * PHP4 compatible array clone.
+	 *
+	 * @param mixed $arr Item to properly clone in php5 without references.
+	 * @return mixed Cloned copy of whatever you throw at it.
+	 */
+	function Cln($arr)
+	{
+		if (substr(phpversion(), 0, 1) != '5') { $copy = $arr; return $copy; }
+		$ret = array();
+
+		foreach ($arr as $id => $val)
+		{
+			if (is_array($val)) $ret[$id] = array_clone($val);
+			else if (is_object($val)) $ret[$id] = clone($val);
+			else $ret[$id] = $val;
+		}
+
+		return $ret;
+	}
 }
 
 ?>

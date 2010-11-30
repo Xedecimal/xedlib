@@ -257,7 +257,7 @@ class FormInput
 
 				$selAtrs = $this->atrs;
 				unset($selAtrs['TYPE'],$selAtrs['VALUE']);
-				$ret = "<select".GetAttribs($selAtrs).'>';
+				$ret = "<select".HM::GetAttribs($selAtrs).'>';
 				if (!empty($this->atrs['VALUE']))
 				{
 					$newsels = $this->GetValue($persist);
@@ -293,7 +293,7 @@ class FormInput
 			//Single Selectables...
 			case 'select':
 			case 'radios':
-				$newsels = array_clone($this->atrs['VALUE']);
+				$newsels = Arr::Cln($this->atrs['VALUE']);
 				if ($persist)
 				{
 					$sel = GetVar($this->name);
@@ -329,7 +329,7 @@ class FormInput
 	{
 		$id = !empty($parent) ? $parent.'_' : null;
 		$id .= !empty($this->atrs['ID']) ? $this->atrs['ID'] : @$this->atrs['NAME'];
-		return CleanID($id);
+		return HM::CleanID($id);
 	}
 
 	static function GetPostValue($name)
