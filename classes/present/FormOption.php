@@ -98,7 +98,7 @@ class FormOption extends TreeNode
 			if (is_array($item))
 			{
 				$o = new FormOption($ix, $default == $item);
-				$o->children = ArrayToSelOptions($item, $default, $use_keys);
+				$o->children = FormOption::FromArray($item, $default, $use_keys);
 				$o->group = true;
 			}
 			else $o = new FormOption($item, $default == $item);
@@ -118,18 +118,18 @@ class FormOption extends TreeNode
 	 * @param string $none Text for unselected item (id of 0)
 	 * @return array SelOption array.
 	 */
-	function FromData($result, $col_disp, $col_id, $default = 0, $none = null)
+	static function FromData($result, $col_disp, $col_id, $default = 0, $none = null)
 	{
 		$ret = null;
 		if (isset($none))
 		{
-			$sel = new SelOption($none, false, $default == 0);
+			$sel = new FormOption($none, false, $default == 0);
 			$sel->valu = 0;
 			$ret[0] = $sel;
 		}
 		foreach ($result as $res)
 		{
-			$sel = new SelOption($res[$col_disp],
+			$sel = new FormOption($res[$col_disp],
 				strcmp($default, $res[$col_id]) == 0);
 			$sel->valu = $res[$col_id];
 			$ret[$res[$col_id]] = $sel;

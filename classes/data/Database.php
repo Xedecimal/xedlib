@@ -187,9 +187,9 @@ class Database
 				$this->func_aff = 'mysql_affected_rows';
 				$this->type = DB_MY;
 
-				if (!$this->link = mysql_connect($m[5], $m[3], $m[4], true))
+				if (!$this->link = mysql_connect($m['host'], $m['user'], $m['pass'], true))
 					return false;
-				mysql_select_db($m[6], $this->link);
+				mysql_select_db($this->name, $this->link);
 				$this->lq = $this->rq = '`';
 				break;
 			case 'odbc':

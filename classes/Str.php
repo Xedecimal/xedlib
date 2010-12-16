@@ -91,6 +91,12 @@ class Str
 				: rand(65, 90));
 		return $ret;
 	}
+
+}
+
+function strmatch($str1, $str2)
+{
+	return $str1 === $str2;
 }
 
 ?>

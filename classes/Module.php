@@ -4,18 +4,22 @@ require_once(__DIR__.'/present/Template.php');
 
 class Module
 {
-	static function Initialize($repath = false)
+	static function Initialize($root_path, $repath = false)
 	{
+		global $_d;
+
 		if ($repath)
 		{
-			global $_d;
-
 			$_d['template.transforms']['link'] = array('Module', 'TransPath', 'HREF');
 			$_d['template.transforms']['a'] = array('Module', 'TransPath', 'HREF');
 			$_d['template.transforms']['img'] = array('Module', 'TransPath', 'SRC');
 			$_d['template.transforms']['script'] = array('Module', 'TransPath', 'SRC');
 			$_d['template.transforms']['form'] = array('Module', 'TransPath', 'ACTION');
 		}
+		
+		$_d['app_dir'] = $root_path;
+		$_d['app_abs'] = Server::GetRelativePath($root_path);
+		$_d['q'] = explode('/', $GLOBALS['rw'] = Server::GetVar('rw'));
 
 		if (!file_exists('modules')) return;
 		$dp = opendir('modules');
@@ -214,6 +218,18 @@ class Module
 	 */
 	function InstallFields(&$frm) { }
 
+	function AddDataset($name, $ds) { $GLOBALS['_d']['datasets'][$name] = $ds; }
+	
+	/**
+	 * Request a previously stored dataset.
+	 *
+	 * @param string $name Name of dataset to request.
+	 * @return DataSet Named dataset requested.
+	 */
+	function GetDataSet($name) { return $GLOBALS['_d']['datasets'][$name]; }
+	
+	function GetDatabase() { return $GLOBALS['_d']['db']; }
+	
 	static function P($path)
 	{
 		// Only translate finished paths.

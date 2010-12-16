@@ -4,10 +4,12 @@ fieldset legend { font-weight: bold; }
 /* Vertical List Style Forms */
 
 fieldset ul { list-style: none; padding: 0; margin: 0; }
-fieldset li { margin: 1em 0; border-top: 1px solid #CCC; }
+fieldset li { margin: 1em 0; }
 fieldset li label { display: block; font-size: large;  }
 fieldset li select { width: 100%; }
 fieldset li input { width: 100%; }
+fieldset li textarea { width: 100%; }
+fieldset li input.submit { width: auto; }
 fieldset li label input { width: auto; }
 
 /* Horizontal Table Style Forms */

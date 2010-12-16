@@ -564,7 +564,7 @@ class Template extends LayeredOutput
 	static function TagCallback($t, $g, $a)
 	{
 		$ds = @$GLOBALS[$a['DS']];
-		return RunCallbacks(@$ds[$a['NAME']], $this);
+		return U::RunCallbacks(@$ds[$a['NAME']], $t);
 	}
 
 	static function TagNEmpty($t, $g, $a)

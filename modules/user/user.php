@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__.'/../../classes/Str.php');
+
 class ModUser extends Module
 {
 	/**
@@ -11,12 +13,6 @@ class ModUser extends Module
 	private $_ds = array();
 
 	public $Block = 'user';
-
-	public $UserVar = 'user_sessuser';
-	public $PassVar = 'user_sesspass';
-
-	public $Name = 'user';
-	public $User;
 
 	public $fields = array(
 		'user' => array(
@@ -51,18 +47,11 @@ class ModUser extends Module
 	function __construct()
 	{
 		$this->Behavior = new ModUserBehavior();
-
-		global $_d;
-
-		require_once(dirname(__FILE__).'/../../h_data.php');
-
 		$this->CheckActive('user');
 
-		$_d['template.rewrites']['access'] = array('ModUser', 'TagAccess');
-
-		#$this->lm = new LoginManager('lmAdmin');
-		#if (isset($_d['user.encrypt']) && !$_d['user.encrypt'])
-		#	$this->lm->Behavior->Encryption = false;
+		global $_d;
+		$_d['user.session.user'] = 'user_sessuser';
+		$_d['user.session.pass'] = 'user_sesspass';
 	}
 
 	function Link()
@@ -78,6 +67,8 @@ class ModUser extends Module
 			));
 			$_d['nav.links']['Log Out'] = "{$rw}?$url";
 		}
+
+		$_d['template.rewrites']['access'] = array('ModUser', 'TagAccess');
 	}
 
 	function Prepare()
@@ -90,7 +81,7 @@ class ModUser extends Module
 		{
 			foreach ($this->fields as $f['name'] => $f)
 			{
-				$add[$f['column']] = GetVar($f['name'].'_create');
+				$add[$f['column']] = Server::GetVar($f['name'].'_create');
 				if (@$f['type'] == 'password') $add[$f['column']] = md5($add[$f['column']]);
 			}
 			$this->ds->Add($add);
@@ -100,7 +91,7 @@ class ModUser extends Module
 
 		if (@$_d['q'][1] == 'forgot-password' && @$_d['q'][2] == 'complete')
 		{
-			$em = GetVar('email');
+			$em = Server::GetVar('email');
 			$q['match']['usr_email'] = $em;
 			$act = $this->ds->Get($q);
 			if (!empty($act))
@@ -129,17 +120,17 @@ class ModUser extends Module
 
 		# Create Account
 
-		if (@$_d['q'][1] == 'create')
+		if ($this->Active && @$_d['q'][1] == 'create')
 		{
 			if (!empty($_d['user.disable_signup'])) return;
 			$t = new Template();
 			$t->ReWrite('field', array(&$this, 'TagFieldCreate'));
-			$ret['default'] = $t->ParseFile(l('user/signup.xml'));
+			$ret['default'] = $t->ParseFile(Module::L('user/signup.xml'));
 		}
 
 		# Forgot Password
 
-		if (@$_d['q'][1] == 'forgot-password')
+		if ($this->Active && @$_d['q'][1] == 'forgot-password')
 		{
 			$t = new Template();
 			$t->ReWrite('field', array(&$this, 'TagFieldForgot'));
@@ -148,13 +139,13 @@ class ModUser extends Module
 
 		# Nobody is logged in.
 
-		else if (empty($this->User) && !empty($_d['user.login']))
+		else if (empty($_d['user.user']))
 		{
 			$t = new Template();
 			$t->ReWrite('links', array(&$this, 'TagLinks'));
 			$t->Rewrite('field', array(&$this, 'TagFieldLogin'));
-			$t->Set('name', $this->Name);
-			$ret['user'] = $t->ParseFile(l('user/login.xml'));
+			//$t->Set('name', $this->Name);
+			$ret['user'] = $t->ParseFile(Module::L('user/login.xml'));
 		}
 
 		return $ret;
@@ -172,43 +163,46 @@ class ModUser extends Module
 		if (!isset($this->_ds[0])) return;
 		if (is_string($this->_ds[0][0])) return;
 
-		$nav = new TreeNode();
-		if ($this->Behavior->CreateAccount) $nav->AddChild(new TreeNode(
-			'Create an account', '{{app_abs}}/user/create'));
-		if ($this->Behavior->ForgotPassword) $nav->AddChild(new TreeNode(
-			'Forgot your password?', '{{app_abs}}/user/forgot-password'));
-		return ModNav::GetLinks($nav);
+		#$nav = new TreeNode();
+		#if ($this->Behavior->CreateAccount) $nav->AddChild(new TreeNode(
+		#	'Create an account', '{{app_abs}}/user/create'));
+		#if ($this->Behavior->ForgotPassword) $nav->AddChild(new TreeNode(
+		#	'Forgot your password?', '{{app_abs}}/user/forgot-password'));
+		#return ModNav::GetLinks($nav);
 	}
 
-	function AddDataset($ds, $passcol, $usercol)
+	function AddUserDataset($ds, $passcol, $usercol)
 	{
-		$this->_ds[] = array($ds, $passcol, $usercol);
+		global $_d;
+		$_d['user.datasets'][] = array($ds, $passcol, $usercol);
 	}
 
-	function Authenticate()
+	static function Authenticate()
 	{
 		global $_d;
 
 		# Process state changes
 
-		$check_user = GetVar($this->UserVar);
-		$check_pass = GetVar($this->PassVar);
-		$act = GetVar($this->Name.'_action');
+		$check_user = Server::GetVar($_d['user.session.user']);
+		$check_pass = Server::GetVar($_d['user.session.pass']);
+		$act = Server::GetVar('user_action');
 
 		if ($act == 'login')
 		{
-			$check_user = SetVar($this->UserVar, GetVar('user'));
-			$check_pass = SetVar($this->PassVar, md5(GetVar('pass')));
+			$check_user = Server::SetVar($_d['user.session.user'],
+				Server::GetVar('user'));
+			$check_pass = Server::SetVar($_d['user.session.pass'],
+				md5(Server::GetVar('pass')));
 		}
 		if ($act == 'logout')
 		{
 			$check_pass = null;
-			UnsetVar($this->PassVar);
+			UnsetVar($_d['user.session.pass']);
 		}
 
 		# Check existing data sources
 
-		foreach ($this->_ds as $ds)
+		foreach ($_d['user.datasets'] as $ds)
 		{
 			if (!isset($ds[0]))
 				Error("<br />What: Dataset is not set.
@@ -233,16 +227,16 @@ class ModUser extends Module
 			{
 				$query['match'] = array(
 					$ds[1] => $check_pass,
-					$ds[2] => SqlAnd($check_user)
+					$ds[2] => Database::SqlAnd($check_user)
 				);
 
 				$item = $ds[0]->GetOne($query);
 			}
 
-			$this->User = $item;
+			$u = $_d['user.user'] = $item;
 		}
 
-		return $this->User;
+		return $u;
 	}
 
 	function TagFieldLogin($t, $g)
@@ -318,8 +312,6 @@ class ModUserBehavior
 	public $Password = true;
 }
 
-Module::Register('ModUser');
-
 class ModUserAdmin extends Module
 {
 	/**
@@ -333,13 +325,8 @@ class ModUserAdmin extends Module
 	{
 		global $_d, $mods;
 
-		require_once(dirname(__FILE__).'/../../a_editor.php');
-		require_once(dirname(__FILE__).'/../../h_display.php');
-
 		if (empty($_d['user.levels']))
 			$_d['user.levels'] = array(0 => 'Guest', 1 => 'User', 2 => 'Admin');
-
-		$this->edUser = new EditorData('user', $mods['ModUser']->ds);
 	}
 
 	function Auth() { return false; }
@@ -372,6 +359,8 @@ class ModUserAdmin extends Module
 			'usr_access' => new FormInput('Access', 'select', null,
 				ArrayToSelOptions($_d['user.levels']))
 		);
+
+		$this->edUser = new EditorData('user', $mods['ModUser']->ds);
 		$this->edUser->Behavior->Search = false;
 		$this->edUser->Behavior->Target = $_d['app_abs'].$me.'/user';
 		$this->edUser->Prepare();
@@ -385,7 +374,5 @@ class ModUserAdmin extends Module
 		if (ModUser::RequireAccess(2)) return $this->edUser->GetUI();
 	}
 }
-
-Module::Register('ModUserAdmin');
 
 ?>
