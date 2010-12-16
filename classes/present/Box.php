@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/../U.php');
+require_once(__DIR__.'/../Utility.php');
 
 /**
  * A simple themed box.
