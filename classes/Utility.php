@@ -113,6 +113,34 @@ class U
 	{
 		if (!isset($var)) $var = $val;
 	}
+
+	/**
+	 * Returns a string representation of time from $ts to now. Eg. '5 days'
+	 *
+	 * @param int $ts Timestamp.
+	 * @return string English offset.
+	 */
+	static function GetDateOffset($ts)
+	{
+		$ss = time()-$ts;
+		$mm = $ss / 60;
+		$hh = $mm / 60;
+
+		$d = $hh / 24;
+		$w = $d / 7;
+		$m = $d / 31;
+		$y = $d / 365;
+
+		$ret = null;
+		if ($y >= 1) $ret = number_format($y).' year'.($y > 1 ? 's' : null);
+		else if ($m >= 1) $ret = number_format($m).' month'.($m > 1 ? 's' : null);
+		else if ($w >= 1) $ret = number_format($w).' week'.($w > 1 ? 's' : null);
+		else if ($d >= 1) $ret = number_format($d).' day'.($d > 1 ? 's' : null);
+		else if ($hh >= 1) $ret = number_format($hh).' hour'.($hh > 1 ? 's' : null);
+		else if ($mm >= 1) $ret = number_format($mm).' minute'.($mm > 1 ? 's' : null);
+		else $ret = number_format($ss).' second'.($ss > 1 ? 's' : null);
+		return $ret.' ago';
+	}
 }
 
 if (!function_exists('http_build_url'))

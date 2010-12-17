@@ -58,12 +58,12 @@ class ModUser extends Module
 	{
 		global $_d;
 
-		if (!empty($this->User) && empty($_d['user.hide_logout']))
+		if (!empty($_d['user.user']) && empty($_d['user.hide_logout']))
 		{
 			global $rw;
 
 			$url = http_build_query(array(
-				$this->Name.'_action' => 'logout'
+				'user_action' => 'logout'
 			));
 			$_d['nav.links']['Log Out'] = "{$rw}?$url";
 		}
@@ -171,7 +171,7 @@ class ModUser extends Module
 		#return ModNav::GetLinks($nav);
 	}
 
-	function AddUserDataset($ds, $passcol, $usercol)
+	function AddUserDataSet($ds, $passcol, $usercol)
 	{
 		global $_d;
 		$_d['user.datasets'][] = array($ds, $passcol, $usercol);
@@ -197,7 +197,7 @@ class ModUser extends Module
 		if ($act == 'logout')
 		{
 			$check_pass = null;
-			UnsetVar($_d['user.session.pass']);
+			Server::UnsetVar($_d['user.session.pass']);
 		}
 
 		# Check existing data sources
@@ -299,8 +299,7 @@ class ModUser extends Module
 	static function TagAccess($t, $g, $a)
 	{
 		global $_d;
-		if (isset($_d['cl']) && $a['REQUIRE'] > @$_d['cl']['usr_access']) return;
-		return $g;
+		if (@$_d['user'][$_d['user.cols.access']] >= @$a['REQUIRE']) return $g;
 	}
 }
 

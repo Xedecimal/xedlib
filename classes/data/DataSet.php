@@ -401,7 +401,7 @@ class DataSet
 			}
 			else
 			{
-				Error('Arrays are not allowed here.');
+				Server::Error('Arrays are not allowed here.');
 				varinfo($val);
 			}
 		}
@@ -755,6 +755,19 @@ class DataSet
 		$query .= $this->SetClause($values);
 		$query .= $this->WhereClause($match);
 		$this->database->Query($query);
+	}
+
+	function Update2($q, $values)
+	{
+		//Prepare Query
+		$query = 'UPDATE ';
+		$query .= $this->QuoteTable($this->table);
+		$query .= $this->JoinClause(@$q['joins'], $this->joins);
+		$query .= $this->SetClause($values);
+		$query .= $this->WhereClause(@$q['match']);
+
+		//Execute Query
+		$rows = $this->database->Query($query, $this->ErrorHandler);
 	}
 
 	/**

@@ -123,7 +123,7 @@ class Server
 	 */
 	static function Trace($msg)
 	{
-		if (!empty($GLOBALS['debug'])) varinfo($msg);
+		if (!empty($GLOBALS['debug'])) U::VarInfo($msg);
 		if (!empty($GLOBALS['__debfile'])) file_put_contents('trace.txt', $msg."\r\n", FILE_APPEND);
 	}
 
@@ -178,6 +178,25 @@ class Server
 			return $HTTP_SERVER_VARS[$name];
 
 		return $default;
+	}
+
+	/**
+	 * Unsets a var that was possibly set using SetVar or other methods of session
+	 * setting.
+	 *
+	 * @param string $name Name of variable to get rid of.
+	 */
+	static function UnsetVar($name)
+	{
+		global $HTTP_SESSION_VARS;
+
+		if (is_array($name))
+		{
+			if (!empty($name))
+			foreach ($name as $var) UnsetVar($var);
+		}
+		if (isset($_SESSION)) unset($_SESSION[$name]);
+		if (isset($HTTP_SESSION_VARS)) unset($HTTP_SESSION_VARS[$name]);
 	}
 
 	static function SanitizeEnvironment()

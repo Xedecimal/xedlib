@@ -576,6 +576,13 @@ class Template extends LayeredOutput
 		if (!empty($var) && !empty($var[$a['INDEX']])) return $g;
 	}
 
+	static function TagDate($t, $g, $a)
+	{
+		U::VarInfo('TagDate');
+		$vp = new VarParser();
+		return date($a['FORMAT'], strtotime($a['VALUE']));
+	}
+
 	/**
 	 * Returns a callstack style template stack, showing the path that
 	 * processing has gone.

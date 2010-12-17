@@ -77,25 +77,6 @@ function GetPost($name, $default = null)
 }
 
 /**
- * Unsets a var that was possibly set using SetVar or other methods of session
- * setting.
- *
- * @param string $name Name of variable to get rid of.
- */
-function UnsetVar($name)
-{
-	global $HTTP_SESSION_VARS;
-
-	if (is_array($name))
-	{
-		if (!empty($name))
-		foreach ($name as $var) UnsetVar($var);
-	}
-	if (isset($_SESSION)) unset($_SESSION[$name]);
-	if (isset($HTTP_SESSION_VARS)) unset($HTTP_SESSION_VARS[$name]);
-}
-
-/**
  * Attempts to keep a value persistant across all xedlib editors.
  *
  * @param string $name Name of value to persist.
@@ -164,34 +145,6 @@ function TimestampToMsSql($ts)
 function DateInputToTS($value)
 {
 	return mktime(null, null, null, $value[0], $value[1], $value[2]);
-}
-
-/**
- * Returns a string representation of time from $ts to now. Eg. '5 days'
- *
- * @param int $ts Timestamp.
- * @return string English offset.
- */
-function GetDateOffset($ts)
-{
-	$ss = time()-$ts;
-	$mm = $ss / 60;
-	$hh = $mm / 60;
-
-	$d = $hh / 24;
-	$w = $d / 7;
-	$m = $d / 31;
-	$y = $d / 365;
-
-	$ret = null;
-	if ($y >= 1) $ret = number_format($y, 1).' year'.($y > 1 ? 's' : null);
-	else if ($m >= 1) $ret = number_format($m, 1).' month'.($m > 1 ? 's' : null);
-	else if ($w >= 1) $ret = number_format($w, 1).' week'.($w > 1 ? 's' : null);
-	else if ($d >= 1) $ret = number_format($d, 1).' day'.($d > 1 ? 's' : null);
-	else if ($hh >= 1) $ret = number_format($hh, 1).' hour'.($hh > 1 ? 's' : null);
-	else if ($mm >= 1) $ret = number_format($mm, 1).' minute'.($mm > 1 ? 's' : null);
-	else $ret = number_format($ss, 1).' second'.($ss > 1 ? 's' : null);
-	return $ret.' ago';
 }
 
 /////////////////
