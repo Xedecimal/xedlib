@@ -10,7 +10,7 @@ class ModUser extends Module
 	 */
 	private $lm;
 
-	private $_ds = array();
+	public $_ds = array();
 
 	public $Block = 'user';
 
@@ -84,7 +84,8 @@ class ModUser extends Module
 				$add[$f['column']] = Server::GetVar($f['name'].'_create');
 				if (@$f['type'] == 'password') $add[$f['column']] = md5($add[$f['column']]);
 			}
-			$this->ds->Add($add);
+			foreach ($this->_ds as $ds) $ds[0]->Add($add);
+			$this->User = $add;
 		}
 
 		# Forgot Password
@@ -93,14 +94,18 @@ class ModUser extends Module
 		{
 			$em = Server::GetVar('email');
 			$q['match']['usr_email'] = $em;
-			$act = $this->ds->Get($q);
-			if (!empty($act))
+			foreach ($this->_ds as $ds)
 			{
-				$pass = random_string();
-				$body = "Your new password is: $pass";
-				$this->ds->update(array('usr_email' => $em),
-					array('usr_pass' => md5($pass)));
-				mail($em, 'Forgotten Password', $body);
+				$act = $ds[0]->Get($q);
+				if (!empty($act))
+				{
+					$pass = random_string();
+					$body = "Your new password is: $pass";
+					$ds[0]->update(array('usr_email' => $em),
+						array('usr_pass' => md5($pass)));
+					mail($em, 'Forgotten Password', $body);
+					break;
+				}
 			}
 		}
 	}
@@ -124,8 +129,16 @@ class ModUser extends Module
 		{
 			if (!empty($_d['user.disable_signup'])) return;
 			$t = new Template();
-			$t->ReWrite('field', array(&$this, 'TagFieldCreate'));
+			if (@$_d['q'][2] == 'complete')
+			{
+				$t->Set($this->User);
+				$ret['default'] = $t->ParseFile(l('user/signup_complete.xml'));
+			}
+			else
+			{
+				$t->ReWrite('field', array(&$this, 'TagFieldCreate'));
 			$ret['default'] = $t->ParseFile(Module::L('user/signup.xml'));
+			}
 		}
 
 		# Forgot Password
@@ -163,12 +176,11 @@ class ModUser extends Module
 		if (!isset($this->_ds[0])) return;
 		if (is_string($this->_ds[0][0])) return;
 
-		#$nav = new TreeNode();
-		#if ($this->Behavior->CreateAccount) $nav->AddChild(new TreeNode(
-		#	'Create an account', '{{app_abs}}/user/create'));
-		#if ($this->Behavior->ForgotPassword) $nav->AddChild(new TreeNode(
-		#	'Forgot your password?', '{{app_abs}}/user/forgot-password'));
-		#return ModNav::GetLinks($nav);
+		if ($this->Behavior->CreateAccount)
+			$nav['Create an account'] = '{{app_abs}}/user/create';
+		if ($this->Behavior->ForgotPassword)
+			$nav['Forgot your password?'] = '{{app_abs}}/user/forgot-password';
+		return ModNav::GetLinks(ModNav::LinkTree($nav));
 	}
 
 	function AddUserDataSet($ds, $passcol, $usercol)
@@ -328,7 +340,7 @@ class ModUserAdmin extends Module
 			$_d['user.levels'] = array(0 => 'Guest', 1 => 'User', 2 => 'Admin');
 	}
 
-	function Auth() { return false; }
+	function Auth() { return ModUser::RequireAccess(2); }
 
 	function Link()
 	{
@@ -347,21 +359,21 @@ class ModUserAdmin extends Module
 		global $mods;
 		$modUser = $mods['ModUser'];
 
-		$modUser->ds->Description = 'User';
-		$modUser->ds->DisplayColumns = array(
+		$modUser->_ds[0][0]->Description = 'User';
+		$modUser->_ds[0][0]->DisplayColumns = array(
 			'usr_name' => new DisplayColumn('Name'),
 			'usr_access' => new DisplayColumn('Access', 'socallback')
 		);
-		$modUser->ds->FieldInputs = array(
+		$modUser->_ds[0][0]->FieldInputs = array(
 			'usr_name' => new FormInput('Name'),
 			'usr_pass' => new FormInput('Password', 'password'),
 			'usr_access' => new FormInput('Access', 'select', null,
 				ArrayToSelOptions($_d['user.levels']))
 		);
 
-		$this->edUser = new EditorData('user', $mods['ModUser']->ds);
+		$this->edUser = new EditorData('user', $mods['ModUser']->_ds[0][0]);
 		$this->edUser->Behavior->Search = false;
-		$this->edUser->Behavior->Target = $_d['app_abs'].$me.'/user';
+		$this->edUser->Behavior->Target = $_d['app_abs'].'/user';
 		$this->edUser->Prepare();
 	}
 

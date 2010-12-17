@@ -25,16 +25,17 @@ name = '{{name}}';
 </results>
 
 <search>
-<form action="{{app_abs}}{{me}}/{{name}}/search" method="post">
+<form id="data_search_{{name}}"
+	action="{{app_abs}}{{me}}/{{name}}/search" method="post">
 <script type="text/javascript" src="{{app_abs}}/xedlib/temps/data_search.js" />
 <fieldset>
 <legend>Select fields to search</legend>
 <ul>
 <searchfield>
-	<li><input type="checkbox" id="hider_{{id}}"
+	<li><label><input type="checkbox" id="hider_{{id}}"
 		name="{{name}}_search[{{fname}}]" class="hider" />
-	<label for="{{id}}">{{text}}</label>
-	<div class="hidden ds_field" id="hidden_{{id}}">{{field}}</div></li>
+		{{text}}</label>
+		<div class="hidden ds_field" id="hidden_{{id}}">{{field}}</div></li>
 </searchfield>
 </ul>
 </fieldset>

@@ -1,0 +1,11 @@
+<div class="profile">
+<form action="profile/update" method="post">
+<fieldset>
+<ul>
+	<field><li><label>{{text}}</label><input type="{{itype}}" name="profile[{{name}}]"
+		value="{{value}}" /></li></field>
+</ul>
+<input type="submit" value="Update" />
+</fieldset>
+</form>
+</div>

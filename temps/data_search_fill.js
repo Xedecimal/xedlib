@@ -1,13 +1,12 @@
 <null>
-json = {{json}}
+var json = {{json}}
 
 record = 0
 
 function fill(ix, element) {
 	input = $(this);
 	// form[{1}]
-	m = $(this).attr('name').match(/form\[([^\]]+)\]/);
-	if (m)
+	if ((m = $(this).attr('name').match(/form\[([^\]]+)\]/)))
 	{
 		// Checkboxes must be a sub-table
 		if (input.attr('type') == 'checkbox')
@@ -32,6 +31,11 @@ function fill(ix, element) {
 			input.val(json[record][m[1]]);
 		}
 	}
+
+	$('.date').each(function () {
+		if ((m = $(this).val().match(/(\d+)-(\d+)-(\d+)/)))
+			$(this).val(m[2]+'/'+m[3]+'/'+m[1]);
+	});
 }
 
 $(function () {
