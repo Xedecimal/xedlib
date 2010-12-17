@@ -1,11 +1,18 @@
 <?php
 
+require_once(__DIR__.'/File.php');
+require_once(__DIR__.'/FileInfo.php');
+require_once(__DIR__.'/FilterDefault.php');
+require_once(__DIR__.'/FilterGallery.php');
+require_once(__DIR__.'/HM.php');
+require_once(__DIR__.'/Module.php');
+require_once(__DIR__.'/U.php');
+require_once(__DIR__.'/present/Form.php');
+require_once(__DIR__.'/present/Template.php');
+
 /**
  * @package File Management
  */
-
-require_once('h_utility.php');
-require_once('h_display.php');
 
 define('FM_SORT_MANUAL', -1);
 define('FM_SORT_TABLE', -2);
@@ -100,16 +107,17 @@ class FileManager
 	 * @param string $root Highlest folder level allowed.
 	 * @param array $filters Directory filters allowed.
 	 */
-	function FileManager($name, $root, $filters = null)
+	function __construct($name, $root, $filters = null)
 	{
-		$this->Name = CleanID($name);
+		# TODO: Don't run cleanID here!
+		$this->Name = HM::CleanID($name);
 		$this->Root = $root;
 		$this->filters = $filters;
 
 		$this->Behavior = new FileManagerBehavior();
 		$this->View = new FileManagerView();
 
-		$this->Template = dirname(__FILE__).'/temps/file.xml';
+		$this->Template = __DIR__.'/../temps/file.xml';
 
 		if (!file_exists($root))
 			die("FileManager::FileManager(): Root ($root) directory does
@@ -117,7 +125,7 @@ class FileManager
 
 		//Append trailing slash.
 		if (substr($this->Root, -1) != '/') $this->Root .= '/';
-		$this->cf = SecurePath(GetState($this->Name.'_cf'));
+		$this->cf = File::SecurePath(Server::GetState($this->Name.'_cf'));
 		if (!file_exists($this->Root.$this->cf))
 		{
 			Error('Directory does not exist:'.$this->cf);
@@ -129,7 +137,7 @@ class FileManager
 			&& substr($this->cf, -1) != '/')
 			$this->cf .= '/';
 
-		$rp = GetRelativePath(dirname(__FILE__));
+		$rp = Server::GetRelativePath(dirname(__FILE__));
 	}
 
 	/**
@@ -139,7 +147,7 @@ class FileManager
 	 */
 	function Prepare()
 	{
-		$act = GetVar($this->Name.'_action');
+		$act = Server::GetVar($this->Name.'_action');
 
 		//Don't allow renaming the root or the file manager will throw errors
 		//ever after.
@@ -390,16 +398,16 @@ class FileManager
 	static function GetIcon($f)
 	{
 		$icons = array(
-			'folder' => p('images/icons/folder.png'),
-			'png' => p('images/icons/image.png'),
-			'jpg' => p('images/icons/image.png'),
-			'jpeg' => p('images/icons/image.png'),
-			'gif' => p('images/icons/image.png'),
-			'pdf' => p('images/icons/acrobat.png'),
-			'sql' => p('images/icons/db.png'),
-			'xls' => p('images/icons/excel.png'),
-			'doc' => p('images/icons/word.png'),
-			'docx' => p('images/icons/word.png')
+			'folder' => Module::P('images/icons/folder.png'),
+			'png' => Module::P('images/icons/image.png'),
+			'jpg' => Module::P('images/icons/image.png'),
+			'jpeg' => Module::P('images/icons/image.png'),
+			'gif' => Module::P('images/icons/image.png'),
+			'pdf' => Module::P('images/icons/acrobat.png'),
+			'sql' => Module::P('images/icons/db.png'),
+			'xls' => Module::P('images/icons/excel.png'),
+			'doc' => Module::P('images/icons/word.png'),
+			'docx' => Module::P('images/icons/word.png')
 		);
 		if (!empty($f->vars['icon']))
 			return $f->vars['icon'];
@@ -438,7 +446,7 @@ class FileManager
 
 		if (isset($this->cf))
 		{
-			$d['uri'] = URL($this->Behavior->Target,
+			$d['uri'] = HM::URL($this->Behavior->Target,
 				array($this->Name.'_cf' => ''));
 			$d['name'] = $attribs['ROOT'];
 			$ret .= $vp->ParseVars($guts, $d);
@@ -512,10 +520,10 @@ class FileManager
 					unset($vars[$k]);
 				}
 				global $me;
-				$this->vars['url'] = URL($me, $vars);
+				$this->vars['url'] = HM::URL($me, $vars);
 			}
 			else
-				$this->vars['url'] = URL($this->Behavior->Target,
+				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' =>
 					"{$this->cf}{$f->filename}"));
 
@@ -763,9 +771,7 @@ class FileManager
 		if (!file_exists($this->Root.$this->cf))
 			return "FileManager::Get(): File doesn't exist ({$this->Root}{$this->cf}).<br/>\n";
 
-		require_once('h_template.php');
-
-		$relpath = GetRelativePath(dirname(__FILE__));
+		$relpath = Server::GetRelativePath(dirname(__FILE__));
 
 		if (!isset($GLOBALS['page_head'])) $GLOBALS['page_head'] = '';
 		$GLOBALS['page_head'] .= <<<EOF
@@ -790,8 +796,8 @@ EOF;
 		$this->vars['path'] = $this->Root.$this->cf;
 		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
 		$this->vars['relpath'] = $relpath;
-		$this->vars['host'] = GetVar('HTTP_HOST');
-		$this->vars['sid'] = GetVar('PHPSESSID');
+		$this->vars['host'] = Server::GetVar('HTTP_HOST');
+		$this->vars['sid'] = Server::GetVar('PHPSESSID');
 		$this->vars['behavior'] = $this->Behavior;
 
 		$this->vars['folders'] = count($this->files['folders']);
@@ -800,7 +806,7 @@ EOF;
 		$t = new Template();
 		$t->Set($this->vars);
 
-		$t->ReWrite('form', 'TagForm');
+		$t->ReWrite('form', array('Form', 'TagForm'));
 		$t->ReWrite('header', array(&$this, 'TagHeader'));
 		$t->ReWrite('path', array(&$this, 'TagPath'));
 		$t->ReWrite('download', array(&$this, 'TagDownload'));
@@ -837,7 +843,7 @@ EOF;
 	function GetDirectorySelect($name)
 	{
 		$ret = "<select name=\"{$name}\">";
-		$dirs = Comb($this->Root, null, OPT_DIRS);
+		$dirs = File::Comb($this->Root, null, SCAN_DIRS);
 		sort($dirs);
 		foreach ($dirs as $d) $ret .= "<option value=\"{$d}\">{$d}</option>";
 		$ret .= '</select>';
@@ -1014,13 +1020,13 @@ EOF;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
 			{
 				if ($this->Behavior->ShowFolders) $ret['folders'][] = $newfi;
-				let($newfi->info['index'], $foidx++);
+				U::Let($newfi->info['index'], $foidx++);
 				$newfi->SaveInfo();
 			}
 			else
 			{
 				$ret['files'][] = $newfi;
-				let($newfi->info['index'], $fiidx++);
+				U::Let($newfi->info['index'], $fiidx++);
 			}
 		}
 
@@ -1403,585 +1409,6 @@ class FileManagerBehavior
 			foreach ($info['access'] as $id) $na[$id] = 1;
 			$info['access'] = $na;
 		}
-	}
-}
-
-/**
- * Collects information for a SINGLE file OR folder.
- */
-class FileInfo
-{
-	/**
-	 * Path of this file, including the filename.
-	 *
-	 * @var string
-	 */
-	public $path;
-	/**
-	 * Directory of this file excluding filename.
-	 *
-	 * @var string
-	 */
-	public $dir;
-	/**
-	 * Position of the current forward slash.
-	 *
-	 * @var int
-	 */
-	public $bitpos;
-	/**
-	 * Name of this file, excluding path.
-	 *
-	 * @var string
-	 */
-	public $filename;
-
-	/**
-	 * Name of the associated filter, hopefully depricated.
-	 *
-	 * @var string
-	 */
-	public $filtername;
-	/**
-	 * Whether or not the current users owns this object.
-	 *
-	 * @var bool
-	 */
-	public $owned;
-	/**
-	 * Array of serializable information on this file, including but not limited
-	 * to, index and title.
-	 *
-	 * @var array
-	 */
-	public $info;
-	/**
-	 * Extension of this filename, used for collecting icon information.
-	 *
-	 * @var string
-	 */
-	public $type;
-	/**
-	 * Icon of this item, this should be depricated as it only applies
-	 * to FilterGallery.
-	 *
-	 * @var string
-	 */
-	public $icon;
-	/**
-	 * Whether or not this file should be shown.
-	 *
-	 * @var bool
-	 */
-	public $show;
-
-	function __toString()
-	{
-		return $this->filename;
-	}
-
-	/**
-	 * Creates a new FileInfo from an existing file. Filter manages how this
-	 * information will be handled, manipulated or displayed.
-	 *
-	 * @param string $source Filename to gather information on.
-	 * @param array $filters Array of available filters.
-	 */
-	function FileInfo($source)
-	{
-		global $user_root;
-		if (!file_exists($source))
-			Error("FileInfo: File/Directory does not exist. ({$source})<br/>\n");
-
-		if (!empty($user_root))
-			$this->owned = strlen(strstr($source, $user_root)) > 0;
-
-		$this->bitpos = 0;
-		$this->path = $source;
-		$this->dir = dirname($source);
-		$this->filename = basename($source);
-		$this->show = true;
-
-		$finfo = $this->dir.'/.'.$this->filename;
-		if (is_file($finfo) && file_exists($finfo))
-		{
-			$this->info = unserialize(file_get_contents($finfo));
-			if (!isset($this->info))
-				Error("Failed to unserialize: {$finfo}<br/>\n");
-		}
-		else $this->info = array();
-	}
-
-	/**
-	 * Returns the filter that was explicitely set on this object, object's
-	 * directory, or fall back on the default filter.
-	 *
-	 * @param string $path Path to file to get filter of.
-	 * @param string $default Default filter to fall back on.
-	 * @return FilterDefault Or a derivitive.
-	 */
-	static function GetFilter(&$fi, $root, $defaults)
-	{
-		$ft = $fi;
-
-		while (is_file($ft->path) || empty($ft->info['type']))
-		{
-			if (is_in($ft->dir, $root)) $ft = new FileInfo($ft->dir);
-			else
-			{
-				if (isset($defaults[0]))
-					$fname = 'Filter'.$defaults[0];
-				else
-					$fname = 'FilterDefault';
-				$f = new $fname();
-				$f->GetInfo($fi);
-				return $f;
-			}
-		}
-
-		if (in_array($ft->info['type'], $defaults))
-			$fname = 'Filter'.$ft->info['type'];
-		else $fname = 'Filter'.$defaults[0];
-
-		$f = new $fname();
-		$f->GetInfo($fi);
-		return $f;
-	}
-
-	/**
-	 * Gets a bit of a path, a bit is anything between the path separators
-	 * ('/').
-	 *
-	 * @param int $off Which bit to return
-	 * @return string
-	 */
-	function GetBit($off)
-	{
-		$items = explode('/', $this->path);
-		if ($off < count($items)) return $items[$off];
-		return null;
-	}
-
-	/**
-	 * Serializes the information of this file to the filesystem for later
-	 * reuse.
-	 *
-	 */
-	function SaveInfo()
-	{
-		//Access is not stored in files, just directories.
-		if (is_file($this->path)) unset($this->info['access']);
-		$info = $this->dir.'/.'.$this->filename;
-		$fp = fopen($info, 'w+');
-		fwrite($fp, serialize($this->info));
-		fclose($fp);
-		//This can cause issues if trying to chmod in the root. If the webserver
-		//created the file, it should already be writeable.
-		//chmod($info, 0777);
-	}
-}
-
-/**
- * The generic file handler.
- */
-class FilterDefault
-{
-	/**
-	 * Name of this filter for identification purposes.
-	 * @var string
-	 */
-	public $Name = "Default";
-
-	/**
-	 * Places information into $fi for later use.
-	 *
-	 * @param FileInfo $fi
-	 * @return FileInfo
-	 * @todo Replace this with ApplyInfo as reference with no return.
-	 */
-	function GetInfo(&$fi)
-	{
-		if (is_dir($fi->path)) $fi->type = 'folder';
-		else $fi->type = fileext($fi->filename);
-		return $fi;
-	}
-
-	/**
-	 * Returns an array of options that allow configuring this filter.
-	 * @param FileManager $fm Calling filemanager.
-	 * @param FileInfo $fi Object to get information out of.
-	 * @param string $default Default option set.
-	 * @return array
-	 */
-	function GetOptions(&$fm, &$fi, $default)
-	{
-		$more = array(
-			new FormInput('Description', 'text', 'info[title]',
-			stripslashes(@$fi->info['title']), null)
-		);
-
-		if (!empty($default)) return array_merge($default, $more);
-		else return $more;
-	}
-
-	/**
-	 * Called when a file is requested to upload.
-	 *
-	 * @param array $file Upload form's file field.
-	 * @param string $target Destination folder.
-	 */
-	function Upload($file, $target)
-	{
-		$this->UpdateMTime($target->path.$file);
-	}
-
-	/**
-	 * This will rename the info file and update the virtual modified time
-	 * accordingly, as well as handle moving files.
-	 *
-	 * @param FileInfo $fi Source file information.
-	 * @param FileInfo $newname Destination file information.
-	 */
-	function Rename(&$fi, $newname)
-	{
-		$pinfo = pathinfo($newname);
-		$finfo = "{$fi->dir}/.{$fi->filename}";
-		$ddir = $pinfo['dirname'] == '.' ? $fi->dir : $pinfo['dirname'];
-		if (file_exists($finfo))
-			rename($finfo, $ddir.'/.'.$pinfo['basename']);
-		rename($fi->path, $ddir.'/'.$pinfo['basename']);
-		$fi->path = $ddir.'/'.$newname;
-		$fi->filename = $newname;
-		$this->UpdateMTime($ddir.'/'.$pinfo['basename']);
-	}
-
-	/**
-	 * When options are updated, this will be fired.
-	 * @param FileInfo $fi Associated file information.
-	 */
-	function Updated(&$fm, &$fi, &$newinfo)
-	{
-	}
-
-	/**
-	* Delete a file or folder.
-	*
-	* @param FileInfo $fi Associated file information.
-	* @param bool $save Whether or not to back up the file getting deleted.
-	*/
-	function Delete($fi, $save)
-	{
-		$finfo = "{$fi->dir}/.{$fi->filename}";
-		if (file_exists($finfo)) unlink($finfo);
-		if ($save)
-		{
-			$r_target = $fi->dir.'/.deleted_'.$fi->filename;
-			if (file_exists($r_target)) unlink($r_target);
-			rename($fi->path, $fi->dir.'/.deleted_'.$fi->filename);
-		}
-		else if (is_dir($fi->path)) DelTree($fi->path);
-		else unlink($fi->path);
-	}
-
-	/**
-	 * Called when a filter is set to this one.
-	 * @param string $path Source path.
-	 */
-	function Install($path) {}
-
-	/**
-	 * Called when a filter is no longer set to this one.
-	 * @param string $path Source path.
-	 */
-	function Cleanup($path) {}
-
-	static function UpdateMTime($filename)
-	{
-		$finfo = new FileInfo($filename);
-		$finfo->info['mtime'] = time();
-		$finfo->SaveInfo();
-	}
-}
-
-class FilterGallery extends FilterDefault
-{
-	/**
-	 * Name of this object for identification purposes.
-	 *
-	 * @var string
-	 */
-	public $Name = 'Gallery';
-
-	/**
-	 * Appends the width, height, thumbnail and any other image related
-	 * information on this file.
-	 *
-	 * @param FileInfo $fi
-	 * @return FileInfo
-	 */
-	function GetInfo(&$fi)
-	{
-		parent::GetInfo($fi);
-		if (substr($fi->filename, 0, 2) == 't_') $fi->show = false;
-		if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = 200;
-		if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = 200;
-
-		global $_d;
-
-		$dir = $fi->dir;
-		$abs = "{$dir}/t_{$fi->filename}";
-		$rel = "{$fi->dir}/t_{$fi->filename}";
-		if (file_exists($rel)) $fi->icon = htmlspecialchars($abs);
-
-		if (is_dir($fi->path))
-		{
-			$fs = glob($fi->path.'/.t_image.*');
-			if (!empty($fs)) $fi->vars['icon'] = $fs[0];
-			else $fi->vars['icon'] = FileManager::GetIcon($fi);
-		}
-		return $fi;
-	}
-
-	/**
-	 * @param FileInfo $fi Associated file information.
-	 */
-	function Updated(&$fm, &$fi, &$newinfo)
-	{
-		$img = GetVar('image');
-		$upimg = GetVar('upimage');
-
-		// Uploaded folder image
-		if (!empty($upimg['name']))
-		{
-			mkdir("timg");
-			move_uploaded_file($upimg['tmp_name'], 'timg/'.$upimg['name']);
-			$newimg = 'timg/'.$upimg['name'];
-		}
-		// No folder image.
-		else if ($img == 1)
-		{
-			$files = glob("{$fi->path}.t_image.*");
-			foreach ($files as $f) unlink($f);
-		}
-		// Selected folder image.
-		else if (!empty($img)) $newimg = $fi->path.$img;
-
-		// Uploaded folder image.
-		if (!empty($newimg))
-		{
-			$this->ResizeFile($newimg,
-				"{$fi->path}/.t_image",
-				$newinfo['thumb_width'], $newinfo['thumb_height']);
-		}
-		if (!empty($upimg['name']))
-		{
-			unlink("timg/{$upimg['name']}");
-			rmdir("timg");
-		}
-
-		if (is_dir($fi->path) && (
-			$fi->info['thumb_width'] != $newinfo['thumb_width'] ||
-			$fi->info['thumb_height'] != $newinfo['thumb_height']))
-		{
-			$this->UpdateThumbs($fi, $newinfo);
-		}
-
-		if (is_file($fi->path)) unset(
-			$newinfo['thumb_width'],
-			$newinfo['thumb_height'],
-			$newinfo['thumb']
-		);
-	}
-
-	function UpdateThumbs($fi, $info)
-	{
-		$dp = opendir($fi->path);
-		while ($file = readdir($dp))
-		{
-			if ($file[0] == '.') continue;
-			if (substr($file, 0, 2) == 't_') continue;
-
-			$fir = new FileInfo($fi->path.'/'.$file);
-
-			if (is_dir($fi->path.'/'.$file))
-			{
-				$g = glob("{$fir->path}/._image.*");
-				if (!empty($g))
-					$this->ResizeFile($g[0], $fir->path.'/.'.
-						filenoext('t'.substr(basename($g[0]), 1)),
-						$info['thumb_width'], $info['thumb_height']);
-				$this->UpdateThumbs($fir, $info);
-			}
-			else
-			{
-				$w = $info['thumb_width'];
-				$h = $info['thumb_height'];
-				$src = $fir->path;
-				$dst = $fir->dir.'/t_'.filenoext($fir->filename);
-				$this->ResizeFile($src, $dst, $w, $h);
-			}
-		}
-	}
-
-	/**
-	 * Returns an array of options that allow configuring this filter.
-	 * @param FileInfo $fi Associated file information.
-	 * @param array $default Default values.
-	 * @return array
-	 */
-	function GetOptions(&$fm, &$fi, $default)
-	{
-		$new = array();
-		if (is_dir($fi->path))
-		{
-			$selImages[0] = new SelOption('No Change');
-			$selImages[1] = new SelOption('Remove');
-
-			if (!empty($fm->files['files']))
-			foreach ($fm->files['files'] as $fiImg)
-			{
-				if (substr($fiImg->filename, 0, 2) == 't_') continue;
-				$selImages[htmlspecialchars($fiImg->filename)] = new SelOption($fiImg->filename);
-			}
-
-			$new[] = new FormInput('Thumbnail Width', 'text',
-				'info[thumb_width]', $fi->info['thumb_width']);
-			$new[] = new FormInput('Thumbnail Height', 'text',
-				'info[thumb_height]', $fi->info['thumb_height']);
-			$new[] = new FormInput('Gallery Image', 'select',
-				'image', $selImages);
-			$new[] = new FormInput('or Upload', 'file',
-				'upimage');
-		}
-		return array_merge(parent::GetOptions($fm, $fi, $default), $new);
-	}
-
-	/**
-	 * This will update the thumbnail properly, after the parent filter
-	 * handles the move.
-	 *
-	 * @param FileInfo $fi Source file information.
-	 * @param string $newname Destination filename.
-	 */
-	function Rename(&$fi, $newname)
-	{
-		parent::Rename($fi, $newname);
-		$thumb = $fi->dir.'/t_'.basename($fi->filename);
-		$ttarget = dirname($newname).'/t_'.basename($newname);
-		if (file_exists($thumb)) rename($thumb, $ttarget);
-	}
-
-	/**
-	 * Called when an item is to be deleted.
-	 *
-	 * @param FileInfo $fi Target to be deleted.
-	 * @param bool $save Whether or not to back up the item to be deleted.
-	 */
-	function Delete($fi, $save)
-	{
-		parent::Delete($fi, $save);
-		$thumb = $fi->dir.'/t_'.$fi->filename;
-		if (file_exists($thumb)) unlink($thumb);
-	}
-
-	/**
-	 * Called when a file is requested to upload.
-	 *
-	 * @param array $file Upload form's file field.
-	 * @param FileInfo $target Destination folder.
-	 */
-	function Upload($file, $target)
-	{
-		parent::Upload($file, $target);
-		$tdest = 't_'.substr($file, 0, strrpos($file, '.'));
-		$this->ResizeFile($target->path.$file, $target->path.$tdest,
-			$target->info['thumb_width'], $target->info['thumb_height']);
-	}
-
-	/**
-	 * Regenerates the associated thumbnails for a given folder.
-	 * @param string $path Destination path.
-	 */
-	function Install($path)
-	{
-		$files = glob($path."*.*");
-		$fi = new FileInfo($path);
-		$fi->info['thumb_width'] = $fi->info['thumb_height'] = 200;
-		foreach ($files as $file)
-		{
-			if (substr($file, 0, 2) == 't_') continue;
-			$pinfo = pathinfo($file);
-			$this->ResizeFile($file, $path.'t_'.filenoext($pinfo['basename']),
-				$fi->info['thumb_width'], $fi->info['thumb_height']);
-		}
-	}
-
-	/**
-	 * Cleans up all the generated thumbnail files for the given path.
-	 * @param string $path Target path.
-	 */
-	function Cleanup($path)
-	{
-		$files = glob($path."t_*.*");
-		foreach ($files as $file) unlink($file);
-	}
-
-	/**
-	 * Extension will be automatically appended to $dest filename.
-	 */
-	function ResizeFile($file, $dest, $nx, $ny)
-	{
-		$pinfo = pathinfo($file);
-		$dt = $dest.'.'.$pinfo['extension'];
-
-		switch (strtolower($pinfo['extension']))
-		{
-			case "jpg":
-			case "jpeg":
-				$img = imagecreatefromjpeg($file);
-				$img = $this->ResizeImg($img, $nx, $ny);
-				imagejpeg($img, $dt);
-			break;
-			case "png":
-				$img = imagecreatefrompng($file);
-				$img = $this->ResizeImg($img, $nx, $ny);
-				imagepng($img, $dt);
-			break;
-			case "gif":
-				$img = imagecreatefromgif($file);
-				$img = $this->ResizeImg($img, $nx, $ny);
-				imagegif($img, $dt);
-			break;
-		}
-	}
-
-	/**
-	 * Resizes an image bicubicly with GD keeping aspect ratio.
-	 *
-	 * @param resource $img
-	 * @param int $nx
-	 * @param int $ny
-	 * @return resource
-	 */
-	function ResizeImg($img, $nx, $ny)
-	{
-		$sx  = ImageSX($img);
-		$sy = ImageSY($img);
-		if ($sx < $nx && $sy < $ny) return $img;
-
-		if ($sx < $sy)
-		{
-			$dx = $nx * $sx / $sy;
-			$dy = $ny;
-		}
-		else
-		{
-			$dx = $nx;
-			$dy = $ny * $sy / $sx;
-		}
-		$dimg = imagecreatetruecolor($dx, $dy);
-		ImageCopyResampled($dimg, $img, 0, 0, 0, 0, $dx, $dy, $sx, $sy);
-		return $dimg;
 	}
 }
 

@@ -49,7 +49,6 @@ function GetTypeName($type)
 	}
 }
 
-
 /**
  * PHP source code reader.
  *
@@ -535,7 +534,7 @@ class CodeReader
 			{
 				if (count($this->tree) == 1) //Method
 				{
-					$parent = array_get($this->tree);
+					$parent = $this->tree[count($this->tree)-1];
 					$this->current->parent = $parent;
 					$parent->members[$tok[1]] = $this->current;
 				}

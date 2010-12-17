@@ -1,5 +1,8 @@
 <?php
 
+require_once(__DIR__.'/../Server.php');
+require_once(__DIR__.'/Form.php');
+
 /**
  * @package Calendar
  */
@@ -176,15 +179,15 @@ class Calendar
 	function Get($timestamp = null)
 	{
 		global $me;
-		require_once('h_template.php');
+		require_once('Template.php');
 
 		$vp = new VarParser();
 
 		$t = new Template();
 		$t->Set('target', $this->Behavior->Target);
 
-		$month = GetVar('calmonth', date("n", time()));
-		$year = GetVar('calyear', date("Y", time()));
+		$month = Server::GetVar('calmonth', date("n", time()));
+		$year = Server::GetVar('calyear', date("Y", time()));
 		$t->Set('month', $month);
 		$t->Set('year', $year);
 
@@ -192,12 +195,12 @@ class Calendar
 			1, $year);
 		$this->month = new CalendarMonth($this->ts);
 
-		$t->ReWrite('input', 'TagInput');
-		$t->ReWrite('form', 'TagForm');
+		$t->ReWrite('input', array('Form', 'TagInput'));
+		$t->ReWrite('form', array('Form', 'TagForm'));
 		$t->ReWrite('month', array(&$this, 'TagMonth'));
 		$t->ReWrite('week', array(&$this, 'TagWeek'));
 
-		return $t->ParseFile(dirname(__FILE__).'/temps/calendar_horiz.xml');
+		return $t->ParseFile(__DIR__.'/../../temps/calendar_horiz.xml');
 	}
 
 	/**

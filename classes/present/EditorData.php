@@ -1,5 +1,9 @@
 <?php
 
+require_once(__DIR__.'/Template.php');
+require_once(__DIR__.'/../Str.php');
+require_once(__DIR__.'/Form.php');
+
 /**
  * @package Editor
  */
@@ -8,7 +12,11 @@ define('ED_SORT_NONE',   0);
 define('ED_SORT_MANUAL', 1);
 define('ED_SORT_TABLE',  2);
 
-require_once('h_data.php');
+define('CONTROL_SIMPLE', 0);
+define('CONTROL_BOUND', 1);
+
+define('STATE_CREATE', 0);
+define('STATE_EDIT', 1);
 
 class DisplayColumn
 {
@@ -139,6 +147,7 @@ class HandlerFile extends EditorHandler
 	/**
 	 * Creates a new file handler.
 	 *
+	 * @param FileManager $fm Associated file manager.
 	 * @param string $target VarParsed string of associated database columns.
 	 * @param array $conditions Conditions to consider enabling folder
 	 * management.
@@ -367,9 +376,6 @@ class EditorData
 	 */
 	function EditorData($name, &$ds, $filter = null, $sort = null)
 	{
-		require_once('h_utility.php');
-		require_once('h_display.php');
-
 		$this->Name = $name;
 		$this->filter = $filter;
 		$this->ds = $ds;
@@ -406,10 +412,11 @@ class EditorData
 	 */
 	function Prepare()
 	{
-		$act = GetState($this->Name.'_action');
+		$act = Server::GetState($this->Name.'_action');
 
 		if ($this->sorting == ED_SORT_TABLE)
-			$this->sort = array(GetVar('sort', $this->ds->id) => GetVar('order', 'ASC'));
+			$this->sort = array(Server::GetVar('sort', $this->ds->id) =>
+				Server::GetVar('order', 'ASC'));
 
 		$this->state = $act == 'edit' ? STATE_EDIT : STATE_CREATE;
 
@@ -418,7 +425,7 @@ class EditorData
 		if ($act == 'Create')
 		{
 			$insert = array();
-			$child_id = GetVar('child');
+			$child_id = Server::GetVar('child');
 			$context = isset($child_id) ? $this->ds->children[$child_id] : $this;
 
 			$fields = $context->ds->FieldInputs;
@@ -426,7 +433,7 @@ class EditorData
 			{
 				if (is_object($in))
 				{
-					$value = GetVar($this->Name.'_'.$col);
+					$value = Server::GetVar($this->Name.'_'.$col);
 					if ($in->attr('TYPE') == 'date')
 					{
 						$insert[$col] = $value[2].'-'.$value[0].'-'.$value[1];
@@ -472,11 +479,11 @@ class EditorData
 				if (!$handler->Create($this, $insert)) { $this->Reset(); return; }
 			}
 
-			$parent = GetVar('parent');
+			$parent = Server::GetVar('parent');
 
 			if (isset($parent))
 			{
-				$child = $this->ds->children[GetVar('child')];
+				$child = $this->ds->children[Server::GetVar('child')];
 				$insert[$child->child_key] = $parent;
 			}
 
@@ -502,19 +509,19 @@ class EditorData
 
 		else if ($act == 'Update')
 		{
-			$ci = GetVar($this->Name.'_ci');
+			$ci = Server::GetVar($this->Name.'_ci');
 
 			if ($this->type == CONTROL_SIMPLE)
 			{
 				foreach (array_keys($this->ds->FieldInputs) as $name)
 				{
-					$vals[$name] = GetVar($name);
+					$vals[$name] = Server::GetVar($name);
 				}
 				$fp = fopen($ci, 'w+');
 				fwrite($fp, serialize($vals));
 				fclose($fp);
 			}
-			$child_id = GetVar('child');
+			$child_id = Server::GetVar('child');
 			$context = $child_id != null ? $this->ds->children[$child_id] : $this;
 			$update = array();
 			foreach ($context->ds->FieldInputs as $col => $in)
@@ -523,7 +530,7 @@ class EditorData
 				{
 					if (get_class($in) == 'FieldInput' && $in->type == 'label') continue;
 
-					$value = GetVar($this->Name.'_'.$col);
+					$value = Server::GetVar($this->Name.'_'.$col);
 
 					//TODO: Support editing custom fields.
 					#if ($in->type == 'custom')
@@ -597,9 +604,9 @@ class EditorData
 
 		else if ($act == 'delete')
 		{
-			$ci = GetState($this->Name.'_ci');
+			$ci = Server::GetState($this->Name.'_ci');
 
-			$child_id = GetVar('child');
+			$child_id = Server::GetVar('child');
 			$context = isset($child_id) ? $this->ds->children[$child_id] : $this;
 
 			$data = $context->ds->GetOne(array($context->ds->id => $ci));
@@ -683,16 +690,16 @@ class EditorData
 	{
 		$ret['name'] = $this->Name;
 
-		$act = GetVar($this->Name.'_action');
-		$sq = GetVar($this->Name.'_q');
+		$act = Server::GetVar($this->Name.'_action');
+		$sq = Server::GetVar($this->Name.'_q');
 
 		$ret['ds'] = $this->ds;
 		if ($act != 'edit' && !empty($this->ds->DisplayColumns)
 			&& ($this->Behavior->Search && isset($sq)))
 			$ret['table'] = $this->GetTable($this->Behavior->Target, $act, $sq);
 		else $ret['table'] = null;
-		$ret['forms'] = $this->GetForms(GetVar($assoc) == $this->Name ?
-			GetVar('child') : null);
+		$ret['forms'] = $this->GetForms(Server::GetVar($assoc) == $this->Name ?
+			Server::GetVar('child') : null);
 		return $ret;
 	}
 
@@ -707,10 +714,11 @@ class EditorData
 	{
 		if (!empty($items))
 		{
-			//Columns
-			//* Gather all columns required for display and relation.
-			//Children
-			//* Map child names to child index.
+			# Columns
+			# * Gather all columns required for display and relation.
+			# Children
+			# * Map child names to child index.
+
 			$cols[$this->ds->table] = array($this->ds->id => 1);
 			if (!empty($this->ds->DisplayColumns))
 			foreach (array_keys($this->ds->DisplayColumns) as $col)
@@ -729,35 +737,35 @@ class EditorData
 				}
 			}
 
-			//Flats
-			// * Convert each item into separated TreeNodes
-			// * Associate all indexes by table, then id
+			# Flats
+			# * Convert each item into separated TreeNodes
+			# * Associate all indexes by table, then id
 
 			$flats = array();
 
-			//Iterate all the resulting database rows.
+			# Iterate all the resulting database rows.
 			foreach ($items as $ix => $item)
 			{
 
-				//Iterate the columns that were created in step 1.
+				# Iterate the columns that were created in step 1.
 				foreach ($cols as $table => $columns)
 				{
-					//This will store all the associated data in the treenode
-					//for the editor to reference while processing the treee.
+					# This will store all the associated data in the treenode
+					# for the editor to reference while processing the tree.
 					$data = array();
 					$skip = false;
 
-					//Now we're iterating the display columns.
+					# Now we're iterating the display columns.
 					foreach ($columns as $column => $id)
 					{
-						//This column is not associated with a database row.
+						# This column is not associated with a database row.
 						if (is_numeric($column)) continue;
 
-						//Table names are included to avoid ambiguity.
+						# Table names are included to avoid ambiguity.
 						$colname = $table.'_'.$column;
 
-						//ID would be specified if this is specified as a keyed
-						//value.
+						# ID would be specified if this is specified as a keyed
+						# value.
 						if ($id)
 						{
 							if (empty($item[$colname]))
@@ -778,8 +786,8 @@ class EditorData
 				}
 			}
 
-			//Tree
-			// * Construct tree out of all items and children.
+			# Tree
+			# * Construct tree out of all items and children.
 
 			$tree = new TreeNode('Root');
 
@@ -804,8 +812,8 @@ class EditorData
 						$tree->children[] = $node;
 				}
 			}
-			//Put child table children above related
-			//children, helps to understand the display.
+			# Put child table children above related children, helps to
+			# understand the display.
 			if (count($this->ds->children) > 0) $this->FixTree($tree);
 			return $tree;
 		}
@@ -855,7 +863,7 @@ class EditorData
 	{
 		if ($this->Behavior->Search)
 		{
-			$sq = GetVar($this->Name.'_q');
+			$sq = Server::GetVar($this->Name.'_q');
 			if (!isset($sq)) return;
 		}
 
@@ -1099,7 +1107,7 @@ class EditorData
 
 		$fullname = $this->Name;
 		if ($curchild != null) $fullname .= '_'.$curchild;
-		$ci = GetState($this->Name.'_ci');
+		$ci = Server::GetState($this->Name.'_ci');
 
 		if ($this->type == CONTROL_BOUND)
 		{
@@ -1276,8 +1284,8 @@ class EditorData
 		$ret = null;
 		$context = $curchild != null ? $this->ds->children[$curchild] : $this;
 
-		$ci = GetState($this->Name.'_ci');
-		$ca = GetVar($this->Name.'_ca');
+		$ci = Server::GetState($this->Name.'_ci');
+		$ca = Server::GetVar($this->Name.'_ca');
 
 		$frm = $this->GetForm($this->state, $curchild);
 		if ($frm != null) $ret[] = $frm;
@@ -1328,8 +1336,6 @@ class EditorData
 	 */
 	function GetUI($assoc = 'editor')
 	{
-		require_once('h_template.php');
-
 		$this->assoc = $assoc;
 
 		$t = new Template();
@@ -1337,18 +1343,18 @@ class EditorData
 		$t->ReWrite('search', array(&$this, 'TagSearch'));
 		$t->Set('target', $this->Behavior->Target);
 		$t->Set('name', $this->Name);
-		$t->Set('plural', Plural($this->ds->Description));
+		$t->Set('plural', Str::Plural($this->ds->Description));
 
 		if (!empty($this->ds))
-			$t->Set('table_title', Plural($this->ds->Description));
+			$t->Set('table_title', Str::Plural($this->ds->Description));
 
 		$t->Set('table', $this->GetTable($this->Behavior->Target,
-			GetState($this->Name.'_ci')));
+			Server::GetState($this->Name.'_ci')));
 
 		$t->Set($this->View);
 		$t->Set('assoc', $assoc);
 
-		return $t->ParseFile(dirname(__FILE__).'/temps/editor.xml');
+		return $t->ParseFile(__DIR__.'/../../temps/editor.xml');
 	}
 
 	function Reset()
@@ -1397,960 +1403,6 @@ class EditorDataBehavior
 	public $Group;
 
 	public $Target;
-}
-
-class DisplayData
-{
-	/**
-	 * @var string
-	 */
-	public $Name;
-
-	/**
-	 * @var DataSet
-	 */
-	public $ds;
-
-	/**
-	 * Array of Join objects associated with this data display.
-	 *
-	 * @var array
-	 */
-	public $joins;
-
-	/**
-	 * Behavior that will affect this data display.
-	 *
-	 * @var DisplayDataBehavior
-	 */
-	public $Behavior;
-
-	private $count;
-
-	/**
-	 * @param string $name Name of this display for state management.
-	 * @param DataSet $ds Associated dataset to collect information from.
-	 */
-	function DisplayData($name, $ds)
-	{
-		$this->Name = $name;
-		$this->ds = $ds;
-		$this->Behavior = new DisplayDataBehavior();
-	}
-
-	/**
-	 * Available to calling script to prepare any actions that may be ready to
-	 * be performed.
-	 *
-	 * @access public
-	 */
-	function Prepare()
-	{
-		$act = GetVar($this->Name.'_action');
-
-		if ($act == 'update')
-		{
-			$ci = GetVar('ci');
-			$up = array();
-			foreach ($this->ds->FieldInputs as $col => $fi)
-			{
-				$fi->atrs['NAME'] = $col;
-				// Sub table, we're going to need to clear and re-create the
-				// associated table rows.
-				$ms = null;
-				if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
-				{
-					$join = $this->joins[$ms[1]];
-					$cond = $join->Condition;
-					$join->DataSet->Remove(array($cond[0] => $ci));
-					$vals = GetVar($ms[2]);
-					if (!empty($vals))
-					foreach ($vals as $val)
-					{
-						$add = array($cond[0] => $ci);
-						$add[$ms[2]] = $val;
-						$join->DataSet->Add($add);
-					}
-				}
-				else $up[$col] = $fi->GetData();
-			}
-			$this->ds->Update(array($this->ds->id => $ci), $up);
-		}
-
-		//Collect search data
-
-		if ($act == 'search')
-		{
-			$this->fs = GetVar('field');
-			$this->ss = GetVar($this->Name.'_search');
-			$this->ipp = GetVar($this->Name.'_ipp', 10);
-
-			$query = array();
-
-			foreach (array_keys($this->ds->DisplayColumns) as $col)
-			{
-				$fi = $this->ds->FieldInputs[$col];
-				if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
-				{
-					$query['columns'][0] = '*';
-					$query['columns'][$ms[2]] = SqlUnquote("GROUP_CONCAT(DISTINCT {$col})");
-					$query['group'] =  $this->ds->id;
-				}
-			}
-
-			// Collect the data.
-
-			if (!empty($this->ss))
-			{
-				foreach (array_keys($this->ss) as $col)
-				{
-					if (!isset($this->fs[$col])) return;
-					$this->AddToQuery($query, $col, $this->fs[$col]);
-				}
-
-				$this->result = $this->ds->Get($query);
-				$this->count = count($this->result);
-			}
-			else $this->result = array();
-
-			if (!empty($this->result))
-				$this->items = GetFlatPage($this->result, GetVar('cp', 0),
-					$this->ipp);
-		}
-	}
-
-	function AddToQuery(&$query, $col, $val)
-	{
-		if (is_array(@$this->SearchFields[$col]))
-		{
-			foreach ($this->SearchFields[$col] as $icol)
-				$this->AddToQuery($query, $icol, $val);
-		}
-
-		$fi = $this->ds->FieldInputs[$col];
-		$fi->atrs['NAME'] = $col;
-
-		// This may not work.
-		if ($fi->atrs['TYPE'] == 'select')
-			$query['match'][$col] = SqlIn($val);
-		else if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
-			foreach ($this->fs[$col] as $ix => $v)
-				$query['having'][] = " FIND_IN_SET($v, $ms[2]) > 0";
-		else if ($fi->atrs['TYPE'] == 'date')
-			$query['match'][$col] = SqlBetween(TimestampToMySql(DateInputToTS(
-				$this->fs[$col][0]), false), TimestampToMySql(DateInputToTS(
-				$this->fs[$col][1]), false));
-		else $query['match'][$col] = SqlLike('%'.$val.'%');
-	}
-
-	/**
-	 * @param string $temp Template to use for rendering me.
-	 */
-	function Get($temp = null)
-	{
-		$t = new Template();
-		$t->Set('name', $this->Name);
-
-		$t->ReWrite('results', array(&$this, 'TagResults'));
-		$t->ReWrite('result', array(&$this, 'TagResult'));
-		$t->ReWrite('search', array(&$this, 'TagSearch'));
-		$t->ReWrite('pages', array(&$this, 'TagPages'));
-
-		return $t->ParseFile(!isset($temp) ? dirname(__FILE__).
-			'/temps/displaydata.xml' : $temp);
-
-		/*$q = GetVar('q');
-
-		if ($ca == 'edit' && $this->Behavior->AllowEdit)
-		{
-			$ci = GetVar('ci');
-
-			if (!empty($this->ds->FieldInputs))
-			{
-				foreach (array_keys($this->ds->FieldInputs) as $col)
-				{
-					// This is a sub table, we GROUP_CONCAT these for
-					// finding later if need be.
-					$ms = null;
-					if (preg_match('/([^.]+)\.(.+)/', $col, $ms))
-						$cols[$ms[2]] =
-							SqlUnquote("GROUP_CONCAT(DISTINCT {$ms[2]})");
-					else $cols[$col] = $col;
-				}
-
-				$item = $this->ds->GetOne(array($this->ds->id => $ci),
-					$this->joins, $cols, $this->ds->id);
-
-				$frm = new Form('frmEdit');
-				$frm->AddHidden($this->assoc, $this->Name);
-				$frm->AddHidden('ca', 'update');
-				$frm->AddHidden('ci', $ci);
-
-				foreach ($this->ds->FieldInputs as $col => $fi)
-				{
-					if (preg_match('/([^.]+)\.(.+)/', $col, $ms))
-						$col = $ms[2];
-					$fi->atrs['NAME'] = $col;
-					if ($fi->type == 'select' || $fi->type == 'selects'
-						|| $fi->type == 'radios' || $fi->type == 'checks')
-					{
-						$sels = explode(',', $item[$col]);
-						if (!empty($sels))
-						foreach($sels as $sel)
-							if (isset($fi->valu[$sel]))
-								$fi->valu[$sel]->selected = true;
-						if (isset($fi->valu[$item[$col]]))
-							$fi->valu[$item[$col]]->selected = true;
-					}
-					else $fi->valu = $item[$col];
-
-					$frm->AddInput($fi);
-				}
-				$frm->AddInput(new FormInput(null, 'submit', null, 'Update'));
-				$ret .= $frm->Get('action="'.$target.'" method="post"');
-			}
-
-			if (!empty($this->Editors))
-			foreach ($this->Editors as $join => $editor)
-			{
-				if (preg_match('/([^.]+)\.(.*)/', $join, $ms))
-					$editor->filter = "{$ms[2]} = $ci";
-				$ret .= $editor->GetUI($target, $ci);
-			}
-		}
-
-		//else $ret = $this->GetSearch($target);
-
-		return $ret;*/
-	}
-
-	function TagSearch($t, $g, $a)
-	{
-		global $me;
-
-		$act = GetVar($this->Name.'_action');
-
-		if ($act == 'search') return;
-
-		if (empty($this->SearchFields))
-		{
-			Error("You should specify a few SearchField items");
-			return;
-		}
-
-		require_once('h_display.php');
-		$frm = new Form($this->Name);
-		$frm->Template = $g;
-		$frm->AddHidden($this->Name.'_action', 'search');
-		if (isset($GLOBALS['editor'])) $frm->AddHidden('editor', $GLOBALS['editor']);
-		$frm->AddInput(new FormInput('Search', 'custom', null, array(&$this, 'callback_fields')));
-		$frm->AddInput(new FormInput(null, 'submit', 'butSubmit', 'Search'));
-		return $frm->Get('action="'.GetVar('q').'" method="post"');
-	}
-
-	function TagResults($t, $g, $a)
-	{
-		if (isset($this->count)) return $g;
-		else return 'No results';
-	}
-
-	/**
-	 * @param Template $t Associated template.
-	 */
-	function TagResult($t, $g, $a)
-	{
-		if (!empty($this->items) && !empty($this->ds->DisplayColumns))
-		{
-			$tField = new Template();
-			$tField->ReWrite('field', array(&$this, 'TagField'));
-
-			$ret = '';
-			foreach ($this->items as $ix => $i)
-			{
-				if (!empty($this->Callbacks->Result))
-					RunCallbacks($this->Callbacks->Result, $tField, $i);
-				$this->item = $i;
-				$tField->Set($i);
-				$ret .= $tField->GetString($g);
-
-				if ($ix > $this->ipp) break;
-			}
-			return $ret;
-		}
-		else if (isset($this->count)) return '<p>No results found!</p>';
-	}
-
-	function TagField($t, $g, $a)
-	{
-		$ret = '';
-		$vp = new VarParser();
-		foreach ($this->ds->DisplayColumns as $f => $dc)
-		{
-			$vars['text'] = $dc->text;
-			$vars['val'] = '';
-
-			if (strpos($f, '.')) // Sub Table
-			{
-				$vs = explode(',', $this->item[$this->ds->StripTable($f)]);
-
-				foreach ($vs as $ix => $val)
-				{
-					if ($ix > 0) $vars['val'] .= ', ';
-
-					if (!empty($this->fs[$f]))
-					{
-						$bold = array_search($val, $this->fs[$f]) ? true : false;
-						if ($bold) $vars['val'] .= '<span class="result">';
-					}
-					if (!empty($val))
-						$vars['val'] .= $this->ds->FieldInputs[$f]->atrs['VALUE'][$val]->text;
-					if (!empty($this->fs[$f]) && $bold) $vars['val'] .= '</span>';
-				}
-			}
-			else // Standard column
-			{
-				$vars['val'] = !empty($dc->callback)
-					? call_user_func($dc->callback, $this->ds, $this->item, $f)
-					: $this->item[$this->ds->StripTable($f)];
-			}
-			$ret .= $vp->ParseVars($g, $vars);
-		}
-		return $ret;
-	}
-
-	function TagPages($t, $g, $a)
-	{
-		if ($this->count > 10)
-		{
-			$vars = array_merge($_GET, $_POST);
-			unset($vars['cp']);
-			return GetPages(count($this->result), $this->ipp, $vars);
-		}
-	}
-
-	function callback_fields()
-	{
-		$ret = '<table>';
-		foreach ($this->SearchFields as $idx => $col)
-			$ret .= $this->add_field($idx, $col);
-		return $ret.'</table>';
-	}
-
-	function add_field($idx, $col)
-	{
-		$ret = null;
-
-		// Tied to multiple fields
-		if (is_array($col)) $col = $idx;
-		if (!isset($this->ds->FieldInputs[$col])) return;
-		$fi = $this->ds->FieldInputs[$col];
-		$fi->atrs['NAME'] = "field[{$col}]";
-		$target = '#'.str_replace('.','\\\\.',$col);
-		$ret .= '<tr><td valign="top"><label><input type="checkbox"
-			value="1" id="'.$this->Name.'_search_'.$col.'" name="'.$this->Name.'_search['.$col.']"
-			onclick="$(\''.$target.'\').showHide($(this).attr(\'checked\'))" />
-			'.$fi->text.'</label></td>';
-		if ($fi->atrs['TYPE'] == 'date')
-		{
-			$fi->atrs['NAME'] = 'field['.$col.'][0]';
-			$ret .= ' <td valign="top"><div id="'.$col.'" class="hidden">
-				from '.$fi->Get($this->Name).' to ';
-			$fi->atrs['NAME'] = 'field['.$col.'][1]';
-			$ret .= $fi->Get($this->Name)."</div></td>\n";
-		}
-		else if ($fi->atrs['TYPE'] == 'select')
-			$fi->type = 'checks';
-		else $ret .= '<td><div id="'.$col.'" class="hidden">'.
-			$fi->Get($this->Name).'</div></td>';
-		$ret .= '</tr>';
-		return $ret;
-	}
-}
-
-class DisplayDataBehavior
-{
-	public $AllowEdit;
-
-	function AllowAll()
-	{
-		$this->AllowEdit = true;
-	}
-}
-
-class FileAccessHandler extends EditorHandler
-{
-	/**
-	 * Top level directory to allow access.
-	 * @var string
-	 */
-	private $root;
-
-	private $ed;
-
-	/**
-	 * Constructor for this object, sets required properties.
-	 * @param string $root Top level directory to allow access.
-	 */
-	function FileAccessHandler($ed, $root, $depth = 0)
-	{
-		require_once('a_file.php');
-		$this->ed = $ed;
-		$this->depth = $depth;
-		$this->root = $root;
-	}
-
-	/**
-	 * Recurses a single folder to collect access information out of it.
-	 * @param string $root Source folder to recurse into.
-	 * @param int $level Amount of levels deep for tree construction.
-	 * @param int $id Identifier of the object we are looking for access to.
-	 * @return array Array of SelOption objects.
-	 */
-	static function PathToSelOption($root, $id, $level, $depth = 0)
-	{
-		$ret = array();
-		if (!empty($depth) && $level > $depth) return $ret;
-
-		//Get information on this item.
-		$so = new SelOption($root);
-		$fi = new FileInfo($root);
-
-		if (!empty($id) && !empty($fi->info['access'][$id]))
-			$so->selected = true;
-		$ret[$root] = $so;
-
-		//Recurse children.
-		$dp = opendir($root);
-		while ($file = readdir($dp))
-		{
-			if ($file[0] == '.') continue;
-			$fp = $root.'/'.$file;
-			if (is_dir($fp)) $ret = array_merge($ret,
-				FileAccessHandler::PathToSelOption($fp, $id, $level+1, $depth));
-		}
-
-		natcasesort($ret);
-
-		return $ret;
-	}
-
-	/**
-	 * Recurses a single folder to set access information in it.
-	 * @param string $root Source folder to recurse into.
-	 * @param int $id Identifier of the object we are looking for access to.
-	 * @param array $accesses Series of access items that will eventually get set.
-	 */
-	static function RecurseSetPerm($root, $id, $accesses)
-	{
-		//Set information on this item.
-		$fi = new FileInfo($root);
-
-		if (!empty($accesses) && in_array($root, $accesses))
-			$fi->info['access'][$id] = 1;
-		else if (isset($fi->info['access'][$id]))
-			unset($fi->info['access'][$id]);
-		$fi->SaveInfo();
-
-		//Recurse children.
-		$dp = opendir($root);
-		while ($file = readdir($dp))
-		{
-			if ($file[0] == '.') continue;
-			$fp = $root.'/'.$file;
-			if (is_dir($fp)) FileAccessHandler::RecurseSetPerm($fp, $id, $accesses);
-		}
-	}
-
-	static function RecurseGetPerm($root, $id)
-	{
-		$ret = array();
-		$fi = new FileInfo($root);
-		if (isset($fi->info['access'][$id])) $ret[] = $root;
-
-		$dp = opendir($root);
-		while ($file = readdir($dp))
-		{
-			if ($file[0] == '.') continue;
-			$fp = $root.'/'.$file;
-			if (is_dir($fp)) $ret = array_merge($ret, FileAccessHandler::RecurseGetPerm($fp, $id));
-		}
-
-		return $ret;
-	}
-
-	static function Copy($root, $src, $dst)
-	{
-		FileAccessHandler::RecurseSetPerm($root, $dst, FileAccessHandler::RecurseGetPerm($root, $src));
-	}
-
-	/**
-	 * Called when a file or folder gets updated.
-	 */
-	function Update($s, $id, &$original, &$update)
-	{
-		$accesses = GetVar($this->ed->Name.'_accesses');
-		$this->RecurseSetPerm($this->root, $id, $accesses);
-		return true;
-	}
-
-	function Created($s, $id, $inserted)
-	{
-		$accesses = GetVar($this->ed->Name.'_accesses');
-		$this->RecurseSetPerm($this->root, $id, $accesses);
-	}
-
-	/**
-	 * Adds a series of options to the form associated with the given file.
-	 * @todo Rename to AddFields
-	 */
-	function GetFields($s, &$form, $id, $data)
-	{
-		$form->AddInput(new FormInput('Accessable Folders', 'selects',
-			'accesses', $this->PathToSelOption($this->root, $id, 0, 2), array('SIZE' => 8)));
-	}
-}
-
-class EditorText
-{
-	public $Name;
-	private $item;
-
-	function EditorText($name, $item)
-	{
-		$this->Name = $name;
-		$this->item = str_replace('\\', '', $item);
-	}
-
-	function Prepare()
-	{
-		$q = $GLOBALS['_d']['q'];
-		$action = array_pop($q);
-		$target = array_pop($q);
-
-		if ($target != $this->Name) return;
-
-		if ($action == 'update')
-		{
-			$this->item = SecurePath(GetVar($this->Name.'_ci'));
-			file_put_contents($this->item, GetVar($this->Name.'_body'));
-		}
-	}
-
-	function Get($target)
-	{
-		$frmRet = new Form($this->Name);
-		$frmRet->AddHidden($this->Name.'_action', 'update');
-		$frmRet->AddHidden($this->Name.'_ci', $this->item);
-
-		$frmRet->AddInput(new FormInput(null, 'area', $this->Name.'_body',
-			@file_get_contents($this->item),
-				array('ROWS' => 30, 'COLS' => 30, 'style' => 'width: 100%')));
-		$frmRet->AddInput(new FormInput(null, 'submit', 'butSubmit', 'Update'));
-
-		return $frmRet->Get('method="post" action="'.$target.'/'.$this->Name.'/update"');
-	}
-}
-
-class EditorUpload
-{
-	public $Name;
-	private $item;
-
-	function EditorUpload($name, $item)
-	{
-		$this->Name = $name;
-		$this->item = $item;
-	}
-
-	function Prepare()
-	{
-		$action = GetVar($this->Name.'_action');
-		if ($action == 'update')
-		{
-			move_uploaded_file($_FILES[$this->Name.'file']['tmp_name'], $this->item);
-		}
-	}
-
-	function Get($target)
-	{
-		$frmRet = new Form($this->Name);
-		$frmRet->AddHidden('action', 'update');
-
-		$frmRet->AddInput(new FormInput(null, 'file', 'file'));
-		$frmRet->AddInput(new FormInput(null, 'submit', 'butSubmit', 'Update'));
-
-		return $frmRet->Get('enctype="multipart/form-data" method="post" action="'.$target.'"');
-	}
-}
-
-class DataSearch
-{
-	/** @var string */
-	public $Name;
-	/** @var DataSearchBehavior */
-	public $Behavior;
-	/** @var array */
-	public $SearchFields;
-	/** @var DataSet */
-	private $_ds;
-
-	function __construct($name, &$ds)
-	{
-		$this->Name = $name;
-		$this->_ds = $ds;
-		$this->Behavior = new DataSearchBehavior();
-		$this->Behavior->Buttons['View'] = array(
-			'href' => '{{app_abs}}{{me}}/{{name}}/view/{{id}}',
-			'target' => '_blank'
-		);
-		$this->Behavior->Buttons['Edit'] = array(
-			'href' => '{{app_abs}}{{me}}/{{name}}/edit/{{id}}',
-			'target' => '_blank'
-		);
-		$this->Behavior->Buttons['Delete'] = array(
-			'class' => 'delResult',
-			'href' => '#',
-			'id' => 'del:{{id}}'
-		);
-	}
-
-	function Prepare()
-	{
-		global $_d;
-
-		$this->_q = array_reverse($_d['q']);
-
-		if (@$this->_q[3] == $this->Name)
-		{
-			if (@$this->_q[2] == 'js')
-			{
-				$t = new Template();
-				if (@$this->_q[1] == 'data_search_fill')
-				{
-					$ci = $this->_q[0];
-					$orders[$this->_ds->id] = 'ASC';
-					foreach ($this->_ds->joins as $j)
-						$orders[$j->DataSet->id] = 'ASC';
-
-					$data = $this->_ds->Get(array(
-						'match' => array('app_id' => $ci),
-						'args' => GET_ASSOC,
-						'order' => $orders
-					));
-
-					$t->Set('json', json_encode($data));
-				}
-				$t->Set('name', $this->Name);
-				die($t->ParseFile(dirname(__FILE__).
-					'/temps/'.@$this->_q[1].'.js'));
-			}
-		}
-
-		//Collect search data
-
-		if (@$this->_q[1] == $this->Name && @$this->_q[0] == 'search')
-		{
-			$this->ss = GetVar($this->Name.'_search');
-			$this->ipp = GetVar($this->Name.'_ipp', 10);
-
-			$query['group'] = $this->_ds->id;
-
-			foreach (array_keys($this->_ds->DisplayColumns) as $col)
-			{
-				$fi = $this->_ds->FieldInputs[$col];
-				if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
-					$query['cols'][$ms[2]] = "GROUP_CONCAT(DISTINCT {$col})";
-			}
-
-			// Collect the data.
-
-			if (!empty($this->ss))
-			{
-				foreach (array_keys($this->ss) as $col)
-				{
-					$val = GetVar("{$col}");
-					if (!isset($val)) return;
-					$this->AddToQuery($query, $col, $val);
-				}
-
-				$query['cols'] = array(SqlUnquote('SQL_CALC_FOUND_ROWS *'));
-				$this->items = $this->_ds->Get($query);
-
-				$count = $this->_ds->GetCustom('SELECT FOUND_ROWS()');
-				$this->count = $count[0][0];
-			}
-			else $this->items = array();
-		}
-
-		if (@$this->_q[2] == $this->Name && @$this->_q[1] == 'delete')
-		{
-			$id = $this->_q[0];
-			$this->_ds->Remove(array($this->_ds->id => $id));
-			die(json_encode(array('result' => 1)));
-		}
-	}
-
-	function Get()
-	{
-		global $_d;
-
-		$qc = $_d['q'];
-		$ci = array_pop($qc);
-		$act = array_pop($qc);
-		$target = array_pop($qc);
-
-		$t = new Template();
-
-		$t->Set($_d);
-
-		if ($target == $this->Name && $act == 'view')
-		{
-			$t->ReWrite('loop', 'TagLoop');
-			$t->ReWrite('input', 'TagInput');
-			$ret = '<script type="text/javascript" src="../js/data_search_fill/'.$ci.'"></script>';
-			$ret .= '<script type="text/javascript" src="../js/data_search_print/'.$ci.'"></script>';
-			return $ret.$t->ParseFile($this->Form);
-		}
-		if ($target == $this->Name && $act == 'edit'
-		&& $this->Behavior->AllowEdit)
-		{
-			$t->ReWrite('loop', 'TagLoop');
-			$t->ReWrite('input', 'TagInput');
-			$t->ReWrite('form', array($this, 'TagEditForm'));
-			$this->ci = $ci;
-			$ret = '<script type="text/javascript" src="../../../js"></script>';
-			$ret .= '<script type="text/javascript" src="../js/data_search_fill/'.$ci.'"></script>';
-			return $ret.$t->ParseFile($this->Form);
-		}
-		else
-		{
-			$t->ReWrite('search', array($this, 'TagSearch'));
-			$t->ReWrite('results', array($this, 'TagResults'));
-			return $t->Parsefile(dirname(__FILE__).'/temps/data_search.xml');
-		}
-	}
-
-	# Search Related
-
-	function TagSearch($t, $g, $a)
-	{
-		$tt = new Template();
-		$tt->Set('name', $this->Name);
-		$tt->Set('tempurl', GetRelativePath(dirname(__FILE__).'/temps'));
-
-		$tt->ReWrite('searchfield', array(&$this, 'TagSearchField'));
-		return $tt->GetString($g);
-		return $g;
-	}
-
-	function TagSearchField($t, $g)
-	{
-		$ret = null;
-		foreach ($this->SearchFields as $ix => $sf)
-			$ret .= $this->AddSearchField($ix, $sf, $g);
-		return $ret;
-	}
-
-	function AddSearchField($ix, $sf, $g)
-	{
-		$vp = new VarParser();
-		$ret = null;
-
-		if (is_array($sf)) $sf = $ix;
-		if (array_key_exists($sf, $this->_ds->FieldInputs))
-		{
-			/** @var FormInput */
-			$fi = $this->_ds->FieldInputs[$sf];
-			$fi->attr('NAME', $sf);
-
-			if ($fi->attr('TYPE') == 'date') $fi->attr('TYPE', 'daterange');
-			$field = $fi->Get($this->Name);
-
-			$ret .= $vp->ParseVars($g, array(
-				'id' => $fi->GetCleanID(null),
-				'text' => $fi->text,
-				'fname' => $fi->attr('NAME'),
-				'field' => $field
-			));
-		}
-		else
-			Error("Could not find the field input for {$sf}.");
-		return $ret;
-	}
-
-	function AddToQuery(&$query, $col, $val)
-	{
-		if (is_array(@$this->SearchFields[$col]))
-		{
-			foreach ($this->SearchFields[$col] as $icol)
-				$this->AddToQuery($query, $icol, $val);
-		}
-
-		$fi = $this->_ds->FieldInputs[$col];
-		$fi->attr('NAME', $col);
-
-		if ($fi->attr('TYPE') == 'select')
-		{
-			$query['match'][$col] = SqlOr(SqlIn($val));
-		}
-		if ($fi->attr('TYPE') == 'checks')
-		{
-			$query['match'][$col] = SqlOr(SqlIn($val));
-		}
-		else if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
-			foreach ($this->fs[$col] as $ix => $v)
-				$query['having'][] = " FIND_IN_SET($v, $ms[2]) > 0";
-		else if ($fi->attr('TYPE') == 'date')
-		{
-			$query['match'][$col] = SqlBetween(
-				TimestampToMySql(DateInputToTS(GetVar($col)), false),
-				TimestampToMySql(DateInputToTS(GetVar($col.'2')), false)
-			);
-		}
-		else $query['match'][$col] = SqlLike('%'.$val.'%');
-	}
-
-	# Result Related
-
-	/** @param Template $t Associated template */
-	function TagResults($t, $g)
-	{
-		if (isset($this->count))
-		{
-			$t->ReWrite('result', array($this, 'TagResult'));
-			$t->ReWrite('page', array($this, 'TagPage'));
-			return $t->GetString($g);
-		}
-	}
-
-	function TagResult($t, $g)
-	{
-		if (!empty($this->items) && !empty($this->_ds->DisplayColumns))
-		{
-			global $_d;
-			$t->ReWrite('result_field', array($this, 'TagResultField'));
-			$t->ReWrite('result_button', array($this, 'TagResultButton'));
-
-			$ret = '';
-			$start = $this->Behavior->ItemsPerPage *
-				(GetVar($this->Name.'_page', 1) - 1);
-			for ($ix = 0; $ix < $this->Behavior->ItemsPerPage; $ix++)
-			#foreach ($this->items as $ix => $i)
-			{
-				if ($start+$ix >= count($this->items)) break;
-				$i = $this->items[$start+$ix];
-				if (!empty($this->Callbacks->Result))
-					RunCallbacks($this->Callbacks->Result, $t, $i);
-				$this->item = $i;
-
-				$t->Set('res_links', RunCallbacks(@$_d['datasearch.cb.head_res'], $this, $i));
-				$t->Set('name', $this->Name);
-				$t->Set('id', $i[$this->_ds->id]);
-				$t->Set($i);
-				$ret .= $t->GetString($g);
-			}
-			return $ret;
-		}
-		else if (isset($this->count)) return '<p>No results found!</p>';
-	}
-
-	function TagResultButton($t, $g)
-	{
-		$ret = null;
-		$tButton = new Template();
-		$tButton->ReWrite('a', array($this, 'TagButtonA'));
-		foreach ($this->Behavior->Buttons as $text => $b)
-		{
-			$tButton->Set('text', $text);
-			$this->but = $b;
-			$ret .= $tButton->GetString($g);
-		}
-		return $ret;
-	}
-
-	function TagButtonA($t, $g, $a)
-	{
-		return '<a'.GetAttribs(array_merge($this->but, $a)).'>'.$g.'</a>';
-	}
-
-	function TagResultField($t, $g)
-	{
-		$ret = '';
-		$vp = new VarParser();
-		foreach ($this->_ds->DisplayColumns as $f => $dc)
-		{
-			$vars['text'] = $dc->text;
-			$vars['val'] = '';
-
-			// Sub Table
-			if (strpos($f, '.'))
-			{
-				$vs = explode(',', $this->item[$this->_ds->StripTable($f)]);
-
-				foreach ($vs as $ix => $val)
-				{
-					if ($ix > 0) $vars['val'] .= ', ';
-
-					if (!empty($this->fs[$f]))
-					{
-						$bold = array_search($val, $this->fs[$f]) ? true : false;
-						if ($bold) $vars['val'] .= '<span class="result">';
-					}
-					if (!empty($val))
-						$vars['val'] .= $this->ds->FieldInputs[$f]->valu[$val]->text;
-					if (!empty($this->fs[$f]) && $bold) $vars['val'] .= '</span>';
-				}
-			}
-			else // Standard column
-			{
-				$vars['val'] = !empty($dc->callback)
-					? call_user_func($dc->callback, $this->_ds, $this->item, $f, $f)
-					: $this->item[$this->_ds->StripTable($f)];
-			}
-			$ret .= $vp->ParseVars($g, $vars);
-		}
-		return $ret;
-	}
-
-	function TagPage($t, $g)
-	{
-		global $_d;
-
-		$pages = $this->count / $this->Behavior->ItemsPerPage;
-		$ret = null;
-		$vp = new VarParser();
-		for ($ix = 0; $ix < $pages; $ix++)
-		{
-			$vars['url'] = url($_d['app_abs'].$GLOBALS['me'].'/'.$this->Name
-				.'/search', array_merge($_GET, $_POST));
-			$vars['num'] = $ix+1;
-			$ret .= $vp->ParseVars($g, $vars);
-		}
-		return $ret;
-	}
-
-	# Edit Related
-
-	function TagEditForm($t, $g, $a)
-	{
-		return '<form'.GetAttribs($a).'>'.
-		'<input type="hidden" name="state" value="edit" />'.
-		'<input type="hidden" name="id" value="'.$this->ci.'" />'.
-		$g.'</form>';
-	}
-}
-
-class DataSearchBehavior
-{
-	/** @var Boolean */
-	public $AllowEdit;
-
-	public $ItemsPerPage = 5;
-
-	function AllowAll()
-	{
-		$this->AllowEdit = true;
-	}
 }
 
 ?>
