@@ -146,7 +146,7 @@ class TreeNode
 	 * @param array $arr Array items to add to $n.
 	 * @return TreeNode Root of the tree.
 	 */
-	static function FromArray($n, $arr)
+	static function FromArray($n, $arr = null, $use_keys = true)
 	{
 		$root = new TreeNode($n);
 		foreach ($arr as $k => $v)
