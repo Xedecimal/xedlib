@@ -95,6 +95,7 @@ class U
 			}
 			else $ret .= $item;
 		}
+		else if (!empty($args)) $ret = $args[0];
 		return $ret;
 	}
 

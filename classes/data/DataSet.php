@@ -520,10 +520,21 @@ class DataSet
 		if ($update_existing)
 		{
 			$query .= ' ON DUPLICATE KEY UPDATE ';
+			$nc = $columns;
+			$columns[$this->id] = Database::SqlUnquote(
+				'LAST_INSERT_ID('.$this->id.')');
 			$query .= $this->SetClause($columns, null);
 		}
 
 		$this->database->Query($query);
+		# Update Existing will run a mandatory two queries (slower) than
+		# otherwise.
+		if ($update_existing)
+		{
+			$q['columns']['id'] = Database::SqlUnquote('LAST_INSERT_ID()');
+			$res = $this->Get($q);
+			return $res[0]['id'];
+		}
 		if (isset($columns[$this->id])) return $columns[$this->id];
 		else return $this->database->GetLastInsertID();
 	}
