@@ -48,7 +48,11 @@ class Module
 		if (!empty($_d['module.disable'][$name])) return;
 
 		if (!empty($deps))
-		foreach ($deps as $dep) if (!empty($_d['module.disable'][$dep])) return;
+			foreach ($deps as $n => $dep)
+			{
+				if (!empty($_d['module.disable'][$n])) continue;
+				require_once(Module::L($dep));
+			}
 
 		if (!empty($_d['module.enable']) && empty($_d['module.enable'][$name]))
 			return;
@@ -89,7 +93,7 @@ class Module
 				foreach (array_keys($_d['module.disable']) as $m)
 					unset($mods[$m]);
 
-			uksort($mods, array('Module', 'cmp_mod'));
+			#uksort($mods, array('Module', 'cmp_mod'));
 			U::RunCallbacks(@$_d['index.cb.prelink']);
 
 			foreach ($mods as $n => $mod) $mod->Link();
@@ -124,8 +128,9 @@ class Module
 	{
 		global $_d;
 
-		return @$_d['module.order'][get_class($x)] <
-			@$_d['module.order'][get_class($y)];
+		if (isset($_d['module.order'][$x], $_d['module.order'][$y]))
+			return @$_d['module.order'][$x] < @$_d['module.order'][$y];
+		return 0;
 	}
 
 	static function TagPrepBlock($t, $g, $a)
