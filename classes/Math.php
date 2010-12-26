@@ -6,7 +6,7 @@ class Math
 	 * Constrains a large series of values into the values specified.
 	 * if $arr holds small values and you use large values for min and max,
 	 * they will increase respectively and vice versa.
-	 * @param array $arr
+	 * @param array $arr Eg. array('title' => #, 'Title 2' => #)
 	 * @param int $min_size Floor of total sizes.
 	 * @param int $max_size Ceiling of total sizes.
 	 * @return array Modified array of new sizes.

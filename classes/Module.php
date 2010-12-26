@@ -16,7 +16,7 @@ class Module
 			$_d['template.transforms']['script'] = array('Module', 'TransPath', 'SRC');
 			$_d['template.transforms']['form'] = array('Module', 'TransPath', 'ACTION');
 		}
-		
+
 		$_d['app_dir'] = $root_path;
 		$_d['app_abs'] = Server::GetRelativePath($root_path);
 		$_d['q'] = explode('/', $GLOBALS['rw'] = Server::GetVar('rw'));
@@ -44,6 +44,7 @@ class Module
 	{
 		global $_d;
 		if (!empty($_d['module.disable'][$name])) return;
+
 		if (!empty($deps))
 		foreach ($deps as $dep) if (!empty($_d['module.disable'][$dep])) return;
 
@@ -245,12 +246,15 @@ class Module
 		// Overloaded Path
 		$opath = "$tmp/$path";
 		if (file_exists($opath)) return "$abs/$opath";
+
 		// Absolute Override
 		$apath = "$dir/$path";
 		if (file_exists($apath)) return "$abs/$path";
+
 		// Module Path
 		$modpath = "modules/{$path}";
 		if (file_exists($modpath)) return "$abs/modules/$path";
+
 		// Xedlib Path
 		$xedpath = dirname(__FILE__).'/'.$path;
 		if (file_exists($xedpath))

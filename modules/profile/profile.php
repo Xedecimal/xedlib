@@ -17,7 +17,7 @@ class ModProfile extends Module
 	function Link()
 	{
 		global $_d;
-		
+
 		$_d['nav.links']['Profile'] = '{{app_abs}}/profile';
 	}
 
