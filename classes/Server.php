@@ -202,7 +202,14 @@ class Server
 	static function SanitizeEnvironment()
 	{
 		if (ini_get('magic_quotes_gpc'))
-			foreach ($_POST as $k => $v) Sanitize($_POST[$k]);
+			foreach ($_POST as $k => $v) Server::Sanitize($_POST[$k]);
+	}
+
+	static function Sanitize(&$v)
+	{
+		if (is_array($v))
+			foreach ($v as $i) Server::Sanitize($i);
+		else $v = stripslashes($v);
 	}
 
 	/**

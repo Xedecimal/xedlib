@@ -11,7 +11,7 @@ class Math
 	 * @param int $max_size Ceiling of total sizes.
 	 * @return array Modified array of new sizes.
 	 */
-	function RespectiveSize($arr, $min_size = 12, $max_size = 32)
+	static function RespectiveSize($arr, $min_size = 12, $max_size = 32)
 	{
 		$max_qty = max(array_values($arr));
 		$min_qty = min(array_values($arr));
@@ -34,7 +34,7 @@ class Math
 	 * @param mixed $def Default value to return on failure.
 	 * @return int Result of evaluation.
 	 */
-	function StrToVal($val, $def)
+	static function StrToVal($val, $def)
 	{
 		if (is_numeric($val)) $ret = (int)$val;
 		else $ret = @eval('return '.$val.';');

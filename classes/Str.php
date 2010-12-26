@@ -76,7 +76,7 @@ class Str
 		return $text;
 	}
 
-	function RandomString($chars = 15)
+	static function Random($chars = 15)
 	{
 		$ret = null;
 		for ($ix = 0; $ix < $chars; $ix++)

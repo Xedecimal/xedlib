@@ -4,11 +4,6 @@ require_once(dirname(__FILE__).'/../user/user.php');
 
 class ModProfile extends Module
 {
-	function __construct()
-	{
-		$this->CheckActive('profile');
-	}
-
 	function Auth()
 	{
 		return ModUser::RequireAccess(0);
@@ -19,6 +14,7 @@ class ModProfile extends Module
 		global $_d;
 
 		$_d['nav.links']['Profile'] = '{{app_abs}}/profile';
+		$this->CheckActive('profile');
 	}
 
 	function Prepare()
@@ -29,8 +25,8 @@ class ModProfile extends Module
 
 		if (@$_d['q'][1] == 'update')
 		{
-			$fields = $mods['ModUser']->fields;
-			$p = GetVar('profile');
+			$fields = $_d['profile.source']->fields;
+			$p = Server::GetVar('profile');
 
 			foreach ($p as $n => $v)
 			{
@@ -38,13 +34,16 @@ class ModProfile extends Module
 
 				$c = $fields[$n]['column'];
 				$t = isset($fields[$n]['type']) ? $fields[$n]['type'] : 'text';
-				if ($t == 'password') $up[$c] = MD5($v);
+				if ($t == 'password')
+				{
+					if (empty($v)) continue;
+					$up[$c] = MD5($v);
+				}
 				else $up[$c] = $v;
 			}
 
-
-			$dsUser->Update(array('usr_id' => $mods['ModUser']->User['usr_id']),
-				$up);
+			$_d['profile.source']->dsUser->Update(array(
+				'usr_id' => $_d['user']['usr_id']), $up);
 		}
 	}
 
@@ -54,26 +53,32 @@ class ModProfile extends Module
 
 		$t = new Template();
 		$t->ReWrite('field', array(&$this, 'TagField'));
-		return $t->ParseFile(l('profile/profile.xml'));
+		return $t->ParseFile(Module::L('profile/profile.xml'));
 	}
 
 	function TagField($t, $g)
 	{
-		global $mods;
+		global $mods, $_d;
 
 		$vp = new VarParser();
 		$ret = '';
-		$user = $mods['ModUser']->User;
+		$user = $_d['user'];
+		if (empty($user)) return;
 
-		foreach ($mods['ModUser']->fields as $f['name'] => $f)
+		foreach ($_d['profile.source']->fields as $f['name'] => $f)
 		{
 			$f['value'] = $user[$f['column']];
 
 			if (@is_array($f['type']))
-				{ $cmp = 'in_array'; $f['itype'] = 'text'; }
+			{
+				$cmp = 'in_array';
+				$f['itype'] = 'text';
+			}
 			else
-				{ $cmp = 'strmatch'; $f['itype'] = isset($f['type'])
-				? $f['type'] : 'text'; }
+			{
+				$cmp = 'strmatch';
+				$f['itype'] = isset($f['type']) ? $f['type'] : 'text';
+			}
 
 			if ($f['itype'] == 'password') $f['value'] = '';
 

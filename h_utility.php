@@ -4,12 +4,7 @@
 //Session
 //
 
-function Sanitize(&$v)
-{
-	if (is_array($v))
-		foreach ($v as $i) Sanitize($i);
-	else $v = stripslashes($v);
-}
+
 
 /**
  * Returns a series of values specified in array form, otherwise $default
