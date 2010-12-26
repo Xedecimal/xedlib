@@ -126,19 +126,19 @@ class U
 		$mm = $ss / 60;
 		$hh = $mm / 60;
 
-		$d = $hh / 24;
-		$w = $d / 7;
-		$m = $d / 31;
-		$y = $d / 365;
+		$d = (int)($hh / 24);
+		$w = (int)($d / 7);
+		$m = (int)($d / 31);
+		$y = (int)($d / 365);
 
 		$ret = null;
-		if ($y >= 1) $ret = number_format($y).' year'.($y > 1 ? 's' : null);
-		else if ($m >= 1) $ret = number_format($m).' month'.($m > 1 ? 's' : null);
-		else if ($w >= 1) $ret = number_format($w).' week'.($w > 1 ? 's' : null);
-		else if ($d >= 1) $ret = number_format($d).' day'.($d > 1 ? 's' : null);
-		else if ($hh >= 1) $ret = number_format($hh).' hour'.($hh > 1 ? 's' : null);
-		else if ($mm >= 1) $ret = number_format($mm).' minute'.($mm > 1 ? 's' : null);
-		else $ret = number_format($ss).' second'.($ss > 1 ? 's' : null);
+		if ($y >= 1) $ret = $y.' year'.($y > 1 ? 's' : null);
+		else if ($m >= 1) $ret = $m.' month'.($m > 1 ? 's' : null);
+		else if ($w >= 1) $ret = $w.' week'.($w > 1 ? 's' : null);
+		else if ($d >= 1) $ret = $d.' day'.($d > 1 ? 's' : null);
+		else if ($hh >= 1) $ret = $hh.' hour'.($hh > 1 ? 's' : null);
+		else if ($mm >= 1) $ret = $mm.' minute'.($mm > 1 ? 's' : null);
+		else $ret = $ss.' second'.($ss > 1 ? 's' : null);
 		return $ret.' ago';
 	}
 }
