@@ -238,8 +238,7 @@ class Module
 		global $_d;
 		$abs = $_d['app_abs'];
 		$dir = $_d['app_dir'];
-		if (substr($path, 0, strlen($abs)) == $abs) return $path;
-
+		
 		$tmp = @$_d['settings']['site_template'];
 
 		// Overloaded Path
