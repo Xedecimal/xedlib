@@ -177,15 +177,7 @@ class Module
 
 	function CheckActive($name)
 	{
-		global $_d;
-
-		$q = @$_d['q'];
-
-		if (@$q[0] == $name)
-		{
-			@$GLOBALS['me'] .= '/'.array_shift($q);
-			$this->Active = true;
-		}
+		if (@$GLOBALS['_d']['q'][0] == $name) $this->Active = true;
 	}
 
 	function Auth() { return true; }
