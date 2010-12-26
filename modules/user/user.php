@@ -16,7 +16,7 @@ class ModUser extends Module
 
 	public $fields = array(
 		'user' => array(
-			'column' => 'usr_user',
+			'column' => 'usr_name',
 			'text' => 'Username',
 			'type' => 'user'
 		),
@@ -34,8 +34,8 @@ class ModUser extends Module
 
 	static function RequireAccess($level)
 	{
-		if (empty($GLOBALS['mods']['ModUser']->User)) return false;
-		if (@$GLOBALS['mods']['ModUser']->User['usr_access'] >= $level) return true;
+		global $_d;
+		if (@$_d['user'][$_d['user.cols.access']] >= $level) return true;
 		return false;
 	}
 
@@ -58,7 +58,7 @@ class ModUser extends Module
 	{
 		global $_d;
 
-		if (!empty($_d['user.user']) && empty($_d['user.hide_logout']))
+		if (!empty($_d['user']) && empty($_d['user.hide_logout']))
 		{
 			global $rw;
 
@@ -84,8 +84,9 @@ class ModUser extends Module
 				$add[$f['column']] = Server::GetVar($f['name'].'_create');
 				if (@$f['type'] == 'password') $add[$f['column']] = md5($add[$f['column']]);
 			}
-			foreach ($this->_ds as $ds) $ds[0]->Add($add);
-			$this->User = $add;
+			$this->dsUser->Add($add);
+
+			$_d['user'] = $add;
 		}
 
 		# Forgot Password
@@ -94,18 +95,15 @@ class ModUser extends Module
 		{
 			$em = Server::GetVar('email');
 			$q['match']['usr_email'] = $em;
-			foreach ($this->_ds as $ds)
+			$act = $this->dsUser->Get($q);
+			if (!empty($act))
 			{
-				$act = $ds[0]->Get($q);
-				if (!empty($act))
-				{
-					$pass = random_string();
-					$body = "Your new password is: $pass";
-					$ds[0]->update(array('usr_email' => $em),
-						array('usr_pass' => md5($pass)));
-					mail($em, 'Forgotten Password', $body);
-					break;
-				}
+				$pass = Str::Random();
+				$body = "Your new password is: $pass";
+				$this->dsUser->Update(array('usr_email' => $em),
+					array('usr_pass' => md5($pass)));
+				U::VarInfo($body);
+				#mail($em, 'Forgotten Password', $body);
 			}
 		}
 	}
@@ -129,15 +127,17 @@ class ModUser extends Module
 		{
 			if (!empty($_d['user.disable_signup'])) return;
 			$t = new Template();
+
 			if (@$_d['q'][2] == 'complete')
 			{
-				$t->Set($this->User);
-				$ret['default'] = $t->ParseFile(l('user/signup_complete.xml'));
+				$t->Set($_d['user']);
+				$ret['default'] =
+					$t->ParseFile(Module::L('user/signup_complete.xml'));
 			}
 			else
 			{
 				$t->ReWrite('field', array(&$this, 'TagFieldCreate'));
-			$ret['default'] = $t->ParseFile(Module::L('user/signup.xml'));
+				$ret['default'] = $t->ParseFile(Module::L('user/signup.xml'));
 			}
 		}
 
@@ -147,12 +147,12 @@ class ModUser extends Module
 		{
 			$t = new Template();
 			$t->ReWrite('field', array(&$this, 'TagFieldForgot'));
-			$ret['default'] = $t->ParseFile(l('user/forgot.xml'));
+			$ret['default'] = $t->ParseFile(Module::L('user/forgot.xml'));
 		}
 
 		# Nobody is logged in.
 
-		else if (empty($_d['user.user']))
+		if (empty($_d['user.user']))
 		{
 			$t = new Template();
 			$t->ReWrite('links', array(&$this, 'TagLinks'));
@@ -173,9 +173,6 @@ class ModUser extends Module
 
 	function TagLinks()
 	{
-		if (!isset($this->_ds[0])) return;
-		if (is_string($this->_ds[0][0])) return;
-
 		if ($this->Behavior->CreateAccount)
 			$nav['Create an account'] = '{{app_abs}}/user/create';
 		if ($this->Behavior->ForgotPassword)
@@ -262,6 +259,7 @@ class ModUser extends Module
 
 			if ($cmp('user', @$v['type']))
 			{
+				$v['itype'] = 'text';
 				$v['name'] = 'user';
 				$ret .= $vp->ParseVars($g, $v);
 			}
