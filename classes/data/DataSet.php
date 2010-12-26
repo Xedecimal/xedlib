@@ -470,8 +470,10 @@ class DataSet
 		if ($name == '*') return $name;
 		if (is_array($name))
 		{
-			if ($name['opt'] == SQLOPT_UNQUOTE)
-			return $name['val'];
+			$ret = $name['val'];
+			if (!empty($name['cmp']))
+				$ret = $name['cmp'].' '.$ret;
+			return $ret;
 		}
 		$lq = $this->database->lq;
 		$rq = $this->database->rq;
