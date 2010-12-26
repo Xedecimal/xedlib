@@ -44,25 +44,6 @@ class VarParser
 	 */
 	function var_parser($match)
 	{
-		/*$tvar = $match[1];
-
-		$ret = null;
-
-		//Process an array values from $this->vars
-		if (is_array($this->vars) && isset($this->vars[$tvar]))
-			$ret = $this->vars[$tvar];
-		//Process an object property from $this->vars
-		else if (is_object($this->vars))
-		{
-			$ov = get_object_vars($this->vars);
-			if (isset($ov[$tvar])) $ret = $ov[$tvar];
-		}
-		else if (isset($GLOBALS[$tvar])) $ret = $GLOBALS[$tvar];
-		else if (defined($tvar)) $ret = constant($tvar);
-		else $ret = $this->Bleed ? $match[0] : null;
-
-		return $ret;*/
-
 		$tvar = $match[1];
 
 		// This is an advanced variable.
