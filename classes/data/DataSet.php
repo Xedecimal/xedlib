@@ -1,8 +1,8 @@
 <?php
 
-require_once(__DIR__.'/Database.php');
-require_once(__DIR__.'/Relation.php');
-require_once(__DIR__.'/Join.php');
+require_once(dirname(__FILE__).'/Database.php');
+require_once(dirname(__FILE__).'/Relation.php');
+require_once(dirname(__FILE__).'/Join.php');
 
 /**
  * A general dataset, good for binding to a database's table.

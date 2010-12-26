@@ -1,9 +1,9 @@
 <?php
 
-require_once(__DIR__.'/../HM.php');
-require_once(__DIR__.'/../LayeredOutput.php');
-require_once(__DIR__.'/FormInput.php');
-require_once(__DIR__.'/Template.php');
+require_once(dirname(__FILE__).'/../HM.php');
+require_once(dirname(__FILE__).'/../LayeredOutput.php');
+require_once(dirname(__FILE__).'/FormInput.php');
+require_once(dirname(__FILE__).'/Template.php');
 
 /**
  * A web page form, with functions for easy field creation and layout.
@@ -120,7 +120,7 @@ class Form extends LayeredOutput
 		$this->name = $name;
 		$this->attribs = array();
 		$this->Persist = $persist;
-		$this->Template = file_get_contents(__DIR__.'/../../temps/form.xml');
+		$this->Template = file_get_contents(dirname(__FILE__).'/../../temps/form.xml');
 	}
 
 	/**

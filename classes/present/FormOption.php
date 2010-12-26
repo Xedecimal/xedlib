@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/../TreeNode.php');
+require_once(dirname(__FILE__).'/../TreeNode.php');
 
 /**
  * A select box, multiple select boxes, checkboxes, etc.

@@ -1,7 +1,7 @@
 <?php
 
-require_once(__DIR__.'/../Server.php');
-require_once(__DIR__.'/../Utility.php');
+require_once(dirname(__FILE__).'/../Server.php');
+require_once(dirname(__FILE__).'/../Utility.php');
 
 /**
  * on our way to the storage phase! We shall support the following!

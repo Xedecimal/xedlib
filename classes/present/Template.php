@@ -1,10 +1,10 @@
 <?php
 
-require_once(__DIR__.'/../Utility.php');
-require_once(__DIR__.'/../File.php');
-require_once(__DIR__.'/../LayeredOutput.php');
-require_once(__DIR__.'/../VarParser.php');
-require_once(__DIR__.'/Box.php');
+require_once(dirname(__FILE__).'/../Utility.php');
+require_once(dirname(__FILE__).'/../File.php');
+require_once(dirname(__FILE__).'/../LayeredOutput.php');
+require_once(dirname(__FILE__).'/../VarParser.php');
+require_once(dirname(__FILE__).'/Box.php');
 
 /**
  * A template

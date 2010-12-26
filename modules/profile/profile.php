@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__).'/../user/user.php');
+
 class ModProfile extends Module
 {
 	function __construct()

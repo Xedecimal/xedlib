@@ -1,9 +1,9 @@
 <?php
 
-require_once(__DIR__.'/../Utility.php');
-require_once(__DIR__.'/../Arr.php');
-require_once(__DIR__.'/../HM.php');
-require_once(__DIR__.'/FormOption.php');
+require_once(dirname(__FILE__).'/../Utility.php');
+require_once(dirname(__FILE__).'/../Arr.php');
+require_once(dirname(__FILE__).'/../HM.php');
+require_once(dirname(__FILE__).'/FormOption.php');
 
 class FormInput
 {

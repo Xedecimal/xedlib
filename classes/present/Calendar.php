@@ -1,7 +1,7 @@
 <?php
 
-require_once(__DIR__.'/../Server.php');
-require_once(__DIR__.'/Form.php');
+require_once(dirname(__FILE__).'/../Server.php');
+require_once(dirname(__FILE__).'/Form.php');
 
 /**
  * @package Calendar
@@ -200,7 +200,7 @@ class Calendar
 		$t->ReWrite('month', array(&$this, 'TagMonth'));
 		$t->ReWrite('week', array(&$this, 'TagWeek'));
 
-		return $t->ParseFile(__DIR__.'/../../temps/calendar_horiz.xml');
+		return $t->ParseFile(dirname(__FILE__).'/../../temps/calendar_horiz.xml');
 	}
 
 	/**

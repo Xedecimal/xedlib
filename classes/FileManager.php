@@ -1,14 +1,14 @@
 <?php
 
-require_once(__DIR__.'/File.php');
-require_once(__DIR__.'/FileInfo.php');
-require_once(__DIR__.'/FilterDefault.php');
-require_once(__DIR__.'/FilterGallery.php');
-require_once(__DIR__.'/HM.php');
-require_once(__DIR__.'/Module.php');
-require_once(__DIR__.'/Utility.php');
-require_once(__DIR__.'/present/Form.php');
-require_once(__DIR__.'/present/Template.php');
+require_once(dirname(__FILE__).'/File.php');
+require_once(dirname(__FILE__).'/FileInfo.php');
+require_once(dirname(__FILE__).'/FilterDefault.php');
+require_once(dirname(__FILE__).'/FilterGallery.php');
+require_once(dirname(__FILE__).'/HM.php');
+require_once(dirname(__FILE__).'/Module.php');
+require_once(dirname(__FILE__).'/Utility.php');
+require_once(dirname(__FILE__).'/present/Form.php');
+require_once(dirname(__FILE__).'/present/Template.php');
 
 /**
  * @package File Management
@@ -117,7 +117,7 @@ class FileManager
 		$this->Behavior = new FileManagerBehavior();
 		$this->View = new FileManagerView();
 
-		$this->Template = __DIR__.'/../temps/file.xml';
+		$this->Template = dirname(__FILE__).'/../temps/file.xml';
 
 		if (!file_exists($root))
 			die("FileManager::FileManager(): Root ($root) directory does

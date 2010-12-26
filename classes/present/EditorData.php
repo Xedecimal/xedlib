@@ -1,8 +1,8 @@
 <?php
 
-require_once(__DIR__.'/Template.php');
-require_once(__DIR__.'/../Str.php');
-require_once(__DIR__.'/Form.php');
+require_once(dirname(__FILE__).'/Template.php');
+require_once(dirname(__FILE__).'/../Str.php');
+require_once(dirname(__FILE__).'/Form.php');
 
 /**
  * @package Editor
@@ -1354,7 +1354,7 @@ class EditorData
 		$t->Set($this->View);
 		$t->Set('assoc', $assoc);
 
-		return $t->ParseFile(__DIR__.'/../../temps/editor.xml');
+		return $t->ParseFile(dirname(__FILE__).'/../../temps/editor.xml');
 	}
 
 	function Reset()

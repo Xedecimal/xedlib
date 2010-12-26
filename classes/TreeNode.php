@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/VarParser.php');
+require_once(dirname(__FILE__).'/VarParser.php');
 
 /**
  * A node holds children.

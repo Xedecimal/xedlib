@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/../../classes/Str.php');
+require_once(dirname(__FILE__).'/../../classes/Str.php');
 
 class ModUser extends Module
 {
