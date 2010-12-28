@@ -124,8 +124,8 @@ class U
 	static function GetDateOffset($ts)
 	{
 		$ss = time()-$ts;
-		$mm = $ss / 60;
-		$hh = $mm / 60;
+		$mm = (int)($ss / 60);
+		$hh = (int)($mm / 60);
 
 		$d = (int)($hh / 24);
 		$w = (int)($d / 7);
