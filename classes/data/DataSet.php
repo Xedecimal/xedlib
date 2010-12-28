@@ -252,7 +252,7 @@ class DataSet
 						else $ret .= " ON {$on->Condition}";
 					}
 					else
-						$ret .= "\n LEFT JOIN `{$table}` ON({$on})";
+						$ret .= "\n\t".$on;
 				}
 			}
 			return $ret;
