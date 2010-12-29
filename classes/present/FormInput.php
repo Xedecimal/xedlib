@@ -210,12 +210,12 @@ class FormInput
 
 			case 'date':
 				$this->labl = false;
-				return GetInputDate(array(
+				return FormInput::GetDate(array(
 					'ts' => @$this->atrs['VALUE'],
 					'atrs' => $this->atrs));
 			case 'daterange':
 				$this->labl = false;
-				$one = GetInputDate(array(
+				$one = FormInput::GetDate(array(
 					'NAME' => $this->atrs['NAME'],
 					'ts' => @$this->atrs['VALUE'],
 					'atrs' => $this->atrs));
@@ -224,17 +224,17 @@ class FormInput
 				if (isset($atrsTwo['ID'])) $atrsTwo['ID'] .= '2';
 				$atrsTwo['NAME'] .= '2';
 
-				$two = GetInputDate(array(
+				$two = FormInput::GetDate(array(
 					'NAME' => $this->atrs['NAME'].'2',
 					'ts' => @$this->atrs['VALUE'],
 					'atrs' => $atrsTwo));
 				return $one.' to '.$two;
 			case 'time':
 				$this->labl = false;
-				return GetInputTime($this->atrs['NAME'], $this->valu);
+				return FormInput::GetTime($this->atrs['NAME'], $this->valu);
 			case 'datetime':
 				$this->labl = false;
-				return GetInputDate(array(
+				return FormInput::GetDate(array(
 					'name' => $this->atrs['NAME'],
 					'ts' => $this->valu,
 					'time' => true,
@@ -471,7 +471,8 @@ class FormInput
 		$divAtrs = $args['atrs'];
 		unset($divAtrs['NAME'],$divAtrs['TYPE']);
 		# $strout = '<div'.GetAttribs(@$divAtrs).'>';
-		$strout = GetMonthSelect(@$args['atrs']['NAME'].'[]', date('n', $args['ts']));
+		$strout = FormInput::GetMonthSelect(@$args['atrs']['NAME'].'[]',
+			date('n', $args['ts']));
 		$strout .= '/ <input type="text" size="2" name="'.@$args['atrs']['NAME'].'[]" value="'.
 			date('d', $args['ts']).'" alt="Day" />'."\n";
 		$strout .= '/ <input type="text" size="4" name="'.@$args['atrs']['NAME'].'[]" value="'.
