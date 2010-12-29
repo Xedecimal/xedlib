@@ -47,7 +47,7 @@ class EditorDisplay
 	 */
 	function Prepare()
 	{
-		$act = GetVar($this->Name.'_action');
+		$act = Server::GetVar($this->Name.'_action');
 
 		if ($act == 'update')
 		{
@@ -229,7 +229,7 @@ class EditorDisplay
 	{
 		global $me;
 
-		$act = GetVar($this->Name.'_action');
+		$act = Server::GetVar($this->Name.'_action');
 
 		if ($act == 'search') return;
 
@@ -246,7 +246,7 @@ class EditorDisplay
 		if (isset($GLOBALS['editor'])) $frm->AddHidden('editor', $GLOBALS['editor']);
 		$frm->AddInput(new FormInput('Search', 'custom', null, array(&$this, 'callback_fields')));
 		$frm->AddInput(new FormInput(null, 'submit', 'butSubmit', 'Search'));
-		return $frm->Get('action="'.GetVar('q').'" method="post"');
+		return $frm->Get('action="'.Server::GetVar('q').'" method="post"');
 	}
 
 	function TagResults($t, $g, $a)

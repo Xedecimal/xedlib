@@ -140,7 +140,8 @@ class FormInput
 		if ($this->atrs['TYPE'] == 'boolean')
 		{
 			return GetInputBoolean($parent, $this->atrs,
-				!isset($this->valu) ? GetVar(@$this->atrs['NAME']) : $this->valu);
+				!isset($this->valu) ? Server::GetVar(@$this->atrs['NAME'])
+					: $this->valu);
 		}
 		if ($this->atrs['TYPE'] == 'radios')
 		{
@@ -296,7 +297,7 @@ class FormInput
 				$newsels = Arr::Cln($this->atrs['VALUE']);
 				if ($persist)
 				{
-					$sel = GetVar($this->name);
+					$sel = Server::GetVar($this->name);
 					if ($sel && isset($newsels[$sel]))
 						$newsels[$sel]->selected = true;
 				}
@@ -307,7 +308,7 @@ class FormInput
 				$newsels = array_clone($this->atrs['VALUE']);
 				if ($persist)
 				{
-					$svalus = GetVar($this->name);
+					$svalus = Server::GetVar($this->name);
 					if (!empty($svalus))
 					foreach ($svalus as $val) $newsels[$val]->selected = true;
 				}
@@ -320,7 +321,7 @@ class FormInput
 			//May get a little more complicated if we don't know what it is...
 			default:
 				return htmlspecialchars($persist ?
-					GetVars($this->atrs['NAME'], @$this->atrs['VALUE']) :
+					Server::GetVars($this->atrs['NAME'], @$this->atrs['VALUE']) :
 					@$this->atrs['VALUE']);
 		}
 	}
@@ -349,7 +350,7 @@ class FormInput
 
 	function GetData($val = null)
 	{
-		$val = GetVar($this->name, $val);
+		$val = Server::GetVar($this->name, $val);
 		switch ($this->type)
 		{
 			case 'mask':
@@ -538,7 +539,7 @@ class FormInput
 	 */
 	function InputToString($field)
 	{
-		$val = GetVar($field->name);
+		$val = Server::GetVar($field->name);
 
 		if ($field->type == 'time')
 			return "{$val[0]}:{$val[1]}".($val[2] == 0 ? ' AM' : ' PM');

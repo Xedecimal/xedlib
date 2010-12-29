@@ -195,7 +195,7 @@ class Form extends LayeredOutput
 		if ($input->attr('TYPE') == 'spamblock')
 		{
 			//This form has been submitted.
-			$b = GetVar('block_'.$input->name);
+			$b = Server::GetVar('block_'.$input->name);
 			if (isset($b) && GetVar($input->name) != $this->words[$b])
 				$this->Errors[$input->name] = ' '.GetImg('error.png', 'Error',
 					'style="vertical-align: text-bottom"').

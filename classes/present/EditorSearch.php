@@ -67,8 +67,8 @@ class EditorSearch
 
 		if (@$this->_q[1] == $this->Name && @$this->_q[0] == 'search')
 		{
-			$this->ss = GetVar($this->Name.'_search');
-			$this->ipp = GetVar($this->Name.'_ipp', 10);
+			$this->ss = Server::GetVar($this->Name.'_search');
+			$this->ipp = Server::GetVar($this->Name.'_ipp', 10);
 
 			$query['group'] = $this->_ds->id;
 
@@ -85,7 +85,7 @@ class EditorSearch
 			{
 				foreach (array_keys($this->ss) as $col)
 				{
-					$val = GetVar("{$col}");
+					$val = Server::GetVar("{$col}");
 					if (!isset($val)) return;
 					$this->AddToQuery($query, $col, $val);
 				}
@@ -191,7 +191,7 @@ class EditorSearch
 			));
 		}
 		else
-			Error("Could not find the field input for {$sf}.");
+			Server::Error("Could not find the field input for {$sf}.");
 		return $ret;
 	}
 
@@ -250,7 +250,7 @@ class EditorSearch
 
 			$ret = '';
 			$start = $this->Behavior->ItemsPerPage *
-				(GetVar($this->Name.'_page', 1) - 1);
+				(Server::GetVar($this->Name.'_page', 1) - 1);
 			for ($ix = 0; $ix < $this->Behavior->ItemsPerPage; $ix++)
 			#foreach ($this->items as $ix => $i)
 			{
