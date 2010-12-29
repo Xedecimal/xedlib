@@ -143,7 +143,7 @@ class EditorSearch
 		{
 			$t->ReWrite('search', array($this, 'TagSearch'));
 			$t->ReWrite('results', array($this, 'TagResults'));
-			return $t->Parsefile(dirname(__FILE__).'/temps/data_search.xml');
+			return $t->Parsefile(Module::L('temps/data_search.xml'));
 		}
 	}
 
@@ -153,7 +153,7 @@ class EditorSearch
 	{
 		$tt = new Template();
 		$tt->Set('name', $this->Name);
-		$tt->Set('tempurl', GetRelativePath(dirname(__FILE__).'/temps'));
+		$tt->Set('tempurl', Module::L('temps'));
 
 		$tt->ReWrite('searchfield', array(&$this, 'TagSearchField'));
 		return $tt->GetString($g);
