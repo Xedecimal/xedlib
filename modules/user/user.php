@@ -52,6 +52,8 @@ class ModUser extends Module
 		global $_d;
 		$_d['user.session.user'] = 'user_sessuser';
 		$_d['user.session.pass'] = 'user_sesspass';
+		if (!isset($_d['user.cols.access']))
+			$_d['user.cols.access'] = 'usr_access';
 	}
 
 	function Link()
