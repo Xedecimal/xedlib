@@ -48,7 +48,7 @@ class Arr
 	 * @param mixed $arr Item to properly clone in php5 without references.
 	 * @return mixed Cloned copy of whatever you throw at it.
 	 */
-	function Cln($arr)
+	static function Cln($arr)
 	{
 		if (substr(phpversion(), 0, 1) != '5') { $copy = $arr; return $copy; }
 		$ret = array();
