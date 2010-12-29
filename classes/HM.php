@@ -87,7 +87,7 @@ class HM
 		$ret = null;
 		if (is_array($val))
 			foreach ($val as $akey => $aval)
-				$ret .= URLParse($key.'['.$akey.']', $aval, $start);
+				$ret .= HM::URLParse($key.'['.$akey.']', $aval, $start);
 		else
 		{
 			//$nval = str_replace(' ', '%20', $val);
