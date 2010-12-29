@@ -180,7 +180,7 @@ class ModUser extends Module
 		return ModNav::GetLinks(ModNav::LinkTree($nav));
 	}
 
-	function AddUserDataSet($ds, $passcol, $usercol)
+	static function AddUserDataSet($ds, $passcol, $usercol)
 	{
 		global $_d;
 		$_d['user.datasets'][] = array($ds, $passcol, $usercol);
