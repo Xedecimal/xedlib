@@ -132,7 +132,7 @@ class FormInput
 			$this->atrs['VALUE'] = $this->GetValue($persist);
 			$this->atrs['ID'] = $this->GetCleanID($parent);
 			$this->labl = false;
-			$atrs = GetAttribs($this->atrs);
+			$atrs = HM::GetAttribs($this->atrs);
 			return '<label>To verify your request, please type the word <u>'.
 				$this->valu.'</u>:<br/>'.
 				"<input{$atrs} /></label>";
@@ -181,7 +181,7 @@ class FormInput
 		if ($this->atrs['TYPE'] == 'checkbox')
 		{
 			$val = $this->GetValue($persist);
-			return "<input ".GetAttribs($this->atrs)." />";
+			return "<input ".HM::GetAttribs($this->atrs)." />";
 		}
 		switch ($this->atrs['TYPE'])
 		{
@@ -394,7 +394,7 @@ class FormInput
 	 * @param string $attribs Additional attributes for the <select> field.
 	 * @return string Rendered month selection.
 	 */
-	function GetMonthSelect($name, $default, $attribs = null)
+	static function GetMonthSelect($name, $default, $attribs = null)
 	{
 		$ret = "<select name=\"$name\"";
 		$ret .= HM::GetAttribs($attribs);

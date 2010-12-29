@@ -287,7 +287,7 @@ class EditorSearch
 
 	function TagButtonA($t, $g, $a)
 	{
-		return '<a'.GetAttribs(array_merge($this->but, $a)).'>'.$g.'</a>';
+		return '<a'.HM::GetAttribs(array_merge($this->but, $a)).'>'.$g.'</a>';
 	}
 
 	function TagResultField($t, $g)
@@ -338,7 +338,7 @@ class EditorSearch
 		$vp = new VarParser();
 		for ($ix = 0; $ix < $pages; $ix++)
 		{
-			$vars['url'] = url($_d['app_abs'].$GLOBALS['me'].'/'.$this->Name
+			$vars['url'] = HM::URL($_d['app_abs'].$GLOBALS['me'].'/'.$this->Name
 				.'/search', array_merge($_GET, $_POST));
 			$vars['num'] = $ix+1;
 			$ret .= $vp->ParseVars($g, $vars);
@@ -350,7 +350,7 @@ class EditorSearch
 
 	function TagEditForm($t, $g, $a)
 	{
-		return '<form'.GetAttribs($a).'>'.
+		return '<form'.HM::GetAttribs($a).'>'.
 		'<input type="hidden" name="state" value="edit" />'.
 		'<input type="hidden" name="id" value="'.$this->ci.'" />'.
 		$g.'</form>';
