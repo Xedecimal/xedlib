@@ -4,34 +4,6 @@
 //Session
 //
 
-
-
-/**
- * Returns a series of values specified in array form, otherwise $default
- *
- * @param string $name Name example: 'posts[]'
- * @param string $default Default value alternatively.
- * @return mixed
- */
-function GetVars($name, $default = null)
-{
-	$m = null;
-	if (preg_match('#([^\[]+)\[([^\]]+)\]#', $name, $m))
-	{
-		$arg = GetVar($m[1]);
-
-		$ix = 0;
-		preg_match_all('/\[([^\[]*)\]/', $name, $m);
-		foreach ($m[1] as $step)
-		{
-			if ($ix == $step) $ix++;
-			$arg = @$arg[isset($step) ? $step : $ix++];
-		}
-		return !empty($arg)?$arg:$default;
-	}
-	else return GetVar($name, $default);
-}
-
 /**
  * Returns a series of posted values that match $match.
  *

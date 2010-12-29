@@ -181,6 +181,32 @@ class Server
 	}
 
 	/**
+	 * Returns a series of values specified in array form, otherwise $default
+	 *
+	 * @param string $name Name example: 'posts[]'
+	 * @param string $default Default value alternatively.
+	 * @return mixed
+	 */
+	static function GetVars($name, $default = null)
+	{
+		$m = null;
+		if (preg_match('#([^\[]+)\[([^\]]+)\]#', $name, $m))
+		{
+			$arg = GetVar($m[1]);
+
+			$ix = 0;
+			preg_match_all('/\[([^\[]*)\]/', $name, $m);
+			foreach ($m[1] as $step)
+			{
+				if ($ix == $step) $ix++;
+				$arg = @$arg[isset($step) ? $step : $ix++];
+			}
+			return !empty($arg)?$arg:$default;
+		}
+		else return Server::GetVar($name, $default);
+	}
+
+	/**
 	 * Unsets a var that was possibly set using SetVar or other methods of session
 	 * setting.
 	 *
