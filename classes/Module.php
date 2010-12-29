@@ -21,7 +21,7 @@ class Module
 		if (!isset($_d['app_abs']))
 			$_d['app_abs'] = Server::GetRelativePath($root_path);
 		$_d['q'] = explode('/', $GLOBALS['rw'] =
-			Server::GetVar('rw', @$_d['default']));
+			Server::GetVar('rw', isset($_d['default']) ? $_d['default'] : ''));
 
 		if (!file_exists('modules')) return;
 		$dp = opendir('modules');
