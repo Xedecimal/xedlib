@@ -90,7 +90,7 @@ class EditorSearch
 					$this->AddToQuery($query, $col, $val);
 				}
 
-				$query['cols'] = array(SqlUnquote('SQL_CALC_FOUND_ROWS *'));
+				$query['cols'] = array(Database::SqlUnquote('SQL_CALC_FOUND_ROWS *'));
 				$this->items = $this->_ds->Get($query);
 
 				$count = $this->_ds->GetCustom('SELECT FOUND_ROWS()');
@@ -208,11 +208,11 @@ class EditorSearch
 
 		if ($fi->attr('TYPE') == 'select')
 		{
-			$query['match'][$col] = SqlOr(SqlIn($val));
+			$query['match'][$col] = Database::SqlOr(Database::SqlIn($val));
 		}
 		if ($fi->attr('TYPE') == 'checks')
 		{
-			$query['match'][$col] = SqlOr(SqlIn(implode(', ', $val)));
+			$query['match'][$col] = Database::SqlOr(Database::SqlIn(implode(', ', $val)));
 		}
 		else if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
 			foreach ($this->fs[$col] as $ix => $v)
@@ -224,7 +224,7 @@ class EditorSearch
 				TimestampToMySql(DateInputToTS(GetVar($col.'2')), false)
 			);
 		}
-		else $query['match'][$col] = SqlLike('%'.$val.'%');
+		else $query['match'][$col] = Database::SqlLike('%'.$val.'%');
 	}
 
 	# Result Related
