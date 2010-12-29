@@ -4,7 +4,7 @@ class EditorSearch
 {
 	/** @var string */
 	public $Name;
-	/** @var DataSearchBehavior */
+	/** @var EditorSearchBehavior */
 	public $Behavior;
 	/** @var array */
 	public $SearchFields;
@@ -15,7 +15,7 @@ class EditorSearch
 	{
 		$this->Name = $name;
 		$this->_ds = $ds;
-		$this->Behavior = new DataSearchBehavior();
+		$this->Behavior = new EditorSearchBehavior();
 		$this->Behavior->Buttons['View'] = array(
 			'href' => '{{app_abs}}{{me}}/{{name}}/view/{{id}}',
 			'target' => '_blank'
