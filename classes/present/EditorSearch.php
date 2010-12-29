@@ -219,9 +219,9 @@ class EditorSearch
 				$query['having'][] = " FIND_IN_SET($v, $ms[2]) > 0";
 		else if ($fi->attr('TYPE') == 'date')
 		{
-			$query['match'][$col] = SqlBetween(
-				TimestampToMySql(DateInputToTS(GetVar($col)), false),
-				TimestampToMySql(DateInputToTS(GetVar($col.'2')), false)
+			$query['match'][$col] = Database::SqlBetween(
+				TimestampToMySql(DateInputToTS(Server::GetVar($col)), false),
+				TimestampToMySql(DateInputToTS(Server::GetVar($col.'2')), false)
 			);
 		}
 		else $query['match'][$col] = Database::SqlLike('%'.$val.'%');
@@ -257,10 +257,10 @@ class EditorSearch
 				if ($start+$ix >= count($this->items)) break;
 				$i = $this->items[$start+$ix];
 				if (!empty($this->Callbacks->Result))
-					RunCallbacks($this->Callbacks->Result, $t, $i);
+					U::RunCallbacks($this->Callbacks->Result, $t, $i);
 				$this->item = $i;
 
-				$t->Set('res_links', RunCallbacks(@$_d['datasearch.cb.head_res'], $this, $i));
+				$t->Set('res_links', U::RunCallbacks(@$_d['datasearch.cb.head_res'], $this, $i));
 				$t->Set('name', $this->Name);
 				$t->Set('id', $i[$this->_ds->id]);
 				$t->Set($i);
