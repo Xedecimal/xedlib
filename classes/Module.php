@@ -96,7 +96,11 @@ class Module
 			#uksort($mods, array('Module', 'cmp_mod'));
 			U::RunCallbacks(@$_d['index.cb.prelink']);
 
-			foreach ($mods as $n => $mod) $mod->Link();
+			foreach ($mods as $n => $mod)
+			{
+				Server::Trace("Linking module: {$n}");
+				$mod->Link();
+			}
 			foreach ($mods as $n => $mod) $mod->Prepare();
 			foreach ($mods as $n => $mod)
 			{
