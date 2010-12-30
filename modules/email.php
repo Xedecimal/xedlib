@@ -8,7 +8,7 @@ class ModEmail extends Module
 	function __construct()
 	{
 		$this->CheckActive($this->Name);
-		$this->_template = l('temps/email.xml');
+		$this->_template = Module::L('temps/email.xml');
 	}
 
 	function Prepare()

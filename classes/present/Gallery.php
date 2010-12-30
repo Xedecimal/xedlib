@@ -266,7 +266,7 @@ EOF;
 		if ($path != $this->root) $t->Set('name', $this->GetCaption($fi));
 		else $t->Set('name', '');
 
-		return $t->ParseFile(l('temps/gallery.xml'));
+		return $t->ParseFile(Module::L('temps/gallery.xml'));
 	}
 
 	/**

@@ -65,7 +65,7 @@ class ModArticle extends Module
 	function __construct()
 	{
 		global $_d;
-		$this->_template = l('temps/mod_article.xml');
+		$this->_template = Module::L('temps/mod_article.xml');
 		if (empty($this->_source))
 			$this->_source = new DataSet($_d['db'], $this->Name, $this->ID);
 	}
@@ -162,7 +162,7 @@ class ModArticleAdmin extends Module
 		global $me;
 		$this->edNews = new EditorData('edNews', $this->_source);
 		$this->edNews->Behavior->Search = false;
-		$this->edNews->Behavior->Target = p($this->Name);
+		$this->edNews->Behavior->Target = Module::P($this->Name);
 		$this->edNews->Prepare();
 	}
 
