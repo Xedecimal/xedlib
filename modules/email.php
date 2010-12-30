@@ -19,7 +19,7 @@ class ModEmail extends Module
 
 		if (@$_d['q'][1] == 'submit')
 		{
-			$this->_from = GetVar('from');
+			$this->_from = Server::GetVar('from');
 			$t = new Template();
 			$t->use_getvar = true;
 

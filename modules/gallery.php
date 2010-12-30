@@ -19,7 +19,7 @@ class ModGallery extends Module
 
 		require_once('xedlib/a_gallery.php');
 		$gal = new Gallery($this->Path);
-		return $gal->Get(GetVar('galcf'));
+		return $gal->Get(Server::GetVar('galcf'));
 	}
 }
 

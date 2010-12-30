@@ -143,7 +143,7 @@ class FileManager
 	/**
 	 * This must be called before Get. This will prepare for presentation.
 	 *
-	 * @param string $action Use GetVar('ca') usually.
+	 * @param string $action Use Server::GetVar('ca') usually.
 	 */
 	function Prepare()
 	{
@@ -161,11 +161,11 @@ class FileManager
 			$filter = FileInfo::GetFilter($fi, $this->Root, $this->filters);
 
 			// Completed chunked upload.
-			if (GetVar('cm') == 'done')
+			if (Server::GetVar('cm') == 'done')
 			{
-				$target = GetVar('cu');
+				$target = Server::GetVar('cu');
 				$ftarget = $this->Root.$this->cf.$target;
-				$count = GetVar('count'); // Amount of peices
+				$count = Server::GetVar('count'); // Amount of peices
 
 				if (file_exists($ftarget)) unlink($ftarget);
 				$fpt = fopen($ftarget, 'ab');
@@ -230,7 +230,7 @@ class FileManager
 		else if ($act == 'Update Captions') //Mass Captions
 		{
 			if (!$this->Behavior->AllowEdit) return;
-			$caps = GetVar($this->Name.'_titles');
+			$caps = Server::GetVar($this->Name.'_titles');
 
 			if (!empty($caps))
 			foreach ($caps as $file => $cap)
@@ -246,7 +246,7 @@ class FileManager
 		{
 			if (!$this->Behavior->AllowRename) return;
 			$fi = new FileInfo($this->Root.$this->cf, $this->filters);
-			$name = GetVar($this->Name.'_rname');
+			$name = Server::GetVar($this->Name.'_rname');
 			$f = FileInfo::GetFilter($fi, $this->Root, $this->filters);
 			$f->Rename($fi, $name);
 			$this->cf = substr($fi->path, strlen($this->Root)).'/';
@@ -257,7 +257,7 @@ class FileManager
 		else if ($act == 'Delete')
 		{
 			if (!$this->Behavior->AllowDelete) return;
-			$sels = GetVar($this->Name.'_sels');
+			$sels = Server::GetVar($this->Name.'_sels');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -345,8 +345,8 @@ class FileManager
 		}
 		else if ($act == 'Link In')
 		{
-			$sels = GetVar($this->Name.'_sels');
-			$ct = GetVar($this->Name.'_ct');
+			$sels = Server::GetVar($this->Name.'_sels');
+			$ct = Server::GetVar($this->Name.'_ct');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -358,7 +358,7 @@ class FileManager
 		{
 			require_once('3rd/zipfile.php');
 			$zip = new zipfile();
-			$sels = GetVar($this->Name.'_sels');
+			$sels = Server::GetVar($this->Name.'_sels');
 			$total = array();
 			foreach ($sels as $s) $total = array_merge($total, Comb($s, '#^t_.*#'));
 
@@ -1089,7 +1089,7 @@ EOF;
 	 */
 	static function TagBreadcrumb($t, $g, $a)
 	{
-		$path = GetVar($a['SOURCE']);
+		$path = Server::GetVar($a['SOURCE']);
 		if (empty($path)) return null;
 
 		$items = explode('/', $path);

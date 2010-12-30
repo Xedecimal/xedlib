@@ -196,7 +196,7 @@ class Form extends LayeredOutput
 		{
 			//This form has been submitted.
 			$b = Server::GetVar('block_'.$input->name);
-			if (isset($b) && GetVar($input->name) != $this->words[$b])
+			if (isset($b) && Server::GetVar($input->name) != $this->words[$b])
 				$this->Errors[$input->name] = ' '.GetImg('error.png', 'Error',
 					'style="vertical-align: text-bottom"').
 					"<span class=\"error\"> Invalid phrase.</span>";
@@ -338,12 +338,12 @@ class Form extends LayeredOutput
 			switch (strtolower($attribs['TYPE']))
 			{
 				case 'radio':
-					if (GetVar($attribs['NAME']) == $attribs['VALUE'])
+					if (Server::GetVar($attribs['NAME']) == $attribs['VALUE'])
 						$attribs['CHECKED'] = 'checked';
 					break;
 				default:
 					if (!isset($attribs['VALUE']))
-					$attribs['VALUE'] = GetVar($attribs['NAME']);
+					$attribs['VALUE'] = Server::GetVar($attribs['NAME']);
 					break;
 			}
 		}

@@ -111,14 +111,14 @@ class FileAccessHandler extends EditorHandler
 	 */
 	function Update($s, $id, &$original, &$update)
 	{
-		$accesses = GetVar($this->ed->Name.'_accesses');
+		$accesses = Server::GetVar($this->ed->Name.'_accesses');
 		$this->RecurseSetPerm($this->root, $id, $accesses);
 		return true;
 	}
 
 	function Created($s, $id, $inserted)
 	{
-		$accesses = GetVar($this->ed->Name.'_accesses');
+		$accesses = Server::GetVar($this->ed->Name.'_accesses');
 		$this->RecurseSetPerm($this->root, $id, $accesses);
 	}
 

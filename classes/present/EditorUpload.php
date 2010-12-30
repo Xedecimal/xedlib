@@ -13,7 +13,7 @@ class EditorUpload
 
 	function Prepare()
 	{
-		$action = GetVar($this->Name.'_action');
+		$action = Server::GetVar($this->Name.'_action');
 		if ($action == 'update')
 		{
 			move_uploaded_file($_FILES[$this->Name.'file']['tmp_name'], $this->item);

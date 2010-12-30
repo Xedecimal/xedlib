@@ -21,8 +21,8 @@ class EditorText
 
 		if ($action == 'update')
 		{
-			$this->item = SecurePath(GetVar($this->Name.'_ci'));
-			file_put_contents($this->item, GetVar($this->Name.'_body'));
+			$this->item = SecurePath(Server::GetVar($this->Name.'_ci'));
+			file_put_contents($this->item, Server::GetVar($this->Name.'_body'));
 		}
 	}
 

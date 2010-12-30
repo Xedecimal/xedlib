@@ -26,7 +26,7 @@ class Template extends LayeredOutput
 	public $objs;
 
 	/**
-	 * Whether or not to use GetVar() for {{vars}}
+	 * Whether or not to use Server::GetVar() for {{vars}}
 	 *
 	 * @var bool
 	 */

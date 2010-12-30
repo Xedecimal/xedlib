@@ -87,7 +87,7 @@ function TagEach($t, $g, $a)
 	$vp = new VarParser;
 	$vp->Behavior->UseGetVar = true;
 	$ret = null;
-	$dat = GetVar($a['VAR']);
+	$dat = Server::GetVar($a['VAR']);
 	for ($ix = $a['START']; $ix < count($dat); $ix++)
 		$ret .= $vp->ParseVars(preg_replace("/{$a['IDX']}/i", $ix, $g));
 	return $ret;

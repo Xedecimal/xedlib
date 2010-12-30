@@ -20,8 +20,8 @@ class TableSort extends Table
 
 		$this->name = $name;
 
-		$sort = GetVar("sort");
-		$order = GetVar("order", "ASC");
+		$sort = Server::GetVar("sort");
+		$order = Server::GetVar("order", "ASC");
 
 		global $me, $PERSISTS;
 		$this->cols = array();

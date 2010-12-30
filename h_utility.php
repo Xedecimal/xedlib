@@ -21,7 +21,7 @@ function GetAssocPosts($match)
 }
 
 /**
- * Just like GetVar but returns only post values.
+ * Just like Server::GetVar but returns only post values.
  *
  * @param string $name Name to retrieve.
  * @param mixed $default Default value if not available.
@@ -67,8 +67,8 @@ function Persist($name, $value)
 function Redirect($url, $getvars = NULL)
 {
 	session_write_close();
-	$redir = GetVar("cr", $url);
-	if (is_array($getvars)) $redir = URL($url, $getvars);
+	$redir = Server::GetVar("cr", $url);
+	if (is_array($getvars)) $redir = HM::URL($url, $getvars);
 	header("Location: $redir");
 	die();
 }
@@ -104,9 +104,9 @@ function TimestampToMsSql($ts)
 }
 
 /**
- * Returns timestamp from a GetDateInput style GetVar value.
+ * Returns timestamp from a GetDateInput style Server::GetVar value.
  *
- * @param array $value Array of 3 elements for a date returned from a GetVar.
+ * @param array $value Array of 3 elements for a date returned from a Server::GetVar.
  * @return int Timestamp result from mktime.
  */
 function DateInputToTS($value)
@@ -164,7 +164,7 @@ function GetPages($total, $count, $args = null)
 	}
 	if ($total <= $count) return;
 
-	$cp = GetVar('cp');
+	$cp = Server::GetVar('cp');
 	$ret = null;
 	$page = 0;
 
@@ -514,7 +514,7 @@ function SendDownloadStart($filename, $size = null)
 
 function GetQ()
 {
-	$pi = GetVar('q', '/home');
+	$pi = Server::GetVar('q', '/home');
 	if (!empty($pi)) return explode('/', substr($pi, 1));
 }
 

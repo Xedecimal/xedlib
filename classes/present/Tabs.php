@@ -24,7 +24,7 @@ class Tabs
 		$ret .= "<tr><td>&nbsp;</td>\n";
 		for ($x = 0; $x < count($tabs); $x++)
 		{
-			if (GetVar("ct") == $x) $class = "tab_active";
+			if (Server::GetVar("ct") == $x) $class = "tab_active";
 			else $class = "tab_inactive";
 			$ret .= "<td class=\"$class\" nowrap>\n";
 			$ret .= "<a href=\"$s?ct=$x$advars\"><b>{$tabs[$x]}</b></a>\n";

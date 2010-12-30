@@ -192,7 +192,7 @@ class Server
 		$m = null;
 		if (preg_match('#([^\[]+)\[([^\]]+)\]#', $name, $m))
 		{
-			$arg = GetVar($m[1]);
+			$arg = Server::GetVar($m[1]);
 
 			$ix = 0;
 			preg_match_all('/\[([^\[]*)\]/', $name, $m);
@@ -239,10 +239,11 @@ class Server
 	}
 
 	/**
-	 * Will set a session variable to $name with the value of GetVar and return it.
+	 * Will set a session variable to $name with the value of Server::GetVar and
+	 * return it.
 	 *
 	 * @param string $name Name of our state object.
-	 * @return mixed The GetVar value of $name.
+	 * @return mixed The Server::GetVar value of $name.
 	 */
 	static function GetState($name, $def = null)
 	{

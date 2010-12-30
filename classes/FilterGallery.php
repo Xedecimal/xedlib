@@ -46,8 +46,8 @@ class FilterGallery extends FilterDefault
 	 */
 	function Updated(&$fm, &$fi, &$newinfo)
 	{
-		$img = GetVar('image');
-		$upimg = GetVar('upimage');
+		$img = Server::GetVar('image');
+		$upimg = Server::GetVar('upimage');
 
 		// Uploaded folder image
 		if (!empty($upimg['name']))

@@ -855,7 +855,7 @@ class EditorData
 	 * Gets the HTML rendered table portion of this editor.
 	 *
 	 * @param string $target Filename that is using this editor.
-	 * @param mixed $ci Currently editing item (eg. GetVar('ci')).
+	 * @param mixed $ci Currently editing item (eg. Server::GetVar('ci')).
 	 * @return string
 	 * @access private
 	 */

@@ -221,7 +221,7 @@ class Calendar
 				$curdate = $key;
 			}
 		}
-		//$thists = GetVar("ts", time());
+		//$thists = Server::GetVar("ts", time());
 		//$ret = "<table class=\"CalendarYear\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
 		$ret = "";
 		$yearx = 0;

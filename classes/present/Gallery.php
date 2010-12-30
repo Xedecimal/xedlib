@@ -55,7 +55,7 @@ class Gallery
 
 	function TagFolder($t, $guts)
 	{
-		$me = GetVar('q');
+		$me = Server::GetVar('q');
 
 		$out = '';
 		$vp = new VarParser();
@@ -70,13 +70,13 @@ class Gallery
 			$fi = new FileInfo($this->root.$this->path.'/'.$file);
 			$this->f->GetInfo($fi);
 
-			$du['editor'] = GetVar('editor');
-			$du['galcf'] = GetVar('galcf', '').'/'.$file;
-			$d['url'] = URL($me, $du);
+			$du['editor'] = Server::GetVar('editor');
+			$du['galcf'] = Server::GetVar('galcf', '').'/'.$file;
+			$d['url'] = HM::URL($me, $du);
 
 			$d['name'] = $file;
 			$d['icon'] = $fi->vars['icon'];
-			$d['editor'] = GetVar('editor');
+			$d['editor'] = Server::GetVar('editor');
 
 			$out .= $vp->ParseVars($guts, $d);
 		}
@@ -96,7 +96,7 @@ class Gallery
 			$d['fullname'] = $fi->path;
 			$d['idx'] = $ix;
 			$d['name'] = $this->GetCaption($fi);
-			$d['path'] = GetVar('galcf', '');
+			$d['path'] = Server::GetVar('galcf', '');
 			$d['icon'] = $fi->icon;
 			$d['desc'] = $this->GetCaption($fi);
 
@@ -106,11 +106,11 @@ class Gallery
 
 		/*if ($this->Behavior->PageCount != null)
 		{
-			$tot = GetFlatPage($files['files'], GetVar('cp'), $this->Behavior->PageCount);
+			$tot = GetFlatPage($files['files'], Server::GetVar('cp'), $this->Behavior->PageCount);
 		}
 		else $tot = $files['files'];
 
-		$ix = GetVar('cp')*$this->Behavior->PageCount;
+		$ix = Server::GetVar('cp')*$this->Behavior->PageCount;
 		$body .= "<tr class=\"images\"><td>\n";
 
 		foreach ($tot as $file)
@@ -124,7 +124,7 @@ class Gallery
 					$url = URL($me, array(
 						'view' => $ix++,
 						'galcf' => "$path",
-						'cp' => GetVar('cp')
+						'cp' => Server::GetVar('cp')
 					));
 					$caption = $this->GetCaption($file);
 
@@ -150,7 +150,7 @@ EOF;
 	function TagImage($t, $guts)
 	{
 		$out = '';
-		$view = GetVar('view');
+		$view = Server::GetVar('view');
 		if (!isset($view)) return null;
 
 		$out .= '  ';
@@ -176,7 +176,7 @@ EOF;
 
 	/**
 	 * Returns the rendered gallery.
-	 * @param string $path Current location, usually GetVar('galcf')
+	 * @param string $path Current location, usually Server::GetVar('galcf')
 	 * @return string Rendered gallery.
 	 */
 	function Get()
@@ -186,7 +186,7 @@ EOF;
 
 		require_once('h_template.php');
 
-		$path = GetVar('galcf');
+		$path = Server::GetVar('galcf');
 		$fm = new FileManager('gallery', $this->root.$path, array('Gallery'), 'Gallery');
 		$fm->Behavior->ShowAllFiles = true;
 		$fm->View->Sort = $this->Display->Sort;
@@ -203,9 +203,9 @@ EOF;
 		$t->ReWrite('part', array(&$this, 'TagPart'));
 
 		$t->Set('disable_save', $this->Behavior->DisableSave);
-		$t->Set('current', GetVar('view'));
-		$t->Set('galcf', GetVar('galcf'));
-		$t->Set('galme', URL($me));
+		$t->Set('current', Server::GetVar('view'));
+		$t->Set('galcf', Server::GetVar('galcf'));
+		$t->Set('galme', HM::URL($me));
 
 		$tot = 0;
 		foreach ($this->files['files'] as $f)
@@ -216,7 +216,7 @@ EOF;
 		$t->Set('total', count($this->files['files']));
 
 		//Page related
-		$view = GetVar('view');
+		$view = Server::GetVar('view');
 
 		if (isset($view))
 		{
@@ -230,7 +230,7 @@ EOF;
 		{
 			$args = array(
 				'view' => $view-1,
-				'galcf' => GetVar('galcf'),
+				'galcf' => Server::GetVar('galcf'),
 			);
 			if ($this->Behavior->PageCount > 0)
 				$args['cp'] = floor(($view-1)/$this->Behavior->PageCount);
@@ -245,7 +245,7 @@ EOF;
 		{
 			$args = array(
 				'view' => $view+1,
-				'galcf' => GetVar('galcf'),
+				'galcf' => Server::GetVar('galcf'),
 
 			);
 			if ($this->Behavior->PageCount > 0)
