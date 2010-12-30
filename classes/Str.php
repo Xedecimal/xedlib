@@ -22,42 +22,6 @@ class Str
 	}
 
 	/**
-	 * Converts a string from digits to proper data size string.
-	 *
-	 * @param int $size Size to convert into proper string.
-	 * @return string Size converted to a string.
-	 */
-	static function SizeString($size)
-	{
-		$units = explode(' ','B KB MB GB TB');
-		for ($i = 0; $size > 1024; $i++) { $size /= 1024; }
-		return round($size, 2).' '.$units[$i];
-	}
-
-	/**
-	 * Converts a data size string to proper digits.
-	 *
-	 * @param string $str String to convert into proper size.
-	 * @return int String converted to proper size.
-	 */
-	static function GetStringSize($str)
-	{
-		$num = (int)substr($str, 0, -1);
-		switch (strtoupper(substr($str, -1)))
-		{
-			case 'Y': $num *= 1024;
-			case 'Z': $num *= 1024;
-			case 'E': $num *= 1024;
-			case 'P': $num *= 1024;
-			case 'T': $num *= 1024;
-			case 'G': $num *= 1024;
-			case 'M': $num *= 1024;
-			case 'K': $num *= 1024;
-		}
-		return $num;
-	}
-
-	/**
 	 * Returns the start of a larger string trimmed down to the length you specify
 	 * without chomping words.
 	 * @param string $text Text to chomp.
