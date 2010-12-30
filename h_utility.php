@@ -33,7 +33,7 @@ function GetPost($name, $default = null)
 
 	if (!empty($_POST[$name]))
 	{
-		Trace("GetVar(): $name (Post)    -> {$_POST[$name]}<br/>\n");
+		Server::Trace("Server::GetVar(): $name (Post)    -> {$_POST[$name]}<br/>\n");
 		return $_POST[$name];
 	}
 

@@ -762,7 +762,7 @@ class DataSet
 	function Update($match, $values)
 	{
 		$sets = $this->GetColVals($values);
-		if (empty($sets)) { Trace('Nothing to update.'); return; }
+		if (empty($sets)) { Server::Trace('Nothing to update.'); return; }
 		$query = 'UPDATE '.$this->QuoteTable($this->table);
 		$query .= $this->JoinClause($this->joins);
 		$query .= $this->SetClause($values);
