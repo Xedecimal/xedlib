@@ -50,7 +50,7 @@ class TableSort extends Table
 			));
 
 			$this->cols[] = "<a href=\"".
-				URL($me, $uri_defaults).
+				HM::URL($me, $uri_defaults).
 				"\">$disp</a>$append";
 		}
 

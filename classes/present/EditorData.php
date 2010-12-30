@@ -1067,10 +1067,10 @@ class EditorData
 
 			if ($this->Behavior->AllowEdit)
 			{
-				$url_edit = URL($target, array_merge(array(
+				$url_edit = HM::URL($target, array_merge(array(
 					$this->Name.'_action' => 'edit',
 					$this->Name.'_ci' => $cnode->id), $url_defaults));
-				$url_del = URL($target, array_merge(array(
+				$url_del = HM::URL($target, array_merge(array(
 					$this->Name.'_action' => 'delete',
 					$this->Name.'_ci' => $cnode->id), $url_defaults));
 				$row[] = "<a href=\"$url_edit#box_{$this->Name}_forms\"><img

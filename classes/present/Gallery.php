@@ -121,7 +121,7 @@ class Gallery
 				{
 					$twidth = $file->info['thumb_width']+16;
 					$theight = $file->info['thumb_height']+60;
-					$url = URL($me, array(
+					$url = HM::URL($me, array(
 						'view' => $ix++,
 						'galcf' => "$path",
 						'cp' => Server::GetVar('cp')
@@ -235,7 +235,7 @@ EOF;
 			if ($this->Behavior->PageCount > 0)
 				$args['cp'] = floor(($view-1)/$this->Behavior->PageCount);
 
-			$t->Set('butBack', GetButton(URL($me, $args).'#fullview',
+			$t->Set('butBack', GetButton(HM::URL($me, $args).'#fullview',
 				'back.png', 'Back', 'class="png"'));
 		}
 		else $t->Set('butBack', '');
@@ -251,7 +251,7 @@ EOF;
 			if ($this->Behavior->PageCount > 0)
 				$args['cp'] = floor(($view+1)/$this->Behavior->PageCount);
 
-			$t->Set('butForward', GetButton(URL($me, $args).'#fullview', 'forward.png',
+			$t->Set('butForward', GetButton(HM::URL($me, $args).'#fullview', 'forward.png',
 				'Forward', 'class="png"'));
 		}
 		else $t->Set('butForward', '');

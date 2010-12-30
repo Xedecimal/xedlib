@@ -171,27 +171,27 @@ function GetPages($total, $count, $args = null)
 	if ($args == null) $args = array();
 
 	if ($cp > 1)
-		$ret .= Getbutton(URL($me, array_merge($args, array('cp' => 0))), 'start.png', 'Start')
+		$ret .= Getbutton(HM::URL($me, array_merge($args, array('cp' => 0))), 'start.png', 'Start')
 		.' &ndash; ';
 	if ($cp > 0)
-		$ret .= GetButton(URL($me, array_merge($args, array('cp' => $cp-1))), 'prev.png', 'Previous').
+		$ret .= GetButton(HM::URL($me, array_merge($args, array('cp' => $cp-1))), 'prev.png', 'Previous').
 		' &ndash; ';
 
 	for ($ix = 0; $ix < $total; $ix += $count)
 	{
 		if ($ix > 0) $ret .= ' &ndash; ';
 		$page = $ix / $count;
-		$url = URL($me, array_merge(array('cp' => $page), $args));
+		$url = HM::URL($me, array_merge(array('cp' => $page), $args));
 		if ($page == $cp) $ret .= '<b>'.($page+1).'</b>';
 		else $ret .= '<b><a href="'.$url.'">'.($page+1).'</a></b>';
 	}
 
 	if ($cp < $page)
 		$ret .= ' &ndash; '.
-		GetButton(URL($me, array_merge(array('cp' => $cp+1), $args)), 'next.png', 'Next');
+		GetButton(HM::URL($me, array_merge(array('cp' => $cp+1), $args)), 'next.png', 'Next');
 	if ($cp < max(0, $page-1))
 		$ret .= ' &ndash; '.
-		GetButton(URL($me, array_merge(array('cp' => $page), $args)), 'end.png', 'End');
+		GetButton(HM::URL($me, array_merge(array('cp' => $page), $args)), 'end.png', 'End');
 
 	return $ret;
 }

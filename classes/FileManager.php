@@ -461,7 +461,7 @@ class FileManager
 		{
 			if (strlen($items[$ix]) < 1) continue;
 			$cpath = (strlen($cpath) > 0 ? $cpath.'/' : null).$items[$ix];
-			$uri = URL($this->Behavior->Target,
+			$uri = HM::URL($this->Behavior->Target,
 				array($this->Name.'_cf' => $cpath));
 			$ret .= ' '.$attribs['SEP'];
 			$d['name'] = $items[$ix];
@@ -599,10 +599,10 @@ class FileManager
 					unset($vars[$k]);
 				}
 				global $me;
-				$this->vars['url'] = URL($me, $vars);
+				$this->vars['url'] = HM::URL($me, $vars);
 			}
 			else if ($this->Behavior->UseInfo)
-				$this->vars['url'] = URL($this->Behavior->Target,
+				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' => $this->cf.$f->filename));
 			else
 				$this->vars['url'] = htmlspecialchars($this->Root.$this->cf.$f->filename);
@@ -937,7 +937,7 @@ EOF;
 
 		$types = $file->type ? 'folders' : 'files';
 		if (isset($file->icon))
-			$d['icon'] = "<img src=\"".URL($file->icon)."\" alt=\"Icon\" />";
+			$d['icon'] = "<img src=\"".HM::URL($file->icon)."\" alt=\"Icon\" />";
 
 		else
 			$d['icon'] = '';
@@ -1102,7 +1102,7 @@ EOF;
 			if ($ix > 0) { $ret .= $a['SEP']; $text = $i; }
 			else $text = $a['ROOT'];
 			$cpath .= ($ix > 0 ? '/' : null).$i;
-			$uri = URL('', array($a['SOURCE'] => $cpath));
+			$uri = HM::URL('', array($a['SOURCE'] => $cpath));
 			$ret .= "<a href=\"{$uri}\">{$text}</a>";
 		}
 		return $ret;
