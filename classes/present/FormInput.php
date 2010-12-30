@@ -465,7 +465,7 @@ class FormInput
 		}
 		else if (!is_numeric($args['ts']) && !empty($args['ts']))
 		{
-			$args['ts'] = MyDateTimestamp($args['ts'], $args['time']);
+			$args['ts'] = Database::MyDateTimestamp($args['ts'], $args['time']);
 		}
 		if (!isset($args['ts'])) $args['ts'] = time();
 		$divAtrs = $args['atrs'];

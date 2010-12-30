@@ -58,7 +58,7 @@ class LoggerAuth extends EditorHandler
 	function Log($user, $action, $target)
 	{
 		$this->dsLog->Add(array(
-			'log_date' => SqlUnquote('NOW()'),
+			'log_date' => Database::SqlUnquote('NOW()'),
 			'log_user' => $user,
 			'log_action' => $action,
 			'log_target' => $target
@@ -83,7 +83,7 @@ class LoggerAuth extends EditorHandler
 
 	function TrimByDate($ts)
 	{
-		$this->dsLog->Remove(array('log_date' => SqlLess(TimestampToMySql($ts))));
+		$this->dsLog->Remove(array('log_date' => Database::SqlLess(TimestampToMySql($ts))));
 	}
 
 	/**
@@ -111,7 +111,7 @@ class LoggerAuth extends EditorHandler
 			$idlead = "{$this->name}_table:";
 			$idend = ":{$ix}";
 
-			$colDate = DateTimeCallback(MyDateTimestamp($item['log_date'], true));
+			$colDate = DateTimeCallback(Database::MyDateTimestamp($item['log_date'], true));
 			$colUser = '<a href="'.$me.'?editor=user&amp;ci='.$item['usr_id'].'">'.$item['usr_name'].'</a>';
 			$colActn = isset($this->actions) ?
 				$this->actions[$item['log_action']] : $item['log_action'];

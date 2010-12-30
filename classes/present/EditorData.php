@@ -467,7 +467,7 @@ class EditorData
 					else $insert[$col] = $value;
 				}
 				else if (is_numeric($col)) continue;
-				else $insert[$col] = SqlUnquote($in);
+				else $insert[$col] = Database::SqlUnquote($in);
 				//I just changed this to 'else' (check the history), because a
 				//numeric value with a string column would not go in eg. 5
 				//instead of '5', if this ends up conflicting, we'll need to
@@ -926,7 +926,7 @@ class EditorData
 
 			if (!empty($sq))
 				foreach($cols as $c)
-					$q['match'][$c] = SqlOr(SqlLike("%$sq%"));
+					$q['match'][$c] = Database::SqlOr(Database::SqlLike("%$sq%"));
 
 			$q['columns'] = $cols;
 			$q['order'] = $this->sort;
@@ -1226,9 +1226,9 @@ class EditorData
 						else if (isset($sel[0][$col]))
 						{
 							if ($in->attr('TYPE') == 'date')
-								$in->attr('VALUE', MyDateTimestamp($sel[0][$col]));
+								$in->attr('VALUE', Database::MyDateTimestamp($sel[0][$col]));
 							else if ($in->attr('TYPE') == 'datetime')
-								$in->attr('VALUE', MyDateTimestamp($sel[0][$col], true));
+								$in->attr('VALUE', Database::MyDateTimestamp($sel[0][$col], true));
 							else $in->attr('VALUE', $sel[0][$col]);
 						}
 						//If we bring this back, make sure setting explicit

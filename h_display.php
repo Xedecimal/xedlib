@@ -85,7 +85,7 @@ function TagInputData($atrs)
 				case 'password':
 					$atrs['VALUE'] = null; break;
 				case 'date':
-					$atrs['VALUE'] = MyDateTimestamp($binds[0][$atrs['NAME']]);
+					$atrs['VALUE'] = Database::MyDateTimestamp($binds[0][$atrs['NAME']]);
 					break;
 				case 'radio':
 				case 'checkbox':

@@ -346,7 +346,7 @@ class Database
 	 */
 	static function MySqlDateCallback($ds, $data, $col, $dbcol)
 	{
-		$ts = MyDateTimestamp($data[$col]);
+		$ts = Database::MyDateTimestamp($data[$col]);
 		return strftime('%x', $ts);
 	}
 

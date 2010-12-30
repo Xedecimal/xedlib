@@ -69,7 +69,7 @@ class U
 	 * @param mixed $col Index of $val to test for a mysql formatted date.
 	 */
 	static function DateCallbackD($ds, $val, $col) { return DateCallback($val[$col]); }
-	static function DateCallback($val) { return date('m/d/Y', MyDateTimestamp($val)); }
+	static function DateCallback($val) { return date('m/d/Y', Database::MyDateTimestamp($val)); }
 
 	static function DateTimeCallbackD($ds, $val, $col) { return DateTimeCallback($val[$col]); }
 	static function DateTimeCallback($val) { return date('m/d/Y h:i:s a', $val); }
