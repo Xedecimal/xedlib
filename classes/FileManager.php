@@ -179,7 +179,7 @@ class FileManager
 
 				$filter->Upload($target, $fi);
 				if (!empty($this->Behavior->Watchers))
-					RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
+					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
 						$fi->path.$target);
 			}
 
@@ -194,7 +194,7 @@ class FileManager
 				{
 					$filter->Upload($name, $fi);
 					if (!empty($this->Behavior->Watchers))
-						RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
+						U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
 							$this->Root.$this->cf.$name);
 				}
 			}
@@ -223,7 +223,7 @@ class FileManager
 				$info->SaveInfo();
 
 				if (!empty($this->Behavior->Watchers))
-					RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPDATE,
+					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPDATE,
 						$info->path);
 			}
 		}
@@ -251,7 +251,7 @@ class FileManager
 			$f->Rename($fi, $name);
 			$this->cf = substr($fi->path, strlen($this->Root)).'/';
 			if (!empty($this->Behavior->Watchers))
-				RunCallbacks($this->Behavior->Watchers, FM_ACTION_RENAME,
+				U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_RENAME,
 					$fi->path.' to '.$name);
 		}
 		else if ($act == 'Delete')
@@ -266,7 +266,7 @@ class FileManager
 				$break = false;
 				if (!empty($this->Behavior->Watchers))
 				{
-					if (!RunCallbacks($this->Behavior->Watchers, FM_ACTION_DELETE,
+					if (!U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_DELETE,
 						$fi->path)) $break = true;
 				}
 				if (!$break)
@@ -287,7 +287,7 @@ class FileManager
 			FilterDefault::UpdateMTime($p);
 
 			if (!empty($this->Behavior->Watchers))
-				RunCallbacks($this->Behavior->Watchers, FM_ACTION_CREATE, $p);
+				U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_CREATE, $p);
 		}
 		else if ($act == 'swap')
 		{
@@ -308,7 +308,7 @@ class FileManager
 				$file->SaveInfo();
 			}
 			if (!empty($this->Behavior->Watchers))
-				RunCallbacks($this->Behavior->Watchers, FM_ACTION_REORDER,
+				U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_REORDER,
 					$sfile->path . ' ' . ($cd == 'up' ? 'up' : 'down'));
 		}
 		else if ($act == 'Move To')
@@ -323,7 +323,7 @@ class FileManager
 				$f->Rename($fi, "$ct/{$fi->filename}");
 
 				if (!empty($this->Behavior->Watchers))
-					RunCallbacks($this->Behavior->Watchers, FM_ACTION_MOVE,
+					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_MOVE,
 						$fi->path . ' to ' . $ct);
 			}
 		}
@@ -339,7 +339,7 @@ class FileManager
 				$f->Copy($fi, $ct.$fi->filename);
 
 				if (!empty($this->Behavior->Watchers))
-					RunCallbacks($this->Behavior->Watchers, FM_ACTION_COPY,
+					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_COPY,
 						$fi->path . ' to ' . $ct);
 			}
 		}
