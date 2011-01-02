@@ -90,7 +90,7 @@ class U
 			$item = call_user_func_array($cb, $args);
 			if (is_array($item))
 			{
-				if (!isset($ret)) $ret = array();
+				if (empty($ret)) $ret = array();
 				$ret = array_merge($ret, $item);
 			}
 			else $ret .= $item;
