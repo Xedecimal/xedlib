@@ -374,6 +374,20 @@ class Database
 			);
 		}
 	}
+
+	/**
+	 * Converts an integer unix epoch timestamp to a mysql equivalent.
+	 *
+	 * @param int $ts Epoch timestamp.
+	 * @param bool $time Whether or not to include time.
+	 * @return string MySql formatted date.
+	 * @todo Move to data.
+	 */
+	static function TimestampToMySql($ts, $time = true)
+	{
+		if (empty($ts)) return null;
+		return date($time ? 'Y-m-d h:i:s' : 'Y-m-d', $ts);
+	}
 }
 
 ?>
