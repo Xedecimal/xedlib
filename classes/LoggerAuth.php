@@ -83,7 +83,7 @@ class LoggerAuth extends EditorHandler
 
 	function TrimByDate($ts)
 	{
-		$this->dsLog->Remove(array('log_date' => Database::SqlLess(TimestampToMySql($ts))));
+		$this->dsLog->Remove(array('log_date' => Database::SqlLess(Database::TimestampToMySql($ts))));
 	}
 
 	/**

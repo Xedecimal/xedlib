@@ -220,8 +220,8 @@ class EditorSearch
 		else if ($fi->attr('TYPE') == 'date')
 		{
 			$query['match'][$col] = Database::SqlBetween(
-				TimestampToMySql(DateInputToTS(Server::GetVar($col)), false),
-				TimestampToMySql(DateInputToTS(Server::GetVar($col.'2')), false)
+				Database::TimestampToMySql(DateInputToTS(Server::GetVar($col)), false),
+				Database::TimestampToMySql(DateInputToTS(Server::GetVar($col.'2')), false)
 			);
 		}
 		else $query['match'][$col] = Database::SqlLike('%'.$val.'%');
