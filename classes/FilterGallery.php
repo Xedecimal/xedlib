@@ -107,7 +107,7 @@ class FilterGallery extends FilterDefault
 				$g = glob("{$fir->path}/._image.*");
 				if (!empty($g))
 					$this->ResizeFile($g[0], $fir->path.'/.'.
-						filenoext('t'.substr(basename($g[0]), 1)),
+						File::GetFile('t'.substr(basename($g[0]), 1)),
 						$info['thumb_width'], $info['thumb_height']);
 				$this->UpdateThumbs($fir, $info);
 			}
@@ -116,7 +116,7 @@ class FilterGallery extends FilterDefault
 				$w = $info['thumb_width'];
 				$h = $info['thumb_height'];
 				$src = $fir->path;
-				$dst = $fir->dir.'/t_'.filenoext($fir->filename);
+				$dst = $fir->dir.'/t_'.File::GetFile($fir->filename);
 				$this->ResizeFile($src, $dst, $w, $h);
 			}
 		}
@@ -210,7 +210,7 @@ class FilterGallery extends FilterDefault
 		{
 			if (substr($file, 0, 2) == 't_') continue;
 			$pinfo = pathinfo($file);
-			$this->ResizeFile($file, $path.'t_'.filenoext($pinfo['basename']),
+			$this->ResizeFile($file, $path.'t_'.File::GetFile($pinfo['basename']),
 				$fi->info['thumb_width'], $fi->info['thumb_height']);
 		}
 	}
