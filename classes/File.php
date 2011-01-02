@@ -7,7 +7,7 @@ define('SCAN_DIRS', 2);
 
 class File
 {
-	function PregRename($glob, $preg_src, $preg_dst)
+	static function PregRename($glob, $preg_src, $preg_dst)
 	{
 		foreach (glob($glob) as $f)
 		{
