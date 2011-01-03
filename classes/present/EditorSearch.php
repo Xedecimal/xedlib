@@ -8,6 +8,10 @@ class EditorSearch
 	public $Behavior;
 	/** @var array */
 	public $SearchFields;
+	/**
+	 * @var string Filename of associated form.
+	 */
+	public $Form;
 	/** @var DataSet */
 	private $_ds;
 
@@ -45,21 +49,17 @@ class EditorSearch
 				if (@$this->_q[1] == 'data_search_fill')
 				{
 					$ci = $this->_q[0];
-					$orders[$this->_ds->id] = 'ASC';
+					$q['match'][$this->_ds->id] = $ci;
+					$q['args'] = GET_ASSOC;
 					foreach ($this->_ds->joins as $j)
-						$orders[$j->DataSet->id] = 'ASC';
+						$q['orders'][$j->DataSet->id] = 'ASC';
 
-					$data = $this->_ds->Get(array(
-						'match' => array('app_id' => $ci),
-						'args' => GET_ASSOC,
-						'order' => $orders
-					));
+					$data = $this->_ds->Get($q);
 
 					$t->Set('json', json_encode($data));
 				}
 				$t->Set('name', $this->Name);
-				die($t->ParseFile(dirname(__FILE__).
-					'/temps/'.@$this->_q[1].'.js'));
+				die($t->ParseFile(Module::L('/temps/'.@$this->_q[1].'.js')));
 			}
 		}
 
@@ -123,20 +123,22 @@ class EditorSearch
 		if ($target == $this->Name && $act == 'view')
 		{
 			$t->ReWrite('loop', 'TagLoop');
-			$t->ReWrite('input', 'TagInput');
-			$ret = '<script type="text/javascript" src="../js/data_search_fill/'.$ci.'"></script>';
-			$ret .= '<script type="text/javascript" src="../js/data_search_print/'.$ci.'"></script>';
+			$t->ReWrite('input', array('Form', 'TagInput'));
+			$ret = '<script type="text/javascript" src="../js/data_search_fill/'
+				.$ci.'"></script>';
+			$ret .= '<script type="text/javascript" src="../js/data_search_print/'
+				.$ci.'"></script>';
 			return $ret.$t->ParseFile($this->Form);
 		}
 		if ($target == $this->Name && $act == 'edit'
-		&& $this->Behavior->AllowEdit)
+			&& $this->Behavior->AllowEdit)
 		{
 			$t->ReWrite('loop', 'TagLoop');
-			$t->ReWrite('input', 'TagInput');
+			$t->ReWrite('input', array('Form', 'TagInput'));
 			$t->ReWrite('form', array($this, 'TagEditForm'));
 			$this->ci = $ci;
-			$ret = '<script type="text/javascript" src="../../../js"></script>';
-			$ret .= '<script type="text/javascript" src="../js/data_search_fill/'.$ci.'"></script>';
+			$ret = '<script type="text/javascript" src="../js/data_search_fill/'
+				.$ci.'"></script>';
 			return $ret.$t->ParseFile($this->Form);
 		}
 		else
@@ -208,7 +210,7 @@ class EditorSearch
 
 		if ($fi->attr('TYPE') == 'select')
 		{
-			$query['match'][$col] = Database::SqlOr(Database::SqlIn($val));
+			$query['match'][$col] = Database::SqlOr($val);
 		}
 		if ($fi->attr('TYPE') == 'checks')
 		{
@@ -219,9 +221,10 @@ class EditorSearch
 				$query['having'][] = " FIND_IN_SET($v, $ms[2]) > 0";
 		else if ($fi->attr('TYPE') == 'date')
 		{
+			$vals = Server::GetVar($col);
 			$query['match'][$col] = Database::SqlBetween(
-				Database::TimestampToMySql(DateInputToTS(Server::GetVar($col)), false),
-				Database::TimestampToMySql(DateInputToTS(Server::GetVar($col.'2')), false)
+				Database::TimestampToMySql(strtotime($vals[0])),
+				Database::TimestampToMySql(strtotime($vals[1]))
 			);
 		}
 		else $query['match'][$col] = Database::SqlLike('%'.$val.'%');
@@ -338,7 +341,7 @@ class EditorSearch
 		$vp = new VarParser();
 		for ($ix = 0; $ix < $pages; $ix++)
 		{
-			$vars['url'] = HM::URL($_d['app_abs'].$GLOBALS['me'].'/'.$this->Name
+			$vars['url'] = HM::URL($_d['app_abs'].'/'.$this->Name
 				.'/search', array_merge($_GET, $_POST));
 			$vars['num'] = $ix+1;
 			$ret .= $vp->ParseVars($g, $vars);
@@ -351,9 +354,8 @@ class EditorSearch
 	function TagEditForm($t, $g, $a)
 	{
 		return '<form'.HM::GetAttribs($a).'>'.
-		'<input type="hidden" name="state" value="edit" />'.
-		'<input type="hidden" name="id" value="'.$this->ci.'" />'.
-		$g.'</form>';
+		'<input type="hidden" name="form['.$this->_ds->id.']" value="'
+			.$this->ci.'" />'.$g.'</form>';
 	}
 }
 
