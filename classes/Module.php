@@ -242,10 +242,9 @@ class Module
 		global $_d;
 		$abs = $_d['app_abs'];
 		$dir = $_d['app_dir'];
-		
-		$tmp = @$_d['settings']['site_template'];
 
 		// Overloaded Path
+		$tmp = @$_d['settings']['site_template'];
 		$opath = "$tmp/$path";
 		if (file_exists($opath)) return "$abs/$opath";
 
@@ -254,7 +253,7 @@ class Module
 		if (file_exists($apath)) return "$abs/$path";
 
 		// Module Path
-		$modpath = "modules/{$path}";
+		$modpath = "$dir/modules/$path";
 		if (file_exists($modpath)) return "$abs/modules/$path";
 
 		// Xedlib Path
