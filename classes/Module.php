@@ -63,7 +63,7 @@ class Module
 
 	static function TransPath($a, $t)
 	{
-		if (isset($a[$t[0]])) $a[$t[0]] = Module::p($a[$t[0]]);
+		if (isset($a[$t[0]])) $a[$t[0]] = Module::P($a[$t[0]]);
 		return $a;
 	}
 
