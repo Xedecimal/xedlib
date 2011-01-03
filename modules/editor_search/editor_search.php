@@ -1,6 +1,6 @@
 <?php
 
-class EditorSearch
+class EditorSearch extends Module
 {
 	/** @var string */
 	public $Name;
@@ -59,7 +59,7 @@ class EditorSearch
 					$t->Set('json', json_encode($data));
 				}
 				$t->Set('name', $this->Name);
-				die($t->ParseFile(Module::L('/temps/'.@$this->_q[1].'.js')));
+				die($t->ParseFile(Module::L('editor_search/'.@$this->_q[1].'.js')));
 			}
 		}
 
@@ -145,7 +145,7 @@ class EditorSearch
 		{
 			$t->ReWrite('search', array($this, 'TagSearch'));
 			$t->ReWrite('results', array($this, 'TagResults'));
-			return $t->Parsefile(Module::L('temps/data_search.xml'));
+			return $t->Parsefile(Module::L('editor_search/data_search.xml'));
 		}
 	}
 
