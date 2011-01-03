@@ -388,6 +388,18 @@ class Database
 		if (empty($ts)) return null;
 		return date($time ? 'Y-m-d h:i:s' : 'Y-m-d', $ts);
 	}
+
+	/**
+	 * Converts an integer unix epoch timestamp to a mssql equivalent.
+	 *
+	 * @param string $ts MySql time stamp.
+	 * @return int Timestamp.
+	 * @todo Move to data.
+	 */
+	static function TimestampToMsSql($ts)
+	{
+		return date("m/d/y h:i:s A", $ts);
+	}
 }
 
 ?>

@@ -78,18 +78,6 @@ function Redirect($url, $getvars = NULL)
 //
 
 /**
- * Converts an integer unix epoch timestamp to a mssql equivalent.
- *
- * @param string $ts MySql time stamp.
- * @return int Timestamp.
- * @todo Move to data.
- */
-function TimestampToMsSql($ts)
-{
-	return date("m/d/y h:i:s A", $ts);
-}
-
-/**
  * Returns timestamp from a GetDateInput style Server::GetVar value.
  *
  * @param array $value Array of 3 elements for a date returned from a Server::GetVar.
