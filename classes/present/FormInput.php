@@ -214,21 +214,14 @@ class FormInput
 					'ts' => @$this->atrs['VALUE'],
 					'atrs' => $this->atrs));
 			case 'daterange':
-				$this->labl = false;
-				$one = FormInput::GetDate(array(
-					'NAME' => $this->atrs['NAME'],
-					'ts' => @$this->atrs['VALUE'],
-					'atrs' => $this->atrs));
-
-				$atrsTwo = $this->atrs;
-				if (isset($atrsTwo['ID'])) $atrsTwo['ID'] .= '2';
-				$atrsTwo['NAME'] .= '2';
-
-				$two = FormInput::GetDate(array(
-					'NAME' => $this->atrs['NAME'].'2',
-					'ts' => @$this->atrs['VALUE'],
-					'atrs' => $atrsTwo));
-				return $one.' to '.$two;
+				$atrs = $this->atrs;
+				$atrs['NAME'] .= '[]';
+				$atrs['TYPE'] = 'text';
+				$atrs['CLASS'] = 'date';
+				$one = '<input '.HM::GetAttribs($atrs).' />';
+				if (isset($atrs['ID'])) $atrs['ID'] .= '2';
+				$two = '<input '.HM::GetAttribs($atrs).' />';
+				return "$one to $two";
 			case 'time':
 				$this->labl = false;
 				return FormInput::GetTime($this->atrs['NAME'], $this->valu);
