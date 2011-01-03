@@ -1,8 +1,4 @@
 <div class="data-search">
-<script type="text/javascript">
-me = '{{me}}';
-name = '{{name}}';
-</script>
 
 <results>
 <div>
@@ -25,19 +21,17 @@ name = '{{name}}';
 </results>
 
 <search>
-<form id="data_search_{{name}}"
-	action="{{app_abs}}/{{name}}/search" method="post">
-<script type="text/javascript" src="{{app_abs}}/xedlib/temps/data_search.js" />
+<form id="data_search_{{name}}" action="{{app_abs}}/{{name}}/search" method="post">
+<script type="text/javascript" src="editor_search/js.js"></script>
 <fieldset>
 <legend>Select fields to search</legend>
-<ul>
-<searchfield>
-	<li><label><input type="checkbox" id="hider_{{id}}"
-		name="{{name}}_search[{{fname}}]" class="hider" />
-		{{text}}</label>
-		<div class="hidden ds_field" id="hidden_{{id}}">{{field}}</div></li>
+<table>
+<searchfield><tr><td>
+	<label><input type="checkbox" id="hider_{{id}}"
+	name="{{name}}_search[{{fname}}]" class="hider" />{{text}}</label></td><td
+	class="hidden ds_field" id="hidden_{{id}}">{{field}}</td></tr>
 </searchfield>
-</ul>
+</table>
 </fieldset>
 <input type="submit" value="Search" />
 </form>
