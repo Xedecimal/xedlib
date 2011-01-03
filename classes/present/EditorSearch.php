@@ -17,11 +17,11 @@ class EditorSearch
 		$this->_ds = $ds;
 		$this->Behavior = new EditorSearchBehavior();
 		$this->Behavior->Buttons['View'] = array(
-			'href' => '{{app_abs}}{{me}}/{{name}}/view/{{id}}',
+			'href' => "{{app_abs}}/{$this->Name}/view/{{id}}",
 			'target' => '_blank'
 		);
 		$this->Behavior->Buttons['Edit'] = array(
-			'href' => '{{app_abs}}{{me}}/{{name}}/edit/{{id}}',
+			'href' => "{{app_abs}}/{$this->Name}/edit/{{id}}",
 			'target' => '_blank'
 		);
 		$this->Behavior->Buttons['Delete'] = array(
