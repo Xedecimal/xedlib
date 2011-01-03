@@ -1,5 +1,5 @@
 jQuery.fn.showHide = function(toggle) {
-	if (toggle) this.show(500);
+	if (toggle) this.show(100);
 	else this.hide(500);
 };
 
@@ -18,7 +18,7 @@ $(function () {
 		{
 			id = $(this).attr('id').match(/del:(\d+)/)[1];
 			$.post(root+me+'/'+name+'/delete/'+id, null, function (data) {
-				$('#result\\:'+id).hide(500);
+				$('#result\\:'+id).hide(100);
 			}, 'json');
 		}
 		return false;
