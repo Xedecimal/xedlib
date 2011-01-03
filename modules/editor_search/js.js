@@ -12,7 +12,7 @@ $(function () {
 			$('#hidden_'+targ).showHide($(this).attr('checked'));
 		});
 	});
-	
+
 	$('.delResult').click(function () {
 		if (confirm('Are you sure you wish to delete this entry?'))
 		{
