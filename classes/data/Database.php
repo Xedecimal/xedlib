@@ -301,6 +301,11 @@ class Database
 		return 0;
 	}
 
+	function Affected()
+	{
+		return $this->func_aff($this->link);
+	}
+
 	/**
  * Removes quoting from a database field to perform functions and
  * such.
