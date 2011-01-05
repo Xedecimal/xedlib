@@ -265,7 +265,7 @@ class Module
 			return Server::GetRelativePath(dirname(__FILE__)).'/'.$path;
 
 		// Xedlib Module
-		$xedmpath = dirname(__FILE__)."/../modules/$path";
+		$xedmpath = realpath(dirname(__FILE__)."/../modules/$path");
 		if (file_exists($xedmpath))
 			return Server::GetRelativePath(realpath(dirname(__FILE__)
 				.'/../modules/')).'/'.$path;
