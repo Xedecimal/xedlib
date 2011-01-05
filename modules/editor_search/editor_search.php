@@ -45,7 +45,7 @@ class EditorSearch extends Module
 			if (@$this->_q[2] == 'js')
 			{
 				$t = new Template();
-				if (@$this->_q[1] == 'data_search_fill')
+				if (@$this->_q[1] == 'fill')
 				{
 					$ci = $this->_q[0];
 					$q['match'][$this->_ds->id] = $ci;
@@ -123,9 +123,9 @@ class EditorSearch extends Module
 		{
 			$t->ReWrite('loop', 'TagLoop');
 			$t->ReWrite('input', array('Form', 'TagInput'));
-			$ret = '<script type="text/javascript" src="../js/data_search_fill/'
+			$ret = '<script type="text/javascript" src="../js/fill/'
 				.$ci.'"></script>';
-			$ret .= '<script type="text/javascript" src="../js/data_search_print/'
+			$ret .= '<script type="text/javascript" src="../js/print/'
 				.$ci.'"></script>';
 			return $ret.$t->ParseFile($this->Form);
 		}
@@ -136,7 +136,7 @@ class EditorSearch extends Module
 			$t->ReWrite('input', array('Form', 'TagInput'));
 			$t->ReWrite('form', array($this, 'TagEditForm'));
 			$this->ci = $ci;
-			$ret = '<script type="text/javascript" src="../js/data_search_fill/'
+			$ret = '<script type="text/javascript" src="../js/fill/'
 				.$ci.'"></script>';
 			return $ret.$t->ParseFile($this->Form);
 		}
