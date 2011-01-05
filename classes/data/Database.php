@@ -307,11 +307,11 @@ class Database
 	}
 
 	/**
- * Removes quoting from a database field to perform functions and
- * such.
- * @param string $data Information that will not be quited.
- * @return array specifying that this string shouldn't be quoted.
- */
+	 * Removes quoting from a database field to perform functions and
+	 * such.
+	 * @param string $data Information that will not be quited.
+	 * @return array specifying that this string shouldn't be quoted.
+	 */
 	static function SqlUnquote($data) { return array('val' => $data, 'opt' => SQLOPT_UNQUOTE); }
 	static function SqlBetween($from, $to) { return array('cmp' => 'BETWEEN', 'opt' => SQLOPT_UNQUOTE, 'val' => "'$from' AND '$to'"); }
 	static function SqlIs($val) { return array('cmp' => 'IS', 'opt' => SQLOPT_UNQUOTE, 'val' => $val); }
