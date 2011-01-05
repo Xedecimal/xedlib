@@ -43,6 +43,13 @@ class HM
 		return $ret;
 	}
 
+	static function AttribAppend(&$atrs, $name, $value)
+	{
+		$key = strtoupper($name);
+		if (isset($atrs[$key])) $atrs[$key] .= ' '.$value;
+		else $atrs[$key] = $value;
+	}
+
 	/**
 	 * Returns a clean URI.
 	 *
