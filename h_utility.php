@@ -171,28 +171,6 @@ function GetPages($total, $count, $args = null)
 }
 
 /**
- * Create a directory recursively supporting php4.
- *
- * @param string $path Complete path to recursively create.
- * @param int $mode Initial mode for linux based filesystems.
- * @return bool Whether the directory creation was successful.
- */
-function mkrdir($path, $mode = 0755)
-{
-	//$path = rtrim(preg_replace(array('#\\#', '#/{2,}#'), '/', $path), '/');
-	$e = explode("/", ltrim($path, "/"));
-	if (substr($path, 0, 1) == "/") $e[0] = "/".$e[0];
-	$c = count($e);
-	$cp = $e[0];
-	for ($i = 1; $i < $c; $i++)
-	{
-		if (!is_dir($cp) && !@mkdir($cp, $mode)) return false;
-		$cp .= "/".$e[$i];
-	}
-	return @mkdir($path, $mode);
-}
-
-/**
  * Will possibly be depricated.
  * @param array $tree Stack of linkable items.
  * @param string $target Target script of interaction.
@@ -468,22 +446,6 @@ function dir_get($path = '.')
 function GetMonthName($month)
 {
 	return date('F', strtotime($month.'/1/'.date('Y')));
-}
-
-function SendDownloadStart($filename, $size = null)
-{
-	//Caching
-	header("Pragma: public");
-	header("Expires: 0");
-	header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-
-	//Ensure we get a download dialog
-	header("Content-Type: application/force-download");
-	header("Content-Type: application/octet-stream");
-	header("Content-Type: application/download");
-	header("Content-Disposition: attachment; filename=\"$filename\";");
-	header("Content-Transfer-Encoding: binary");
-	if (isset($size)) header("Content-Length: {$size}");
 }
 
 function GetQ()

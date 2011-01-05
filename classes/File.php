@@ -202,6 +202,28 @@ class File
 		for ($i = 0; $size > 1024; $i++) { $size /= 1024; }
 		return round($size, 2).' '.$units[$i];
 	}
+
+	/**
+	 * Create a directory recursively supporting php4.
+	 *
+	 * @param string $path Complete path to recursively create.
+	 * @param int $mode Initial mode for linux based filesystems.
+	 * @return bool Whether the directory creation was successful.
+	 */
+	static function MakeFullDir($path, $mode = 0755)
+	{
+		//$path = rtrim(preg_replace(array('#\\#', '#/{2,}#'), '/', $path), '/');
+		$e = explode("/", ltrim($path, "/"));
+		if (substr($path, 0, 1) == "/") $e[0] = "/".$e[0];
+		$c = count($e);
+		$cp = $e[0];
+		for ($i = 1; $i < $c; $i++)
+		{
+			if (!is_dir($cp) && !@mkdir($cp, $mode)) return false;
+			$cp .= "/".$e[$i];
+		}
+		return @mkdir($path, $mode);
+	}
 }
 
 ?>
