@@ -245,8 +245,11 @@ class Module
 
 		// Overloaded Path
 		$tmp = @$_d['settings']['site_template'];
-		$opath = "$tmp/$path";
-		if (file_exists($opath)) return "$abs/$opath";
+		if (!empty($tmp))
+		{
+			$opath = "$tmp/$path";
+			if (file_exists($opath)) return "$abs/$opath";
+		}
 
 		// Absolute Override
 		$apath = "$dir/$path";
