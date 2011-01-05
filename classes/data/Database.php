@@ -317,11 +317,7 @@ class Database
 	static function SqlIs($val) { return array('cmp' => 'IS', 'opt' => SQLOPT_UNQUOTE, 'val' => $val); }
 	static function SqlNot($val) { return array('cmp' => 'NOT', 'val' => $val); }
 	static function SqlAnd($val) { return array('inc' => 'AND', 'val' => $val); }
-	static function SqlOr($val)
-	{
-		if (is_array($val)) { $val['inc'] = 'OR'; return $val; }
-		else return array('inc' => 'OR', 'val' => $val);
-	}
+	static function SqlOr($val) { return array('inc' => 'OR', 'val' => $val); }
 	static function SqlLess($val) { return array('cmp' => '<', 'val' => $val); }
 	static function SqlGreater($val) { return array('cmp' => '>', 'val' => $val); }
 	static function SqlMore($val) { return array('cmp' => '>', 'val' => $val); }
