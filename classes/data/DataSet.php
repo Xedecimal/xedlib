@@ -170,6 +170,8 @@ class DataSet
 			{
 				foreach ($match as $col => $val)
 				{
+					# Handle $val['inc'] which decides how this value will
+					# affect the value that came before it.
 					if ($ix++ > 0)
 					{
 						if (is_array($val) && isset($val['inc']))
@@ -179,7 +181,6 @@ class DataSet
 					}
 
 					//array('col' => 'value')
-
 					if (is_string($col))
 					{
 						if (is_array($val))
@@ -191,8 +192,6 @@ class DataSet
 						else
 							$ret .= "{$col} = ".$this->ProcessVal($val);
 					}
-
-					// array('val')
 
 					else //"col = 'value'"
 						$ret .= " {$val}";
@@ -405,7 +404,6 @@ class DataSet
 			if (array_key_exists('val', $val))
 			{
 				# Recursive Sql* calls.
-
 				if (is_array($val['val']))
 					$val['val'] = $this->ProcessVal($val['val']);
 
