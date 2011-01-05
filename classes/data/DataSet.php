@@ -186,7 +186,6 @@ class DataSet
 						if (is_array($val))
 						{
 							$ret .= $col;
-							$ret .= isset($val['cmp'])?' '.$val['cmp'].' ':' = ';
 							$ret .= $this->ProcessVal($val);
 						}
 						else
