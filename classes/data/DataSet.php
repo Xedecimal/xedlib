@@ -401,18 +401,30 @@ class DataSet
 
 		if (is_array($val))
 		{
+			# Figure out how to present $val['val']
 			if (array_key_exists('val', $val))
 			{
-				if (isset($val['opt']) && $val['opt'] == SQLOPT_UNQUOTE)
-					return $val['val'];
-				else return $lq.$this->database->Escape($val['val']).$rq;
+				# Recursive Sql* calls.
+
+				if (is_array($val['val']))
+					$val['val'] = $this->ProcessVal($val['val']);
+
+				# Unquote is not set, let's quote the value before altering it.
+				if (@$val['opt'] != SQLOPT_UNQUOTE)
+					$val['val'] = $lq.$this->database->Escape($val['val']).$rq;
+
+				# Comparison operator comes before value.
+				if (!empty($val['cmp']))
+					$val['val'] = $val['cmp'].' '.$val['val'];
+
+				return $val['val'];
 			}
 			else
 			{
 				# Arrays are not allowed here because they are to only be used
 				# with Database::Sql* functions. Arrays add confusion.
 				Server::Error('Arrays are not allowed here.');
-				varinfo($val);
+				U::VarInfo($val);
 			}
 		}
 		else
