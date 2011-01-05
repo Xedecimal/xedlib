@@ -253,7 +253,7 @@ class Database
 	*/
 	function Create()
 	{
-		$this->Query("CREATE DATABASE {$this->name}");
+		$this->Query("CREATE DATABASE IF NOT EXISTS {$this->name}");
 	}
 
 	/**
