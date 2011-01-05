@@ -386,6 +386,14 @@ class DataSet
 		return $ret;
 	}
 
+	/**
+	 * This will convert a single value into SQL notation.
+	 * 
+	 * @param mixed $val Either a string or a result of Database::Sql*
+	 * functions.
+	 * @param boolean $tbl Whether or not we're dealing with tables here.
+	 * @return string $val converted to SQL notation.
+	 */
 	function ProcessVal($val, $tbl = false)
 	{
 		$lq = $tbl?$this->database->lq:"'";
@@ -401,6 +409,8 @@ class DataSet
 			}
 			else
 			{
+				# Arrays are not allowed here because they are to only be used
+				# with Database::Sql* functions. Arrays add confusion.
 				Server::Error('Arrays are not allowed here.');
 				varinfo($val);
 			}
