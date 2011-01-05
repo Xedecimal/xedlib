@@ -413,7 +413,8 @@ class DataSet
 				# Comparison operator comes before value.
 				if (!empty($val['cmp']))
 					$val['val'] = " {$val['cmp']} {$val['val']}";
-				else $val['val'] = " = {$val['val']}";
+				else if (@$val['opt'] != SQLOPT_UNQUOTE)
+					$val['val'] = " = {$val['val']}";
 
 				return $val['val'];
 			}
