@@ -30,8 +30,7 @@ class EditorSearch extends Module
 		);
 		$this->Behavior->Buttons['Delete'] = array(
 			'class' => 'delResult',
-			'href' => '#',
-			'id' => 'del:{{id}}'
+			'href' => "{{app_abs}}/{$this->Name}/delete/{{id}}"
 		);
 	}
 
