@@ -303,7 +303,8 @@ class Database
 
 	function Affected()
 	{
-		return $this->func_aff($this->link);
+		$func = $this->func_aff;
+		return $func($this->link);
 	}
 
 	/**
