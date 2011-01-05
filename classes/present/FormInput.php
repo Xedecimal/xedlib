@@ -210,9 +210,10 @@ class FormInput
 
 			case 'date':
 				$this->labl = false;
-				return FormInput::GetDate(array(
-					'ts' => @$this->atrs['VALUE'],
-					'atrs' => $this->atrs));
+				$atrs = $this->atrs;
+				$atrs['TYPE'] = 'text';
+				HM::AttribAppend($atrs, 'class', 'date');
+				return '<input'.HM::GetAttribs($atrs).' />';
 			case 'daterange':
 				$atrs = $this->atrs;
 				$atrs['NAME'] .= '[]';
