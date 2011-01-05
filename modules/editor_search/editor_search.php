@@ -144,7 +144,7 @@ class EditorSearch extends Module
 		{
 			$t->ReWrite('search', array($this, 'TagSearch'));
 			$t->ReWrite('results', array($this, 'TagResults'));
-			return $t->Parsefile(Module::L('editor_search/data_search.xml'));
+			return $t->Parsefile(Module::L('editor_search/t.xml'));
 		}
 	}
 

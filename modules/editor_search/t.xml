@@ -3,7 +3,7 @@
 <results>
 <div>
 <result>
-	<fieldset><legend>{{name}}</legend>
+	<fieldset id="result-{{id}}"><legend>{{name}}</legend>
 	<div class="actions">
 		<result_button><a>{{text}}</a></result_button>
 	</div>
@@ -22,6 +22,7 @@
 
 <search>
 <form id="data_search_{{name}}" action="{{app_abs}}/{{name}}/search" method="post">
+<input type="hidden" name="XDEBUG_PROFILE" value="1" />
 <script type="text/javascript" src="editor_search/js.js"></script>
 <fieldset>
 <legend>Select fields to search</legend>
