@@ -1059,7 +1059,8 @@ class EditorData
 				}
 			}
 
-			$url_defaults = array($this->assoc => $this->Name);
+			#$url_defaults = array($this->assoc => $this->Name);
+			$url_defaults = array();
 			if (isset($child_id)) $url_defaults['child'] = $child_id;
 
 			if (!empty($PERSISTS)) $url_defaults = array_merge($url_defaults,
@@ -1336,9 +1337,9 @@ class EditorData
 	 * @param string Name of state variable to pass around via GPC.
 	 * @return string Rendered html of associated objects.
 	 */
-	function GetUI($assoc = 'editor')
+	function GetUI($target = 'editor')
 	{
-		$this->assoc = $assoc;
+		$this->Behavior->Target = $target;
 
 		$t = new Template();
 		$t->ReWrite('forms', array(&$this, 'TagForms'));
@@ -1354,7 +1355,7 @@ class EditorData
 			Server::GetState($this->Name.'_ci')));
 
 		$t->Set($this->View);
-		$t->Set('assoc', $assoc);
+		$t->Set('assoc', $target);
 
 		return $t->ParseFile(dirname(__FILE__).'/../../temps/editor.xml');
 	}
