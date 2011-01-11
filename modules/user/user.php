@@ -35,7 +35,7 @@ class ModUser extends Module
 	static function RequireAccess($level)
 	{
 		global $_d;
-		if (@$_d['user'][$_d['user.cols.access']] >= $level) return true;
+		if (@$_d['user.user'][$_d['user.cols.access']] >= $level) return true;
 		return false;
 	}
 
@@ -60,7 +60,7 @@ class ModUser extends Module
 	{
 		global $_d;
 
-		if (!empty($_d['user']) && empty($_d['user.hide_logout']))
+		if (!empty($_d['user.user']) && empty($_d['user.hide_logout']))
 		{
 			global $rw;
 
