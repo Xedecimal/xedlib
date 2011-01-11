@@ -541,7 +541,7 @@ class FileManager
 			if ($this->Behavior->AllowSort && $this->Behavior->Sort == FM_SORT_MANUAL && $ix > 0)
 			{
 				$uriUp = $common."&amp;{$this->Name}_action=swap&amp;cd=up&amp;index={$ix}";
-				$img = GetRelativePath(dirname(__FILE__)).'/images/up.png';
+				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/up.png';
 				$this->vars['butup'] = "<a href=\"$uriUp\"><img src=\"{$img}\" ".
 				"alt=\"Move Up\" title=\"Move Up\" /></a>";
 			}
@@ -553,7 +553,7 @@ class FileManager
 				&& $ix < count($this->files['folders'])-1)
 			{
 				$uriDown = $common."&amp;{$this->Name}_action=swap&amp;cd=down&amp;index={$ix}";
-				$img = GetRelativePath(dirname(__FILE__)).'/images/down.png';
+				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/down.png';
 				$this->vars['butdown'] = "<a href=\"$uriDown\"><img src=\"{$img}\" ".
 				"alt=\"Move Down\" title=\"Move Down\" /></a>";
 			}
@@ -622,7 +622,7 @@ class FileManager
 			if ($this->Behavior->AllowSort && $this->Behavior->Sort == FM_SORT_MANUAL && $ix > 0)
 			{
 				$uriUp = $common."&amp;{$this->Name}_action=swap&amp;cd=up&amp;index={$ix}";
-				$img = GetRelativePath(dirname(__FILE__)).'/images/up.png';
+				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/up.png';
 				$this->vars['butup'] = "<a href=\"$uriUp\"><img src=\"{$img}\" ".
 				"alt=\"Move Up\" title=\"Move Up\" /></a>";
 			}
@@ -634,7 +634,7 @@ class FileManager
 				&& $ix < count($this->files['files'])-1)
 			{
 				$uriDown = $common."&amp;{$this->Name}_action=swap&amp;cd=down&amp;index={$ix}";
-				$img = GetRelativePath(dirname(__FILE__)).'/images/down.png';
+				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/down.png';
 				$this->vars['butdown'] = "<a href=\"$uriDown\"><img src=\"{$img}\" ".
 				"alt=\"Move Down\" title=\"Move Down\" /></a>";
 			}
@@ -968,7 +968,7 @@ EOF;
 			&& $this->View->Sort == FM_SORT_MANUAL
 			&& $index > 0)
 		{
-			$img = GetRelativePath(dirname(__FILE__)).'/images/up.png';
+			$img = Server::GetRelativePath(dirname(__FILE__)).'/images/up.png';
 			$d['butup'] = "<a href=\"$uriUp\"><img src=\"{$img}\" ".
 			"alt=\"Move Up\" title=\"Move Up\" /></a>";
 		}
@@ -980,7 +980,7 @@ EOF;
 			&& $this->View->Sort == FM_SORT_MANUAL
 			&& $index < count($this->files[$type])-1)
 		{
-			$img = GetRelativePath(dirname(__FILE__)).'/images/down.png';
+			$img = Server::GetRelativePath(dirname(__FILE__)).'/images/down.png';
 			$d['butdown'] = "<a href=\"$uriDown\"><img src=\"{$img}\" ".
 			"alt=\"Move Down\" title=\"Move Down\" /></a>";
 		}

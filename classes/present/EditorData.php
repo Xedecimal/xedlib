@@ -1063,7 +1063,7 @@ class EditorData
 			if (!empty($PERSISTS)) $url_defaults = array_merge($url_defaults,
 				$PERSISTS);
 
-			$p = GetRelativePath(dirname(__FILE__));
+			$p = Server::GetRelativePath(dirname(__FILE__));
 
 			if ($this->Behavior->AllowEdit)
 			{

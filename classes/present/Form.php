@@ -224,7 +224,7 @@ class Form extends LayeredOutput
 	/*function TagForm($t, $g, $a)
 	{
 		global $PERSISTS;
-		$atrs = GetAttribs($a);
+		$atrs = HM::GetAttribs($a);
 		$ret = "<form {$this->formAttribs}{$atrs}";
 		if ($this->multipart) $ret .= ' enctype="multipart/form-data"';
 		$ret .= ">\n";

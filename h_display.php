@@ -48,7 +48,7 @@ function TagForm($t, $g, $a)
 	global $PERSISTS;
 	$frm = new Form(@$a['ID']);
 	$t->Push($frm);
-	$ret = '<form'.GetAttribs($a).'>';
+	$ret = '<form'.HM::GetAttribs($a).'>';
 	if (is_array($PERSISTS))
 	foreach ($PERSISTS as $n => $v)
 		$ret .= '<input type="hidden" name="'.$n.'" value="'.$v.'" />';
@@ -129,7 +129,7 @@ function TagInputDisplay($t, $guts, $tag)
  */
 function GetNav($t, $links, $attribs = null, $curpage = null, &$pinfo = null, &$stack = null)
 {
-	$ret = "\n<ul".GetAttribs($attribs).">\n";
+	$ret = "\n<ul".HM::GetAttribs($attribs).">\n";
 	foreach ($links->children as $ix => $link)
 	{
 		$stack[] = $ix;
