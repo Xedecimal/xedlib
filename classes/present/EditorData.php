@@ -50,7 +50,7 @@ class DisplayColumn
 	 * @param mixed $callback
 	 * @param string $attribs
 	 */
-	function DisplayColumn($text, $callback = null, $attribs = null)
+	function __construct($text, $callback = null, $attribs = null)
 	{
 		$this->text = $text;
 		$this->callback = $callback;
@@ -376,7 +376,7 @@ class EditorData
 	 * @param array $filter Array to constrain editing to a given expression.
 	 * @param array $sort Array of 'column' => 'desc/asc'.
 	 */
-	function EditorData($name, &$ds, $filter = null, $sort = null)
+	function __construct($name, &$ds, $filter = null, $sort = null)
 	{
 		$this->Name = $name;
 		$this->filter = $filter;
