@@ -7,8 +7,6 @@ class ModNav extends Module
 	public $Block = 'nav';
 
 	/**
-	*
-	*
 	* @param TreeNode $link
 	* @param int $depth
 	*/

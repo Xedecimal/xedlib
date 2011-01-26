@@ -534,12 +534,9 @@ class EditorData
 
 					$value = Server::GetVar($this->Name.'_'.$col);
 
-					//TODO: Support editing custom fields.
-					#if ($in->type == 'custom')
-					#	unset($update[$col]);
 					if ($in->attr('TYPE') == 'date')
 						$update[$col] = $value[2].'-'.$value[0].'-'.$value[1];
-					else if($in->attr('TYPE') == 'datetime')
+					else if ($in->attr('TYPE') == 'datetime')
 					{
 						if ($value[5][0] == 1)
 						{
@@ -553,17 +550,15 @@ class EditorData
 						unset($update[$col]);
 					else if ($in->attr('TYPE') == 'password')
 					{
-						if (strlen($value) > 0) $update[$col] = md5($value);
+						if (!empty($value)) $update[$col] = md5($value);
 					}
 					else if ($in->attr('TYPE') == 'checkbox')
 						$update[$col] = ($value == 1) ? 1 : 0;
 					else if ($in->attr('TYPE') == 'selects')
-					{
 						$update[$col] = $value;
-					}
 					else if ($in->attr('TYPE') == 'file')
 					{
-						if (strlen($value['tmp_name']) > 0)
+						if (!empty($value['tmp_name']))
 						{
 							$vp = new VarParser();
 							$files = glob($vp->ParseVars($in->attr('VALUE'), $update).".*");
@@ -1234,9 +1229,6 @@ class EditorData
 								$in->attr('VALUE', Database::MyDateTimestamp($sel[0][$col], true));
 							else $in->attr('VALUE', $sel[0][$col]);
 						}
-						//If we bring this back, make sure setting explicit
-						//values in DataSet::FormInputs still works.
-						//else { $in->valu = null; }
 					}
 
 					$in->attr('NAME', $this->Name.'_'.$col);
