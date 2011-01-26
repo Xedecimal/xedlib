@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/present/FormInput.php');
+require_once(dirname(__FILE__).'/../../classes/present/FormInput.php');
 
 /**
  * The generic file handler.

@@ -1,14 +1,15 @@
 <?php
 
-require_once(dirname(__FILE__).'/File.php');
-require_once(dirname(__FILE__).'/FileInfo.php');
+require_once(dirname(__FILE__).'/../../classes/File.php');
+require_once(dirname(__FILE__).'/../../classes/FileInfo.php');
+require_once(dirname(__FILE__).'/../../classes/HM.php');
+require_once(dirname(__FILE__).'/../../classes/Module.php');
+require_once(dirname(__FILE__).'/../../classes/Utility.php');
+require_once(dirname(__FILE__).'/../../classes/present/Form.php');
+require_once(dirname(__FILE__).'/../../classes/present/Template.php');
+
 require_once(dirname(__FILE__).'/FilterDefault.php');
 require_once(dirname(__FILE__).'/FilterGallery.php');
-require_once(dirname(__FILE__).'/HM.php');
-require_once(dirname(__FILE__).'/Module.php');
-require_once(dirname(__FILE__).'/Utility.php');
-require_once(dirname(__FILE__).'/present/Form.php');
-require_once(dirname(__FILE__).'/present/Template.php');
 
 /**
  * @package File Management
@@ -30,7 +31,7 @@ define('FM_ACTION_UPLOAD', 1);
 /**
  * Allows a user to administrate files from a web browser.
  */
-class FileManager
+class FileManager extends Module
 {
 	/**
 	 * Name of this file manager.
@@ -117,7 +118,7 @@ class FileManager
 		$this->Behavior = new FileManagerBehavior();
 		$this->View = new FileManagerView();
 
-		$this->Template = dirname(__FILE__).'/../temps/file.xml';
+		$this->Template = dirname(__FILE__).'/FileManager.xml';
 
 		if (!file_exists($root))
 			die("FileManager::FileManager(): Root ($root) directory does
