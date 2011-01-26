@@ -551,6 +551,12 @@ class FormInput
 		else if ($field->type == 'select') return $field->valu[$val]->text;
 		else Error("Unknown field type.");
 	}
+
+	/** Display Column Select Option Callback */
+	static function DisplayColumnSelectCallback($ds, $data, $col, $sqlcol)
+	{
+		return $ds->FieldInputs[$sqlcol]->atrs['VALUE'][$data[$col]]->text;
+	}
 }
 
 ?>
