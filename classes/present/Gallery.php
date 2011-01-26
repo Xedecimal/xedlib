@@ -1,10 +1,10 @@
 <?php
 
+require_once(dirname(__FILE__).'/../FilterGallery.php');
+
 /**
  * @package Gallery
  */
-
-require_once('a_file.php');
 
 define('CAPTION_NONE',  0);
 define('CAPTION_TITLE', 1);
