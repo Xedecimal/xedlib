@@ -252,8 +252,9 @@ EOF;
 			if ($this->Behavior->PageCount > 0)
 				$args['cp'] = floor(($view+1)/$this->Behavior->PageCount);
 
-			$t->Set('butForward', GetButton(HM::URL($me, $args).'#fullview', 'forward.png',
-				'Forward', 'class="png"'));
+			$url = HM::URL($me, $args);
+			$img = '<img src="images/forward.png" alt="Forward" /></a>';
+			$t->Set('butForward', "<a href=\"$url#fullview\">$img</a>");
 		}
 		else $t->Set('butForward', '');
 
