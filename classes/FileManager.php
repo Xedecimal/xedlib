@@ -806,7 +806,7 @@ EOF;
 		$t = new Template();
 		$t->Set($this->vars);
 
-		$t->ReWrite('form', array('Form', 'TagForm'));
+		#$t->ReWrite('form', array('Form', 'TagForm'));
 		$t->ReWrite('header', array(&$this, 'TagHeader'));
 		$t->ReWrite('path', array(&$this, 'TagPath'));
 		$t->ReWrite('download', array(&$this, 'TagDownload'));
