@@ -511,7 +511,7 @@ class EditorData
 
 		else if ($act == 'Update')
 		{
-			$ci = Server::GetVar($this->Name.'_ci');
+			$ci = Server::GetVar('ci');
 
 			if ($this->type == CONTROL_SIMPLE)
 			{
