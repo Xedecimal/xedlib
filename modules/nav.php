@@ -21,7 +21,13 @@ class ModNav extends Module
 			foreach ($link->children as $c)
 			{
 				$ret .= '<li>';
-				if (!empty($c->data)) $ret .= '<a href="'.$c->data.'">';
+				if (!empty($c->data))
+				{
+					if (is_array($c->data))
+						$atrs = HM::GetAttribs($c->data);
+					else $atrs = HM::GetAttribs(array('href' => $c->data));
+					$ret .= "<a$atrs>";
+				}
 				$ret .= $c->id;
 				if (!empty($c->data)) $ret .= '</a>';
 				$ret .= ModNav::GetLinks($c, $depth+1);
