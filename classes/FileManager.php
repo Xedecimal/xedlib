@@ -128,7 +128,7 @@ class FileManager
 		$this->cf = File::SecurePath(Server::GetState($this->Name.'_cf'));
 		if (!file_exists($this->Root.$this->cf))
 		{
-			Error('Directory does not exist:'.$this->cf);
+			Server::Error('Directory does not exist:'.$this->Root.$this->cf);
 			$this->cf = '';
 		}
 
