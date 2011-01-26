@@ -184,7 +184,8 @@ EOF;
 		global $me;
 		$this->f = new FilterGallery();
 
-		require_once('h_template.php');
+		require_once(dirname(__FILE__).'/../FileManager.php');
+		require_once(dirname(__FILE__).'/Template.php');
 
 		$path = Server::GetVar('galcf');
 		$fm = new FileManager('gallery', $this->root.$path, array('Gallery'), 'Gallery');
