@@ -154,7 +154,7 @@ class ModUser extends Module
 
 		# Nobody is logged in.
 
-		if (empty($_d['user.user']))
+		if (empty($_d['user.user']) && @$_d['user.login'])
 		{
 			$t = new Template();
 			$t->ReWrite('links', array(&$this, 'TagLinks'));
