@@ -561,13 +561,15 @@ class EditorData
 						if (!empty($value['tmp_name']))
 						{
 							$vp = new VarParser();
-							$files = glob($vp->ParseVars($in->attr('VALUE'), $update).".*");
-							foreach ($files as $file) unlink($file);
-							$ext = strrchr($value['name'], '.');
+							#$files = glob($vp->ParseVars($in->attr('VALUE'),
+							#	$update).".*");
+							#foreach ($files as $file) unlink($file);
 							$src = $value['tmp_name'];
-							$dst = $vp->ParseVars($in->attr('VALUE').$ext, $update);
+							$vars = $update;
+							$vars[$this->ds->id] = $ci;
+							$dst = $vp->ParseVars($in->attr('VALUE'), $vars);
 							move_uploaded_file($src, $dst);
-							$update[$col] = $ext;
+							unset($update[$col]);
 						}
 					}
 					else $update[$col] = $value;
