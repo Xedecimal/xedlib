@@ -3,7 +3,6 @@
 <script type="text/javascript">
 var fn_name = '{{fn_name}}';
 </script>
-test
 <script type="text/javascript" src="{{xl_abs}}/temps/file.js"></script>
 
 <header>
