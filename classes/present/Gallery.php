@@ -40,7 +40,7 @@ class Gallery
 	 * Constructor, sets default properties, behavior and display.
 	 * @param string $root Root location of images for this gallery.
 	 */
-	function Gallery($root)
+	function __construct($root)
 	{
 		$this->Behavior = new GalleryBehavior();
 		$this->Display = new GalleryDisplay();
