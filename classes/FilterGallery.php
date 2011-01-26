@@ -133,8 +133,8 @@ class FilterGallery extends FilterDefault
 		$new = array();
 		if (is_dir($fi->path))
 		{
-			$selImages[0] = new SelOption('No Change');
-			$selImages[1] = new SelOption('Remove');
+			$selImages[0] = new FormOption('No Change');
+			$selImages[1] = new FormOption('Remove');
 
 			if (!empty($fm->files['files']))
 			foreach ($fm->files['files'] as $fiImg)
