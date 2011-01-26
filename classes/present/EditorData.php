@@ -1312,9 +1312,13 @@ class EditorData
 		foreach ($forms as $frm)
 		{
 			$d['form_title'] = "{$frm->State} {$frm->Description}";
-			$d['form_content'] = $frm->Get('method="post" action="'.
-				$this->Behavior->Target.'"',
-				'class="form"');
+			$atrs['METHOD'] = 'post';
+			$atrs['ACTION'] = $this->Behavior->Target;
+			$atrs['CLASS'] = 'form';
+			foreach ($this->ds->FieldInputs as $fi)
+				if ($fi->atrs['TYPE'] == 'file')
+					$atrs['ENCTYPE'] = 'multipart/form-data';
+			$d['form_content'] = $frm->Get($atrs);
 			$out .= $vp->ParseVars($guts, $d);
 		}
 		return $out;
