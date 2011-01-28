@@ -13,18 +13,19 @@
 	<div class="div-mass-options"> <!-- Mass Options -->
 		<p>With selected files...</p>
 		<behavior type="AllowMove,AllowCopy,AllowLink">
-			<behavior type="AllowMove"><input type="submit" name="action"
-				value="Move To" /></behavior>
-			<behavior type="AllowCopy"><input type="submit" name="action"
-				value="Copy To" /></behavior>
-			<behavior type="AllowLink"><input type="submit" name="action"
-				value="Link In" /></behavior>
+			<behavior type="AllowMove"><input type="submit"
+				name="{{fn_name}}_action" value="Move To" /></behavior>
+			<behavior type="AllowCopy"><input type="submit"
+				name="{{fn_name}}_action" value="Copy To" /></behavior>
+			<behavior type="AllowLink"><input type="submit"
+				name="{{fn_name}}_action" value="Link In" /></behavior>
 			{{dirsel}}
 		</behavior>
-		<behavior type="AllowDelete"><input type="submit" name="action"
-			value="Delete" class="delete" /></behavior>
-		<behavior type="AllowDownloadZip"><input type="submit" name="action"
-			value="Download Selected" /></behavior>
+		<behavior type="AllowDelete"><input type="submit"
+			name="{{fn_name}}_action" value="Delete" class="delete"
+			/></behavior>
+		<behavior type="AllowDownloadZip"><input type="submit"
+			name="{{fn_name}}_action" value="Download Selected" /></behavior>
 	</div> <!-- .mass_options -->
 
 	<search> <!-- Search -->
