@@ -831,7 +831,10 @@ EOF;
 		$t->Set('fn_name', $this->Name);
 		$t->Set($this->View);
 
-		return $t->ParseFile($this->Template);
+		$ret['head'] = '<script type="text/javascript"
+				src="{{xl_abs}}/modules/FileManager/FileManager.js"></script>';
+		$ret['default'] = $t->ParseFile($this->Template);
+		return $ret;
 	}
 
 	/**
