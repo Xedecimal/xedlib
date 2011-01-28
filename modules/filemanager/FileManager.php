@@ -191,6 +191,9 @@ class FileManager extends Module
 				$tname = $_FILES['cu']['tmp_name'][$ix];
 				move_uploaded_file($tname, $this->Root.$this->cf.$name);
 
+				ob_start();
+				var_dump($_POST);
+				file_put_contents('debug.txt', ob_get_clean(), FILE_APPEND);
 				if (!preg_match('#^\.\[[0-9]+\]_.*#', $name))
 				{
 					$filter->Upload($name, $fi);
@@ -204,7 +207,7 @@ class FileManager extends Module
 		{
 			if (!$this->Behavior->AllowEdit) return;
 			$info = new FileInfo($this->Root.$this->cf, $this->filters);
-			$newinfo = GetPost('info');
+			$newinfo = Server::GetVar('info');
 			$f = FileInfo::GetFilter($info, $this->Root, $this->filters);
 			$f->Updated($this, $info, $newinfo);
 			$this->Behavior->Update($newinfo);
@@ -273,7 +276,7 @@ class FileManager extends Module
 				if (!$break)
 				{
 					$f->Delete($fi, $this->Behavior->Recycle);
-					$types = GetVar($this->Name.'_type');
+					$types = Server::GetVar($this->Name.'_type');
 					$this->files = $this->GetDirectory();
 					$ix = 0;
 				}
@@ -282,7 +285,7 @@ class FileManager extends Module
 		else if ($act == 'Create')
 		{
 			if (!$this->Behavior->AllowCreateDir) return;
-			$p = $this->Root.$this->cf.GetVar($this->Name.'_cname');
+			$p = $this->Root.$this->cf.Server::GetVar($this->Name.'_cname');
 			mkdir($p);
 			chmod($p, 0755);
 			FilterDefault::UpdateMTime($p);
@@ -293,9 +296,9 @@ class FileManager extends Module
 		else if ($act == 'swap')
 		{
 			$this->files = $this->GetDirectory();
-			$index = GetVar('index');
-			$types = GetVar('type');
-			$cd = GetVar('cd');
+			$index = Server::GetVar('index');
+			$types = Server::GetVar('type');
+			$cd = Server::GetVar('cd');
 
 			$dpos = $cd == 'up' ? $index-1 : $index+1;
 
@@ -314,8 +317,8 @@ class FileManager extends Module
 		}
 		else if ($act == 'Move To')
 		{
-			$sels = GetVar($this->Name.'_sels');
-			$ct = GetVar($this->Name.'_ct');
+			$sels = Server::GetVar($this->Name.'_sels');
+			$ct = Server::GetVar($this->Name.'_ct');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -330,8 +333,8 @@ class FileManager extends Module
 		}
 		else if ($act == 'Copy To')
 		{
-			$sels = GetVar($this->Name.'_sels');
-			$ct = GetVar($this->Name.'_ct');
+			$sels = Server::GetVar($this->Name.'_sels');
+			$ct = Server::GetVar($this->Name.'_ct');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -399,22 +402,23 @@ class FileManager extends Module
 	static function GetIcon($f)
 	{
 		$icons = array(
-			'folder' => Module::P('images/icons/folder.png'),
-			'png' => Module::P('images/icons/image.png'),
-			'jpg' => Module::P('images/icons/image.png'),
-			'jpeg' => Module::P('images/icons/image.png'),
-			'gif' => Module::P('images/icons/image.png'),
-			'pdf' => Module::P('images/icons/acrobat.png'),
-			'sql' => Module::P('images/icons/db.png'),
-			'xls' => Module::P('images/icons/excel.png'),
-			'doc' => Module::P('images/icons/word.png'),
-			'docx' => Module::P('images/icons/word.png')
+			'folder' => Module::P('filemanager/icons/folder.png'),
+			'png' => Module::P('filemanager/icons/image.png'),
+			'jpg' => Module::P('filemanager/icons/image.png'),
+			'jpeg' => Module::P('filemanager/icons/image.png'),
+			'gif' => Module::P('filemanager/icons/image.png'),
+			'pdf' => Module::P('filemanager/icons/acrobat.png'),
+			'sql' => Module::P('filemanager/icons/db.png'),
+			'xls' => Module::P('filemanager/icons/excel.png'),
+			'doc' => Module::P('filemanager/icons/word.png'),
+			'docx' => Module::P('filemanager/icons/word.png')
 		);
 		if (!empty($f->vars['icon']))
 			return $f->vars['icon'];
 		else if (isset($icons[$f->type]))
-			return $icons[$f->type];
+			$ret = $icons[$f->type];
 		else return null;
+		return '<img src="'.$ret.'" alt="icon" />';
 	}
 
 	function TagPart($t, $guts, $attribs)
@@ -581,10 +585,13 @@ class FileManager extends Module
 		$ret = '';
 		$ix = 0;
 
+		$fi = new FileInfo($this->Root.$this->cf);
+		$filter = FileInfo::GetFilter($fi, $this->Root, $this->filters);
+
 		if (!empty($this->files['files']))
 		foreach ($this->files['files'] as $f)
 		{
-			FileInfo::GetFilter($f, $this->Root, $this->filters, $f->dir);
+			$filter->GetInfo($f);
 			if (!$f->show) continue;
 
 			$this->curfile = $f;
@@ -763,7 +770,7 @@ class FileManager extends Module
 	* Return the display.
 	*
 	* @param string $target Target script.
-	* @param string $action Current action, usually stored in GetVar('ca').
+	* @param string $action Current action, usually stored in Server::GetVar('ca').
 	* @return string Output.
 	*/
 	function Get()

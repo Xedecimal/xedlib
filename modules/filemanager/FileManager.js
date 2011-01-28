@@ -26,7 +26,7 @@ $(function () {
 function checkChanged()
 {
 	if ($('.check_folder:checked,.check_file:checked').length > 0)
-		$('#'+fn_name+'_mass_options').show(500);
+		$('.div-mass-options').show(500);
 	else
-		$('#'+fn_name+'_mass_options').hide(500);
+		$('.div-mass-options').hide(500);
 }
