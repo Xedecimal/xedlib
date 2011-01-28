@@ -216,6 +216,9 @@ class ModUser extends Module
 
 		# Check existing data sources
 
+		$u = null;
+
+		if (!empty($_d['user.datasets']))
 		foreach ($_d['user.datasets'] as $ds)
 		{
 			if (!isset($ds[0]))
