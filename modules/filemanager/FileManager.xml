@@ -1,10 +1,4 @@
 <null>
-
-<script type="text/javascript">
-var fn_name = '{{fn_name}}';
-</script>
-<script type="text/javascript" src="{{xl_abs}}/temps/file.js"></script>
-
 <header>
 <box title="Current Path Location" id="{{fn_name}}_path">
 <path root="Home" sep="&raquo;"> <a href="{{uri}}">{{name}}</a></path>
@@ -15,25 +9,27 @@ var fn_name = '{{fn_name}}';
 <form action="{{target}}" method="post" enctype="multipart/form-data">
 
 <options>
-	<!-- <td valign="top"> -->
-		<box title="File and Folder Tasks" id="{{fn_name}}_tasks">
-			<!-- Mass Options -->
-			<div id="{{fn_name}}_mass_options">
-				<p>With selected files...</p>
-				<behavior type="AllowMove,AllowCopy,AllowLink">
-					<behavior type="AllowMove"><input type="submit" name="{{fn_name}}_action" value="Move To" /></behavior>
-					<behavior type="AllowCopy"><input type="submit" name="{{fn_name}}_action" value="Copy To" /></behavior>
-					<behavior type="AllowLink"><input type="submit" name="{{fn_name}}_action" value="Link In" /></behavior>
-					{{dirsel}}
-				</behavior>
-				<behavior type="AllowDelete"><input type="submit" name="{{fn_name}}_action" value="Delete" onclick="return confirm('Are you sure you wish to delete these files?')" /></behavior>
-				<behavior type="AllowDownloadZip"><input type="submit" name="{{fn_name}}_action" value="Download Selected" /></behavior>
-			</div>
+	<box title="File and Folder Tasks" id="{{fn_name}}_tasks">
+	<div class="div-mass-options"> <!-- Mass Options -->
+		<p>With selected files...</p>
+		<behavior type="AllowMove,AllowCopy,AllowLink">
+			<behavior type="AllowMove"><input type="submit" name="action"
+				value="Move To" /></behavior>
+			<behavior type="AllowCopy"><input type="submit" name="action"
+				value="Copy To" /></behavior>
+			<behavior type="AllowLink"><input type="submit" name="action"
+				value="Link In" /></behavior>
+			{{dirsel}}
+		</behavior>
+		<behavior type="AllowDelete"><input type="submit" name="action"
+			value="Delete" class="delete" /></behavior>
+		<behavior type="AllowDownloadZip"><input type="submit" name="action"
+			value="Download Selected" /></behavior>
+	</div> <!-- .mass_options -->
 
-			<search>
-			<!-- Search -->
-			<tr><td class="opt_title">
-				<a href="#" onclick="$('#{{fn_name}}_search').toggle('slow'); return false;">Search</a>
+	<search> <!-- Search -->
+	<tr><td class="opt_title">
+	<a href="#" onclick="$('#{{fn_name}}_search').toggle('slow'); return false;">Search</a>
 			</td><td>
 				<img id="img{{fn_name}}_search"
 					src="{{xl_abs}}/images/down.png" alt="Visibility" />
@@ -49,9 +45,9 @@ var fn_name = '{{fn_name}}';
 
 			<!-- Upload File -->
 			<behavior type="AllowUpload">
-			<a href="#" id="a_toggle_upload">Send Files</a>
+				<a href="{{fn_name}}_upload" class="a-toggle">Send Files</a>
 				<img id="img{{fn_name}}_upload" src="{{xl_abs}}/images/down.png" alt="Visibility" />
-				<div id="{{fn_name}}_upload">
+				<div id="{{fn_name}}_upload" style="display: none">
 					<applet codebase="{{xl_abs}}/java/" code="uploadApplet.class"
 						archive="UploadApplet.jar,commons-codec-1.3.jar,commons-httpclient-3.0.1.jar,commons-logging-1.0.4.jar"
 						width="525" height="100">
@@ -65,7 +61,7 @@ var fn_name = '{{fn_name}}';
 
 			<!-- Create Folder -->
 			<behavior type="AllowCreateDir">
-				<a href="#" id="a_toggle_create">{{TextCreateFolder}}</a>
+				<a href="{{fn_name}}_create" class="a-toggle">{{TextCreateFolder}}</a>
 				<img id="img{{fn_name}}_create" src="{{xl_abs}}/images/down.png" alt="Visibility" />
 				<div id="{{fn_name}}_create" style="display: none">
 					<input type="text" name="{{fn_name}}_cname" />
@@ -75,7 +71,7 @@ var fn_name = '{{fn_name}}';
 
 			<!-- Rename File / Folder -->
 			<behavior type="AllowRename">
-				<a href="#" id="a_toggle_rename">Rename this file or folder</a>
+				<a href="{{fn_name}}_rename" class="a-toggle">Rename this file or folder</a>
 				<img id="img{{fn_name}}_rename" src="{{xl_abs}}/images/down.png" alt="Visibility" />
 				<div id="{{fn_name}}_rename" style="display: none">
 				<input type="text" name="{{fn_name}}_rname" value="{{filename}}" />
@@ -85,7 +81,7 @@ var fn_name = '{{fn_name}}';
 
 			<!-- Additional Settings -->
 			<behavior type="AllowEdit">
-				<a href="#" id="a_toggle_edit">Additional Settings</a>
+				<a href="{{fn_name}}_edit" class="a-toggle">Additional Settings</a>
 				<img id="img{{fn_name}}_edit" src="{{xl_abs}}/images/down.png" alt="Visibility" />
 				<div id="{{fn_name}}_edit" style="display: none">
 				<addopts>
