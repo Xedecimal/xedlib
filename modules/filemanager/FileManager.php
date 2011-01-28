@@ -711,8 +711,7 @@ class FileManager extends Module
 		if ($this->Behavior->AllowSetType && count($this->filters) > 1 && is_dir($fi->path))
 		{
 			$in = new FormInput('Change Type', 'select',
-				'info[type]',
-				ArrayToSelOptions($this->filters, $f->Name,
+				'info[type]', FormOption::FromArray($this->filters, $f->Name,
 				false));
 			$this->vars['text'] = $in->text;
 			$this->vars['field'] = $in->Get($this->Name);
