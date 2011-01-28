@@ -2,6 +2,9 @@
 
 require_once(dirname(__FILE__).'/../../classes/Str.php');
 
+$_d['user.session.user'] = 'sess_user';
+$_d['user.session.pass'] = 'sess_pass';
+
 class ModUser extends Module
 {
 	/**
