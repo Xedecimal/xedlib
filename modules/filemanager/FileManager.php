@@ -156,7 +156,7 @@ class FileManager extends Module
 
 		//Actions
 
-		if ($act == 'upload' && $this->Behavior->AllowUpload)
+		if ($act == 'Upload' && $this->Behavior->AllowUpload)
 		{
 			$fi = new FileInfo($this->Root.$this->cf);
 			$filter = FileInfo::GetFilter($fi, $this->Root, $this->filters);
@@ -1349,6 +1349,9 @@ class FileManagerBehavior
 	public $UpdateButton = true;
 
 	public $HideOptions = true;
+
+	public $UploadJava = false;
+	public $UploadNormal = true;
 
 	/**
 	 * Return true if options are available.

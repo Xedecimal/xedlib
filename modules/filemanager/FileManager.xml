@@ -49,14 +49,20 @@
 				<a href="{{fn_name}}_upload" class="a-toggle">Send Files</a>
 				<img id="img{{fn_name}}_upload" src="{{xl_abs}}/images/down.png" alt="Visibility" />
 				<div id="{{fn_name}}_upload" style="display: none">
+					<behavior type="UploadJava">
 					<applet codebase="{{xl_abs}}/java/" code="uploadApplet.class"
 						archive="UploadApplet.jar,commons-codec-1.3.jar,commons-httpclient-3.0.1.jar,commons-logging-1.0.4.jar"
 						width="525" height="100">
 						<param name="host" value="http://{{host}}" />
-						<param name="pathToScript" value="{{target}}?{{fn_name}}_action=upload&amp;PHPSESSID={{sid}}" />
+						<param name="pathToScript" value="{{target}}?{{fn_name}}_action=Upload&amp;PHPSESSID={{sid}}" />
 						<param name="path" value="{{cf}}" />
 						<param name="uploadMax" value="500000" />
 					</applet>
+					</behavior>
+					<behavior type="UploadNormal">
+						<input type="file" name="cu[]" />
+						<input type="submit" name="{{fn_name}}_action" value="Upload" />
+					</behavior>
 				</div>
 			</behavior>
 
