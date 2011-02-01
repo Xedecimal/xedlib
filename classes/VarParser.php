@@ -80,7 +80,7 @@ class VarParser
 	{
 		$vp = new VarParser();
 		$ret = '';
-		foreach ($items as $i) $ret .= $vp->ParseVars($t, $i);
+		foreach ($items as $i['id'] => $i) $ret .= $vp->ParseVars($t, $i);
 		return $ret;
 	}
 }
