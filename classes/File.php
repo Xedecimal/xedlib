@@ -224,6 +224,13 @@ class File
 		}
 		return @mkdir($path, $mode);
 	}
+
+	static function SafeDelete($path)
+	{
+		$files = glob(escapeshellcmd($path));
+		if (count($files) > 1) die('Tried to delete too many files.');
+		if (!empty($files)) return unlink($files[0]);
+	}
 }
 
 ?>
