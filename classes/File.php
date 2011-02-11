@@ -227,9 +227,14 @@ class File
 
 	static function SafeDelete($path)
 	{
-		$files = glob(escapeshellcmd($path));
+		$files = glob($path);
 		if (count($files) > 1) die('Tried to delete too many files.');
 		if (!empty($files)) return unlink($files[0]);
+	}
+
+	static function QuoteGlob($str)
+	{
+		return preg_replace('/(\*|\?|\[)/', '[$1]', $str);
 	}
 }
 
