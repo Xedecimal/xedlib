@@ -1,14 +1,15 @@
 <?php
 
-require_once(dirname(__FILE__).'/File.php');
-require_once(dirname(__FILE__).'/FileInfo.php');
+require_once(dirname(__FILE__).'/../../classes/File.php');
+require_once(dirname(__FILE__).'/../../classes/FileInfo.php');
+require_once(dirname(__FILE__).'/../../classes/HM.php');
+require_once(dirname(__FILE__).'/../../classes/Module.php');
+require_once(dirname(__FILE__).'/../../classes/Utility.php');
+require_once(dirname(__FILE__).'/../../classes/present/Form.php');
+require_once(dirname(__FILE__).'/../../classes/present/Template.php');
+
 require_once(dirname(__FILE__).'/FilterDefault.php');
 require_once(dirname(__FILE__).'/FilterGallery.php');
-require_once(dirname(__FILE__).'/HM.php');
-require_once(dirname(__FILE__).'/Module.php');
-require_once(dirname(__FILE__).'/Utility.php');
-require_once(dirname(__FILE__).'/present/Form.php');
-require_once(dirname(__FILE__).'/present/Template.php');
 
 /**
  * @package File Management
@@ -30,7 +31,7 @@ define('FM_ACTION_UPLOAD', 1);
 /**
  * Allows a user to administrate files from a web browser.
  */
-class FileManager
+class FileManager extends Module
 {
 	/**
 	 * Name of this file manager.
@@ -117,7 +118,7 @@ class FileManager
 		$this->Behavior = new FileManagerBehavior();
 		$this->View = new FileManagerView();
 
-		$this->Template = dirname(__FILE__).'/../temps/file.xml';
+		$this->Template = dirname(__FILE__).'/FileManager.xml';
 
 		if (!file_exists($root))
 			die("FileManager::FileManager(): Root ($root) directory does
@@ -128,7 +129,7 @@ class FileManager
 		$this->cf = File::SecurePath(Server::GetState($this->Name.'_cf'));
 		if (!file_exists($this->Root.$this->cf))
 		{
-			Error('Directory does not exist:'.$this->cf);
+			Server::Error('Directory does not exist:'.$this->Root.$this->cf);
 			$this->cf = '';
 		}
 
@@ -155,7 +156,7 @@ class FileManager
 
 		//Actions
 
-		if ($act == 'upload' && $this->Behavior->AllowUpload)
+		if ($act == 'Upload' && $this->Behavior->AllowUpload)
 		{
 			$fi = new FileInfo($this->Root.$this->cf);
 			$filter = FileInfo::GetFilter($fi, $this->Root, $this->filters);
@@ -190,6 +191,9 @@ class FileManager
 				$tname = $_FILES['cu']['tmp_name'][$ix];
 				move_uploaded_file($tname, $this->Root.$this->cf.$name);
 
+				ob_start();
+				var_dump($_POST);
+				file_put_contents('debug.txt', ob_get_clean(), FILE_APPEND);
 				if (!preg_match('#^\.\[[0-9]+\]_.*#', $name))
 				{
 					$filter->Upload($name, $fi);
@@ -203,7 +207,7 @@ class FileManager
 		{
 			if (!$this->Behavior->AllowEdit) return;
 			$info = new FileInfo($this->Root.$this->cf, $this->filters);
-			$newinfo = GetPost('info');
+			$newinfo = Server::GetVar('info');
 			$f = FileInfo::GetFilter($info, $this->Root, $this->filters);
 			$f->Updated($this, $info, $newinfo);
 			$this->Behavior->Update($newinfo);
@@ -272,7 +276,7 @@ class FileManager
 				if (!$break)
 				{
 					$f->Delete($fi, $this->Behavior->Recycle);
-					$types = GetVar($this->Name.'_type');
+					$types = Server::GetVar($this->Name.'_type');
 					$this->files = $this->GetDirectory();
 					$ix = 0;
 				}
@@ -281,7 +285,7 @@ class FileManager
 		else if ($act == 'Create')
 		{
 			if (!$this->Behavior->AllowCreateDir) return;
-			$p = $this->Root.$this->cf.GetVar($this->Name.'_cname');
+			$p = $this->Root.$this->cf.Server::GetVar($this->Name.'_cname');
 			mkdir($p);
 			chmod($p, 0755);
 			FilterDefault::UpdateMTime($p);
@@ -292,9 +296,9 @@ class FileManager
 		else if ($act == 'swap')
 		{
 			$this->files = $this->GetDirectory();
-			$index = GetVar('index');
-			$types = GetVar('type');
-			$cd = GetVar('cd');
+			$index = Server::GetVar('index');
+			$types = Server::GetVar('type');
+			$cd = Server::GetVar('cd');
 
 			$dpos = $cd == 'up' ? $index-1 : $index+1;
 
@@ -313,8 +317,8 @@ class FileManager
 		}
 		else if ($act == 'Move To')
 		{
-			$sels = GetVar($this->Name.'_sels');
-			$ct = GetVar($this->Name.'_ct');
+			$sels = Server::GetVar($this->Name.'_sels');
+			$ct = Server::GetVar($this->Name.'_ct');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -329,8 +333,8 @@ class FileManager
 		}
 		else if ($act == 'Copy To')
 		{
-			$sels = GetVar($this->Name.'_sels');
-			$ct = GetVar($this->Name.'_ct');
+			$sels = Server::GetVar($this->Name.'_sels');
+			$ct = Server::GetVar($this->Name.'_ct');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -398,22 +402,23 @@ class FileManager
 	static function GetIcon($f)
 	{
 		$icons = array(
-			'folder' => Module::P('images/icons/folder.png'),
-			'png' => Module::P('images/icons/image.png'),
-			'jpg' => Module::P('images/icons/image.png'),
-			'jpeg' => Module::P('images/icons/image.png'),
-			'gif' => Module::P('images/icons/image.png'),
-			'pdf' => Module::P('images/icons/acrobat.png'),
-			'sql' => Module::P('images/icons/db.png'),
-			'xls' => Module::P('images/icons/excel.png'),
-			'doc' => Module::P('images/icons/word.png'),
-			'docx' => Module::P('images/icons/word.png')
+			'folder' => Module::P('filemanager/icons/folder.png'),
+			'png' => Module::P('filemanager/icons/image.png'),
+			'jpg' => Module::P('filemanager/icons/image.png'),
+			'jpeg' => Module::P('filemanager/icons/image.png'),
+			'gif' => Module::P('filemanager/icons/image.png'),
+			'pdf' => Module::P('filemanager/icons/acrobat.png'),
+			'sql' => Module::P('filemanager/icons/db.png'),
+			'xls' => Module::P('filemanager/icons/excel.png'),
+			'doc' => Module::P('filemanager/icons/word.png'),
+			'docx' => Module::P('filemanager/icons/word.png')
 		);
 		if (!empty($f->vars['icon']))
 			return $f->vars['icon'];
 		else if (isset($icons[$f->type]))
-			return $icons[$f->type];
+			$ret = $icons[$f->type];
 		else return null;
+		return '<img src="'.$ret.'" alt="icon" />';
 	}
 
 	function TagPart($t, $guts, $attribs)
@@ -541,7 +546,7 @@ class FileManager
 			if ($this->Behavior->AllowSort && $this->Behavior->Sort == FM_SORT_MANUAL && $ix > 0)
 			{
 				$uriUp = $common."&amp;{$this->Name}_action=swap&amp;cd=up&amp;index={$ix}";
-				$img = GetRelativePath(dirname(__FILE__)).'/images/up.png';
+				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/up.png';
 				$this->vars['butup'] = "<a href=\"$uriUp\"><img src=\"{$img}\" ".
 				"alt=\"Move Up\" title=\"Move Up\" /></a>";
 			}
@@ -553,7 +558,7 @@ class FileManager
 				&& $ix < count($this->files['folders'])-1)
 			{
 				$uriDown = $common."&amp;{$this->Name}_action=swap&amp;cd=down&amp;index={$ix}";
-				$img = GetRelativePath(dirname(__FILE__)).'/images/down.png';
+				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/down.png';
 				$this->vars['butdown'] = "<a href=\"$uriDown\"><img src=\"{$img}\" ".
 				"alt=\"Move Down\" title=\"Move Down\" /></a>";
 			}
@@ -580,10 +585,13 @@ class FileManager
 		$ret = '';
 		$ix = 0;
 
+		$fi = new FileInfo($this->Root.$this->cf);
+		$filter = FileInfo::GetFilter($fi, $this->Root, $this->filters);
+
 		if (!empty($this->files['files']))
 		foreach ($this->files['files'] as $f)
 		{
-			FileInfo::GetFilter($f, $this->Root, $this->filters, $f->dir);
+			$filter->GetInfo($f);
 			if (!$f->show) continue;
 
 			$this->curfile = $f;
@@ -622,7 +630,7 @@ class FileManager
 			if ($this->Behavior->AllowSort && $this->Behavior->Sort == FM_SORT_MANUAL && $ix > 0)
 			{
 				$uriUp = $common."&amp;{$this->Name}_action=swap&amp;cd=up&amp;index={$ix}";
-				$img = GetRelativePath(dirname(__FILE__)).'/images/up.png';
+				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/up.png';
 				$this->vars['butup'] = "<a href=\"$uriUp\"><img src=\"{$img}\" ".
 				"alt=\"Move Up\" title=\"Move Up\" /></a>";
 			}
@@ -634,7 +642,7 @@ class FileManager
 				&& $ix < count($this->files['files'])-1)
 			{
 				$uriDown = $common."&amp;{$this->Name}_action=swap&amp;cd=down&amp;index={$ix}";
-				$img = GetRelativePath(dirname(__FILE__)).'/images/down.png';
+				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/down.png';
 				$this->vars['butdown'] = "<a href=\"$uriDown\"><img src=\"{$img}\" ".
 				"alt=\"Move Down\" title=\"Move Down\" /></a>";
 			}
@@ -710,8 +718,7 @@ class FileManager
 		if ($this->Behavior->AllowSetType && count($this->filters) > 1 && is_dir($fi->path))
 		{
 			$in = new FormInput('Change Type', 'select',
-				'info[type]',
-				ArrayToSelOptions($this->filters, $f->Name,
+				'info[type]', FormOption::FromArray($this->filters, $f->Name,
 				false));
 			$this->vars['text'] = $in->text;
 			$this->vars['field'] = $in->Get($this->Name);
@@ -763,7 +770,7 @@ class FileManager
 	* Return the display.
 	*
 	* @param string $target Target script.
-	* @param string $action Current action, usually stored in GetVar('ca').
+	* @param string $action Current action, usually stored in Server::GetVar('ca').
 	* @return string Output.
 	*/
 	function Get()
@@ -806,7 +813,7 @@ EOF;
 		$t = new Template();
 		$t->Set($this->vars);
 
-		$t->ReWrite('form', array('Form', 'TagForm'));
+		#$t->ReWrite('form', array('Form', 'TagForm'));
 		$t->ReWrite('header', array(&$this, 'TagHeader'));
 		$t->ReWrite('path', array(&$this, 'TagPath'));
 		$t->ReWrite('download', array(&$this, 'TagDownload'));
@@ -831,7 +838,10 @@ EOF;
 		$t->Set('fn_name', $this->Name);
 		$t->Set($this->View);
 
-		return $t->ParseFile($this->Template);
+		$ret['head'] = '<script type="text/javascript"
+				src="{{xl_abs}}/modules/FileManager/FileManager.js"></script>';
+		$ret['default'] = $t->ParseFile($this->Template);
+		return $ret;
 	}
 
 	/**
@@ -968,7 +978,7 @@ EOF;
 			&& $this->View->Sort == FM_SORT_MANUAL
 			&& $index > 0)
 		{
-			$img = GetRelativePath(dirname(__FILE__)).'/images/up.png';
+			$img = Server::GetRelativePath(dirname(__FILE__)).'/images/up.png';
 			$d['butup'] = "<a href=\"$uriUp\"><img src=\"{$img}\" ".
 			"alt=\"Move Up\" title=\"Move Up\" /></a>";
 		}
@@ -980,7 +990,7 @@ EOF;
 			&& $this->View->Sort == FM_SORT_MANUAL
 			&& $index < count($this->files[$type])-1)
 		{
-			$img = GetRelativePath(dirname(__FILE__)).'/images/down.png';
+			$img = Server::GetRelativePath(dirname(__FILE__)).'/images/down.png';
 			$d['butdown'] = "<a href=\"$uriDown\"><img src=\"{$img}\" ".
 			"alt=\"Move Down\" title=\"Move Down\" /></a>";
 		}
@@ -1339,6 +1349,9 @@ class FileManagerBehavior
 	public $UpdateButton = true;
 
 	public $HideOptions = true;
+
+	public $UploadJava = false;
+	public $UploadNormal = true;
 
 	/**
 	 * Return true if options are available.

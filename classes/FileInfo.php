@@ -116,10 +116,9 @@ class FileInfo
 	 */
 	static function GetFilter(&$fi, $root, $defaults)
 	{
-		# Either file or no filter here.
-
 		$ft = $fi;
 
+		# Either file or no filter here.
 		while (is_file($fi->path) || empty($fi->info['type']))
 		{
 			# TODO: Infinite loop here.

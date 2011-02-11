@@ -1,6 +1,6 @@
 <?php
 
-require_once('a_editor.php');
+require_once(dirname(__FILE__).'/present/EditorData.php');
 
 /**
  * @package Logging

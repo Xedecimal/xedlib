@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../HTML.php');
+require_once(dirname(__FILE__).'/../HM.php');
 
 /**
  * A generic table class to manage a top level table, with children rows and cells.
@@ -76,7 +76,7 @@ class Table
 	{
 		$ret = "<!-- Start Table: {$this->name} -->\n";
 		$ret .= '<table';
-		$ret .= HTML::GetAttribs($attributes);
+		$ret .= HM::GetAttribs($attributes);
 		$ret .= ">\n";
 
 		$atrs = null;
@@ -108,7 +108,7 @@ class Table
 			{
 				$ret .= '<tr';
 				if (!empty($this->rowattribs))
-					$ret .= HTTP::GetAttribs($this->rowattribs[$ix]);
+					$ret .= HM::GetAttribs($this->rowattribs[$ix]);
 				$ret .= ">\n";
 				if (count($row) < count($this->cols))
 					$span = " colspan=\"".
@@ -124,7 +124,7 @@ class Table
 					{
 						if (is_array($val))
 						{
-							$atrs = GetAttribs($val[1]);
+							$atrs = HM::GetAttribs($val[1]);
 							$val = $val[0];
 						}
 						else if (isset($this->atrs))

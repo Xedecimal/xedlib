@@ -29,8 +29,8 @@ class FilterGallery extends FilterDefault
 
 		$dir = $fi->dir;
 		$abs = "{$dir}/t_{$fi->filename}";
-		$rel = "{$fi->dir}/t_{$fi->filename}";
-		if (file_exists($rel)) $fi->icon = htmlspecialchars($abs);
+		$rel = dirname($fi->path).'/t_'.$fi->filename;
+		if (file_exists($rel)) $fi->icon = '<img src="'.htmlspecialchars($rel).'" />';
 
 		if (is_dir($fi->path))
 		{
@@ -133,14 +133,14 @@ class FilterGallery extends FilterDefault
 		$new = array();
 		if (is_dir($fi->path))
 		{
-			$selImages[0] = new SelOption('No Change');
-			$selImages[1] = new SelOption('Remove');
+			$selImages[0] = new FormOption('No Change');
+			$selImages[1] = new FormOption('Remove');
 
 			if (!empty($fm->files['files']))
 			foreach ($fm->files['files'] as $fiImg)
 			{
 				if (substr($fiImg->filename, 0, 2) == 't_') continue;
-				$selImages[htmlspecialchars($fiImg->filename)] = new SelOption($fiImg->filename);
+				$selImages[htmlspecialchars($fiImg->filename)] = new FormOption($fiImg->filename);
 			}
 
 			$new[] = new FormInput('Thumbnail Width', 'text',

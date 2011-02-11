@@ -1,8 +1,9 @@
 <?php
 
-require_once(dirname(__FILE__).'/Template.php');
 require_once(dirname(__FILE__).'/../Str.php');
+require_once(dirname(__FILE__).'/Template.php');
 require_once(dirname(__FILE__).'/Form.php');
+require_once(dirname(__FILE__).'/Table.php');
 
 /**
  * @package Editor
@@ -48,7 +49,7 @@ class DisplayColumn
 	 * @param mixed $callback
 	 * @param string $attribs
 	 */
-	function DisplayColumn($text, $callback = null, $attribs = null)
+	function __construct($text, $callback = null, $attribs = null)
 	{
 		$this->text = $text;
 		$this->callback = $callback;
@@ -374,7 +375,7 @@ class EditorData
 	 * @param array $filter Array to constrain editing to a given expression.
 	 * @param array $sort Array of 'column' => 'desc/asc'.
 	 */
-	function EditorData($name, &$ds, $filter = null, $sort = null)
+	function __construct($name, &$ds, $filter = null, $sort = null)
 	{
 		$this->Name = $name;
 		$this->filter = $filter;
@@ -509,7 +510,7 @@ class EditorData
 
 		else if ($act == 'Update')
 		{
-			$ci = Server::GetVar($this->Name.'_ci');
+			$ci = Server::GetVar('ci');
 
 			if ($this->type == CONTROL_SIMPLE)
 			{
@@ -532,12 +533,9 @@ class EditorData
 
 					$value = Server::GetVar($this->Name.'_'.$col);
 
-					//TODO: Support editing custom fields.
-					#if ($in->type == 'custom')
-					#	unset($update[$col]);
 					if ($in->attr('TYPE') == 'date')
 						$update[$col] = $value[2].'-'.$value[0].'-'.$value[1];
-					else if($in->attr('TYPE') == 'datetime')
+					else if ($in->attr('TYPE') == 'datetime')
 					{
 						if ($value[5][0] == 1)
 						{
@@ -551,26 +549,26 @@ class EditorData
 						unset($update[$col]);
 					else if ($in->attr('TYPE') == 'password')
 					{
-						if (strlen($value) > 0) $update[$col] = md5($value);
+						if (!empty($value)) $update[$col] = md5($value);
 					}
 					else if ($in->attr('TYPE') == 'checkbox')
 						$update[$col] = ($value == 1) ? 1 : 0;
 					else if ($in->attr('TYPE') == 'selects')
-					{
 						$update[$col] = $value;
-					}
 					else if ($in->attr('TYPE') == 'file')
 					{
-						if (strlen($value['tmp_name']) > 0)
+						if (!empty($value['tmp_name']))
 						{
 							$vp = new VarParser();
-							$files = glob($vp->ParseVars($in->attr('VALUE'), $update).".*");
-							foreach ($files as $file) unlink($file);
-							$ext = strrchr($value['name'], '.');
+							#$files = glob($vp->ParseVars($in->attr('VALUE'),
+							#	$update).".*");
+							#foreach ($files as $file) unlink($file);
 							$src = $value['tmp_name'];
-							$dst = $vp->ParseVars($in->attr('VALUE').$ext, $update);
+							$vars = $update;
+							$vars[$this->ds->id] = $ci;
+							$dst = $vp->ParseVars($in->attr('VALUE'), $vars);
 							move_uploaded_file($src, $dst);
-							$update[$col] = $ext;
+							unset($update[$col]);
 						}
 					}
 					else $update[$col] = $value;
@@ -1057,13 +1055,14 @@ class EditorData
 				}
 			}
 
-			$url_defaults = array($this->assoc => $this->Name);
+			#$url_defaults = array($this->assoc => $this->Name);
+			$url_defaults = array();
 			if (isset($child_id)) $url_defaults['child'] = $child_id;
 
 			if (!empty($PERSISTS)) $url_defaults = array_merge($url_defaults,
 				$PERSISTS);
 
-			$p = GetRelativePath(dirname(__FILE__));
+			$p = Server::GetRelativePath(dirname(__FILE__));
 
 			if ($this->Behavior->AllowEdit)
 			{
@@ -1231,9 +1230,6 @@ class EditorData
 								$in->attr('VALUE', Database::MyDateTimestamp($sel[0][$col], true));
 							else $in->attr('VALUE', $sel[0][$col]);
 						}
-						//If we bring this back, make sure setting explicit
-						//values in DataSet::FormInputs still works.
-						//else { $in->valu = null; }
 					}
 
 					$in->attr('NAME', $this->Name.'_'.$col);
@@ -1315,9 +1311,13 @@ class EditorData
 		foreach ($forms as $frm)
 		{
 			$d['form_title'] = "{$frm->State} {$frm->Description}";
-			$d['form_content'] = $frm->Get('method="post" action="'.
-				$this->Behavior->Target.'"',
-				'class="form"');
+			$atrs['METHOD'] = 'post';
+			$atrs['ACTION'] = $this->Behavior->Target;
+			$atrs['CLASS'] = 'form';
+			foreach ($this->ds->FieldInputs as $fi)
+				if ($fi->atrs['TYPE'] == 'file')
+					$atrs['ENCTYPE'] = 'multipart/form-data';
+			$d['form_content'] = $frm->Get($atrs);
 			$out .= $vp->ParseVars($guts, $d);
 		}
 		return $out;
@@ -1334,9 +1334,9 @@ class EditorData
 	 * @param string Name of state variable to pass around via GPC.
 	 * @return string Rendered html of associated objects.
 	 */
-	function GetUI($assoc = 'editor')
+	function GetUI($target = 'editor')
 	{
-		$this->assoc = $assoc;
+		$this->Behavior->Target = $target;
 
 		$t = new Template();
 		$t->ReWrite('forms', array(&$this, 'TagForms'));
@@ -1352,7 +1352,7 @@ class EditorData
 			Server::GetState($this->Name.'_ci')));
 
 		$t->Set($this->View);
-		$t->Set('assoc', $assoc);
+		$t->Set('assoc', $target);
 
 		return $t->ParseFile(dirname(__FILE__).'/../../temps/editor.xml');
 	}

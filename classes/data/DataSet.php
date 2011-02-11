@@ -554,6 +554,7 @@ class DataSet
 		# otherwise.
 		if ($update_existing)
 		{
+			$q['limit'] = 1;
 			$q['columns']['id'] = Database::SqlUnquote('LAST_INSERT_ID()');
 			$res = $this->Get($q);
 			return $res[0]['id'];

@@ -2,6 +2,9 @@
 
 require_once(dirname(__FILE__).'/../../classes/Str.php');
 
+$_d['user.session.user'] = 'sess_user';
+$_d['user.session.pass'] = 'sess_pass';
+
 class ModUser extends Module
 {
 	/**
@@ -35,7 +38,7 @@ class ModUser extends Module
 	static function RequireAccess($level)
 	{
 		global $_d;
-		if (@$_d['user'][$_d['user.cols.access']] >= $level) return true;
+		if (@$_d['user.user'][$_d['user.cols.access']] >= $level) return true;
 		return false;
 	}
 
@@ -60,7 +63,7 @@ class ModUser extends Module
 	{
 		global $_d;
 
-		if (!empty($_d['user']) && empty($_d['user.hide_logout']))
+		if (!empty($_d['user.user']) && empty($_d['user.hide_logout']))
 		{
 			global $rw;
 
@@ -154,7 +157,7 @@ class ModUser extends Module
 
 		# Nobody is logged in.
 
-		if (empty($_d['user.user']))
+		if (empty($_d['user.user']) && @$_d['user.login'])
 		{
 			$t = new Template();
 			$t->ReWrite('links', array(&$this, 'TagLinks'));
@@ -213,6 +216,9 @@ class ModUser extends Module
 
 		# Check existing data sources
 
+		$u = null;
+
+		if (!empty($_d['user.datasets']))
 		foreach ($_d['user.datasets'] as $ds)
 		{
 			if (!isset($ds[0]))

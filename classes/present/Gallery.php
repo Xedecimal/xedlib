@@ -1,10 +1,10 @@
 <?php
 
+require_once(dirname(__FILE__).'/../FilterGallery.php');
+
 /**
  * @package Gallery
  */
-
-require_once('a_file.php');
 
 define('CAPTION_NONE',  0);
 define('CAPTION_TITLE', 1);
@@ -40,7 +40,7 @@ class Gallery
 	 * Constructor, sets default properties, behavior and display.
 	 * @param string $root Root location of images for this gallery.
 	 */
-	function Gallery($root)
+	function __construct($root)
 	{
 		$this->Behavior = new GalleryBehavior();
 		$this->Display = new GalleryDisplay();
@@ -184,7 +184,8 @@ EOF;
 		global $me;
 		$this->f = new FilterGallery();
 
-		require_once('h_template.php');
+		require_once(dirname(__FILE__).'/../FileManager.php');
+		require_once(dirname(__FILE__).'/Template.php');
 
 		$path = Server::GetVar('galcf');
 		$fm = new FileManager('gallery', $this->root.$path, array('Gallery'), 'Gallery');
@@ -251,8 +252,9 @@ EOF;
 			if ($this->Behavior->PageCount > 0)
 				$args['cp'] = floor(($view+1)/$this->Behavior->PageCount);
 
-			$t->Set('butForward', GetButton(HM::URL($me, $args).'#fullview', 'forward.png',
-				'Forward', 'class="png"'));
+			$url = HM::URL($me, $args);
+			$img = '<img src="images/forward.png" alt="Forward" /></a>';
+			$t->Set('butForward', "<a href=\"$url#fullview\">$img</a>");
 		}
 		else $t->Set('butForward', '');
 

@@ -224,7 +224,7 @@ class Form extends LayeredOutput
 	/*function TagForm($t, $g, $a)
 	{
 		global $PERSISTS;
-		$atrs = GetAttribs($a);
+		$atrs = HM::GetAttribs($a);
 		$ret = "<form {$this->formAttribs}{$atrs}";
 		if ($this->multipart) $ret .= ' enctype="multipart/form-data"';
 		$ret .= ">\n";
@@ -387,15 +387,19 @@ class Form extends LayeredOutput
 	* @param string $g
 	* @param array $a
 	*/
-	static function TagForm($t, $g, $a)
+	function TagForm($t, $g, $a)
 	{
 		global $PERSISTS;
 		$frm = new Form(@$a['ID']);
 		$t->Push($frm);
+		$a += $this->formAttribs;
 		$ret = '<form'.HM::GetAttribs($a).'>';
 		if (is_array($PERSISTS))
 		foreach ($PERSISTS as $n => $v)
 			$ret .= '<input type="hidden" name="'.$n.'" value="'.$v.'" />';
+		if (is_array($this->hiddens))
+		foreach ($this->hiddens as $h)
+			$ret .= '<input type="hidden" name="'.$h[0].'" value="'.$h[1].'" />';
 		$t->ReWrite('input', array('Form', 'TagInput'));
 		$ret .= $t->GetString('<null>'.$g.'</null>');
 		$obj = $t->Pop();

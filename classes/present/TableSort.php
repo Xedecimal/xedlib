@@ -26,11 +26,11 @@ class TableSort extends Table
 		global $me, $PERSISTS;
 		$this->cols = array();
 
-		$imgUp = '<img src="'.GetRelativePath(dirname(__FILE__)).
+		$imgUp = '<img src="'.Server::GetRelativePath(dirname(__FILE__)).
 		'/images/up.png" style="vertical-align: text-bottom;"
 		alt="Ascending" title="Ascending" />';
 
-		$imgDown = '<img src="'.GetRelativePath(dirname(__FILE__)).
+		$imgDown = '<img src="'.Server::GetRelativePath(dirname(__FILE__)).
 		'/images/down.png" style="vertical-align: text-bottom;"
 		alt="Descending" title="Descending" align="middle"/>';
 
