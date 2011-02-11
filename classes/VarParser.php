@@ -76,6 +76,14 @@ class VarParser
 		else if ($this->Behavior->UseGetVar) return Server::GetVar($tvar);
 		return null;
 	}
+
+	static function Concat($t, $items)
+	{
+		$vp = new VarParser();
+		$ret = '';
+		foreach ($items as $i['id'] => $i) $ret .= $vp->ParseVars($t, $i);
+		return $ret;
+	}
 }
 
 class VarParserBehavior
