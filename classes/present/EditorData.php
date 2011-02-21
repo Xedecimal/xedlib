@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__).'/../Str.php');
+
 require_once(dirname(__FILE__).'/Template.php');
 require_once(dirname(__FILE__).'/Form.php');
 require_once(dirname(__FILE__).'/Table.php');
