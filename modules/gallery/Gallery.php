@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../FilterGallery.php');
+require_once(dirname(__FILE__).'/../filemanager/FilterGallery.php');
 
 /**
  * @package Gallery
@@ -10,7 +10,7 @@ define('CAPTION_NONE',  0);
 define('CAPTION_TITLE', 1);
 define('CAPTION_FILE',  2);
 
-class Gallery
+class Gallery extends Module
 {
 	/**
 	 * Whether or not to display the caption specified in the file manager.
@@ -40,11 +40,10 @@ class Gallery
 	 * Constructor, sets default properties, behavior and display.
 	 * @param string $root Root location of images for this gallery.
 	 */
-	function __construct($root)
+	function __construct()
 	{
 		$this->Behavior = new GalleryBehavior();
 		$this->Display = new GalleryDisplay();
-		$this->root = $root;
 	}
 
 	function TagHeader($t, $guts)
@@ -59,15 +58,15 @@ class Gallery
 
 		$out = '';
 		$vp = new VarParser();
-		$dp = opendir($this->root.$this->path);
+		$dp = opendir($this->Root.$this->path);
 		while ($file = readdir($dp))
 		{
 			if ($file[0] == '.') continue;
 
-			$p = $this->root.$this->path.'/'.$file;
+			$p = $this->Root.$this->path.'/'.$file;
 			if (!is_dir($p)) continue;
 
-			$fi = new FileInfo($this->root.$this->path.'/'.$file);
+			$fi = new FileInfo($this->Root.$this->path.'/'.$file);
 			$this->f->GetInfo($fi);
 
 			$du['editor'] = Server::GetVar('editor');
@@ -184,11 +183,14 @@ EOF;
 		global $me;
 		$this->f = new FilterGallery();
 
-		require_once(dirname(__FILE__).'/../FileManager.php');
-		require_once(dirname(__FILE__).'/Template.php');
+		require_once(dirname(__FILE__).'/../filemanager/FileManager.php');
+		require_once(dirname(__FILE__).'/../../classes/present/Template.php');
 
 		$path = Server::GetVar('galcf');
-		$fm = new FileManager('gallery', $this->root.$path, array('Gallery'), 'Gallery');
+		$fm = new FileManager();
+		$fm->Name = $this->Name;
+		$fm->Filters = array('Gallery');
+		$fm->Root = $this->Root.$path;
 		$fm->Behavior->ShowAllFiles = true;
 		$fm->View->Sort = $this->Display->Sort;
 		$this->files = $fm->GetDirectory();
@@ -259,16 +261,19 @@ EOF;
 		else $t->Set('butForward', '');
 
 		//Gallery settings
-		$fig = new FileInfo($this->root);
-		FileInfo::GetFilter($fig, $this->root, array('Gallery'));
+		$fig = new FileInfo($this->Root);
+		Filemanager::GetFilter($fig, $this->Root, array('Gallery'));
 		$t->Set('file_thumb_width', $fig->info['thumb_width']+10);
 		$t->Set('file_thumb_height', $fig->info['thumb_height']+50);
 
-		$fi = new FileInfo($this->root.$path);
-		if ($path != $this->root) $t->Set('name', $this->GetCaption($fi));
+		$fi = new FileInfo($this->Root.$path);
+		if ($path != $this->Root) $t->Set('name', $this->GetCaption($fi));
 		else $t->Set('name', '');
 
-		return $t->ParseFile(Module::L('temps/gallery.xml'));
+		$ret['head'] = '<link type="text/css" rel="stylesheet"
+			href="temps/gallery.css" />';
+		$ret['gallery'] = $t->ParseFile(Module::L('gallery/gallery.xml'));
+		return $ret;
 	}
 
 	/**

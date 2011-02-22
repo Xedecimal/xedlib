@@ -1,11 +1,9 @@
 <div id="gallery">
-<link type="text/css" rel="stylesheet" href="temps/gallery.css" />
-
 <p><breadcrumb source="galcf" sep=" &raquo; " root="Gallery" /></p>
 
 <folder>
 <div class="folder">
-<a href="{{url}}"><img src="{{icon}}" alt="{{name}}" /></a>
+<a href="{{url}}">{{icon}}</a>
 <div class="caption">{{name}}</div>
 </div> <!-- folder -->
 </folder>
@@ -14,7 +12,7 @@
 
 <file>
 <div class="file">
-<img src="{{app_abs}}/{{icon}}" class="thumb" title="{{name}}" alt="{{fullname}}" />
+{{icon}}
 <div class="caption">{{name}}</div>
 </div> <!-- file -->
 </file>
