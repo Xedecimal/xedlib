@@ -153,6 +153,16 @@ class ModUser extends Module
 		return $ret;
 	}
 
+	function Simple($pass)
+	{
+		global $_d;
+
+		unset($this->fields['user']);
+		$this->Behavior->CreateAccount = false;
+		$this->Behavior->ForgotPassword = false;
+		$_d['user.datasets'][] = array($pass, array('usr_access' => 1));
+	}
+
 	function TagUser($t, $g)
 	{
 		if (!isset($this->_ds[0])) return;
