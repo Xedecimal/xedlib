@@ -99,10 +99,8 @@ class Module
 			U::RunCallbacks(@$_d['index.cb.prelink']);
 
 			foreach ($mods as $n => $mod)
-			{
-				Server::Trace("Linking module: {$n}");
-				$mod->Link();
-			}
+				if (!$mod->Auth()) unset($mods[$n]);
+			foreach ($mods as $n => $mod) $mod->Link();
 			foreach ($mods as $n => $mod) $mod->Prepare();
 			foreach ($mods as $n => $mod)
 			{
