@@ -53,7 +53,7 @@ class FilterDefault
 	 */
 	function Upload($file, $target)
 	{
-		$this->UpdateMTime($target->path.$file);
+		$this->UpdateMTime($target->path.'/'.$file);
 	}
 
 	/**

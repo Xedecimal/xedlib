@@ -29,8 +29,9 @@ class FilterGallery extends FilterDefault
 
 		$dir = $fi->dir;
 		$abs = "{$dir}/t_{$fi->filename}";
-		$rel = dirname($fi->path).'/t_'.$fi->filename;
-		if (file_exists($rel)) $fi->icon = '<img src="'.htmlspecialchars($rel).'" />';
+		#$rel = dirname($fi->path).'/t_'.$fi->filename;
+		$rel = Server::GetRelativePath($abs);
+		if (file_exists($abs)) $fi->icon = '<img src="'.htmlspecialchars($rel).'" />';
 
 		if (is_dir($fi->path))
 		{
@@ -193,7 +194,7 @@ class FilterGallery extends FilterDefault
 	{
 		parent::Upload($file, $target);
 		$tdest = 't_'.substr($file, 0, strrpos($file, '.'));
-		$this->ResizeFile($target->path.$file, $target->path.$tdest,
+		$this->ResizeFile($target->path.'/'.$file, $target->path.'/'.$tdest,
 			$target->info['thumb_width'], $target->info['thumb_height']);
 	}
 

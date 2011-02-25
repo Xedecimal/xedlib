@@ -8,16 +8,12 @@
 </div> <!-- folder -->
 </folder>
 
-<div class="clear"></div>
-
 <file>
 <div class="file">
-{{icon}}
+<a href="{{fullname}}" class="gal">{{icon}}</a>
 <div class="caption">{{name}}</div>
 </div> <!-- file -->
 </file>
-
-<div class="clear"></div>
 
 <image>
 	{{butBack}}

@@ -123,6 +123,7 @@ class FileManager extends Module
 	function Prepare()
 	{
 		$act = Server::GetVar($this->Name.'_action');
+		$this->cf = Server::GetVar($this->Name.'_cf');
 
 		//Don't allow renaming the root or the file manager will throw errors
 		//ever after.
@@ -132,8 +133,8 @@ class FileManager extends Module
 
 		if ($act == 'Upload' && $this->Behavior->AllowUpload)
 		{
-			$fi = new FileInfo($this->Root.$this->cf);
-			$filter = FileInfo::GetFilter($fi, $this->Root, $this->filters);
+			$fi = new FileInfo($this->Root.'/'.$this->cf);
+			$filter = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 
 			// Completed chunked upload.
 			if (Server::GetVar('cm') == 'done')
@@ -163,17 +164,15 @@ class FileManager extends Module
 			foreach ($_FILES['cu']['name'] as $ix => $name)
 			{
 				$tname = $_FILES['cu']['tmp_name'][$ix];
-				move_uploaded_file($tname, $this->Root.$this->cf.$name);
+				$target = $this->Root.'/'.$this->cf.'/'.$name;
+				move_uploaded_file($tname, $target);
 
-				ob_start();
-				var_dump($_POST);
-				file_put_contents('debug.txt', ob_get_clean(), FILE_APPEND);
 				if (!preg_match('#^\.\[[0-9]+\]_.*#', $name))
 				{
 					$filter->Upload($name, $fi);
 					if (!empty($this->Behavior->Watchers))
 						U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
-							$this->Root.$this->cf.$name);
+							$target);
 				}
 			}
 		}
@@ -223,9 +222,9 @@ class FileManager extends Module
 		else if ($act == 'Rename')
 		{
 			if (!$this->Behavior->AllowRename) return;
-			$fi = new FileInfo($this->Root.$this->cf, $this->filters);
+			$fi = new FileInfo($this->Root.'/'.$this->cf, $this->filters);
 			$name = Server::GetVar($this->Name.'_rname');
-			$f = FileInfo::GetFilter($fi, $this->Root, $this->filters);
+			$f = FileManager::GetFilter($fi, $this->Root, $this->filters);
 			$f->Rename($fi, $name);
 			$this->cf = substr($fi->path, strlen($this->Root)).'/';
 			if (!empty($this->Behavior->Watchers))

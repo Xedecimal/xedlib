@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__).'/../filemanager/FileManager.php');
 require_once(dirname(__FILE__).'/../filemanager/FilterGallery.php');
 
 /**
@@ -270,8 +271,11 @@ EOF;
 		if ($path != $this->Root) $t->Set('name', $this->GetCaption($fi));
 		else $t->Set('name', '');
 
-		$ret['head'] = '<link type="text/css" rel="stylesheet"
-			href="temps/gallery.css" />';
+		$ret['head'] = <<<EOF
+<link type="text/css" rel="stylesheet" href="{{app_abs}}/xedlib/modules/gallery/gallery.css" />
+<script type="text/javascript" src="{{app_abs}}/xedlib/js/jquery.flyout.js"></script>
+<script type="text/javascript" src="{{app_abs}}/xedlib/modules/gallery/gallery.js"></script>
+EOF;
 		$ret['gallery'] = $t->ParseFile(Module::L('gallery/gallery.xml'));
 		return $ret;
 	}
@@ -340,6 +344,41 @@ class GalleryBehavior
 	 * @var int Numeric amount of images per page.
 	 */
 	public $PageCount = null;
+}
+
+class GalleryAdmin extends FileManager
+{
+	/**
+	* Gallery based file manager instance.
+	*
+	* @var FileManager
+	*/
+	private $fm;
+
+	function __construct()
+	{
+		parent::__construct();
+
+		global $me, $_d;
+		$this->CheckActive('gallery');
+
+		$this->Name = 'fmgal';
+		$this->Root = 'galimg';
+		$this->Filters = array('Gallery');
+	}
+
+	function Link()
+	{
+		global $_d, $me;
+
+		$_d['nav.links']['Admin/Gallery'] = '{{app_abs}}/admin/gallery';
+	}
+
+	function Prepare()
+	{
+		$this->Behavior->AllowAll();
+		parent::Prepare();
+	}
 }
 
 ?>
