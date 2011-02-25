@@ -31,18 +31,6 @@ class ModUser extends Module
 		)
 	);
 
-	static function RequireAccess($level)
-	{
-		global $_d;
-		if (@$_d['user.user'][$_d['user.cols.access']] >= $level) return true;
-		return false;
-	}
-
-	static function GetAccess()
-	{
-		return @$GLOBALS['_d']['cl']['usr_access'];
-	}
-
 	function __construct()
 	{
 		$this->Behavior = new ModUserBehavior();
@@ -178,7 +166,84 @@ class ModUser extends Module
 			$nav['Create an account'] = '{{app_abs}}/user/create';
 		if ($this->Behavior->ForgotPassword)
 			$nav['Forgot your password?'] = '{{app_abs}}/user/forgot-password';
-		return ModNav::GetLinks(ModNav::LinkTree($nav));
+		if (!empty($nav))
+			return ModNav::GetLinks(ModNav::LinkTree($nav));
+	}
+
+	function TagFieldLogin($t, $g)
+	{
+		$vp = new VarParser();
+		$ret = null;
+		foreach ($this->fields as $v['name'] => $v)
+		{
+			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
+			else { $cmp = 'strmatch'; $v['itype'] = isset($v['type']) ? $v['type'] : 'text'; }
+
+			if ($cmp('user', @$v['type']))
+			{
+				$v['itype'] = 'text';
+				$v['name'] = 'user';
+				$ret .= $vp->ParseVars($g, $v);
+			}
+			else if ($cmp('password', @$v['type'])) $ret .= $vp->ParseVars($g, $v);
+		}
+		return $ret;
+	}
+
+	function TagFieldCreate($t, $g)
+	{
+		$vp = new VarParser();
+
+		$ret = null;
+		foreach ($this->fields as $v['name'] => $v)
+		{
+			$v['name'] .= '_create';
+
+			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
+			else { $cmp = 'strmatch'; $v['itype'] = isset($v['type']) ? $v['type'] : 'text'; }
+
+			$ret .= $vp->ParseVars($g, $v);
+
+			if ($cmp('password', @$v['type']))
+			{
+				$v['itype'] = $v['type'];
+				$v['text'] = 'Repeat '.$v['text'];
+				$v['name'] .= '2';
+				$ret .= $vp->ParseVars($g, $v);
+			}
+		}
+		return $ret;
+	}
+
+	function TagFieldForgot($t, $g)
+	{
+		$vp = new VarParser();
+
+		foreach ($this->fields as $v['name'] => $v)
+		{
+			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
+			else { $cmp = 'strmatch'; $v['itype'] = isset($v['type']) ? $v['type'] : 'text'; }
+			if ($cmp('email', @$v['type'])) $ret = $vp->ParseVars($g, $v);
+		}
+		return $ret;
+	}
+
+	static function RequireAccess($level)
+	{
+		global $_d;
+		if (@$_d['user.user'][$_d['user.cols.access']] >= $level) return true;
+		return false;
+	}
+
+	static function GetAccess()
+	{
+		return @$GLOBALS['_d']['cl']['usr_access'];
+	}
+
+	static function TagAccess($t, $g, $a)
+	{
+		global $_d;
+		if (@$_d['user'][$_d['user.cols.access']] >= @$a['REQUIRE']) return $g;
 	}
 
 	static function AddUserDataSet($ds, $passcol, $usercol)
@@ -250,70 +315,6 @@ class ModUser extends Module
 		}
 
 		return $u;
-	}
-
-	function TagFieldLogin($t, $g)
-	{
-		$vp = new VarParser();
-		$ret = null;
-		foreach ($this->fields as $v['name'] => $v)
-		{
-			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
-			else { $cmp = 'strmatch'; $v['itype'] = isset($v['type']) ? $v['type'] : 'text'; }
-
-			if ($cmp('user', @$v['type']))
-			{
-				$v['itype'] = 'text';
-				$v['name'] = 'user';
-				$ret .= $vp->ParseVars($g, $v);
-			}
-			else if ($cmp('password', @$v['type'])) $ret .= $vp->ParseVars($g, $v);
-		}
-		return $ret;
-	}
-
-	function TagFieldCreate($t, $g)
-	{
-		$vp = new VarParser();
-
-		$ret = null;
-		foreach ($this->fields as $v['name'] => $v)
-		{
-			$v['name'] .= '_create';
-
-			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
-			else { $cmp = 'strmatch'; $v['itype'] = isset($v['type']) ? $v['type'] : 'text'; }
-
-			$ret .= $vp->ParseVars($g, $v);
-
-			if ($cmp('password', @$v['type']))
-			{
-				$v['itype'] = $v['type'];
-				$v['text'] = 'Repeat '.$v['text'];
-				$v['name'] .= '2';
-				$ret .= $vp->ParseVars($g, $v);
-			}
-		}
-		return $ret;
-	}
-
-	function TagFieldForgot($t, $g)
-	{
-		$vp = new VarParser();
-
-		foreach ($this->fields as $v['name'] => $v)
-		{
-			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
-			else { $cmp = 'strmatch'; $v['itype'] = isset($v['type']) ? $v['type'] : 'text'; }
-			if ($cmp('email', @$v['type'])) $ret = $vp->ParseVars($g, $v);
-		}
-		return $ret;
-	}
-
-	static function TagAccess($t, $g, $a)
-	{
-		global $_d;
-		if (@$_d['user'][$_d['user.cols.access']] >= @$a['REQUIRE']) return $g;
 	}
 }
 
