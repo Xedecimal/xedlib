@@ -60,7 +60,7 @@ class Module
 			return;
 
 		$mod = new $name(file_exists('settings.ini'));
-		if ($mod->Auth()) $GLOBALS['mods'][$name] = $mod;
+		$GLOBALS['mods'][$name] = $mod;
 	}
 
 	static function TransPath($a, $t)
