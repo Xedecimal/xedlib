@@ -11,10 +11,6 @@ class ModUser extends Module
 	 * @var LoginManager Associated login manager.
 	 * 
 	 */
-	private $lm;
-
-	public $_ds = array();
-
 	public $Block = 'user';
 
 	public $fields = array(
