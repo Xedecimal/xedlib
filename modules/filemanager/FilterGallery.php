@@ -229,7 +229,7 @@ class FilterGallery extends FilterDefault
 	/**
 	 * Extension will be automatically appended to $dest filename.
 	 */
-	function ResizeFile($file, $dest, $nx, $ny)
+	static function ResizeFile($file, $dest, $nx, $ny)
 	{
 		$pinfo = pathinfo($file);
 		$dt = $dest.'.'.$pinfo['extension'];
@@ -239,17 +239,17 @@ class FilterGallery extends FilterDefault
 			case "jpg":
 			case "jpeg":
 				$img = imagecreatefromjpeg($file);
-				$img = $this->ResizeImg($img, $nx, $ny);
+				$img = FilterGallery::ResizeImg($img, $nx, $ny);
 				imagejpeg($img, $dt);
 			break;
 			case "png":
 				$img = imagecreatefrompng($file);
-				$img = $this->ResizeImg($img, $nx, $ny);
+				$img = FilterGallery::ResizeImg($img, $nx, $ny);
 				imagepng($img, $dt);
 			break;
 			case "gif":
 				$img = imagecreatefromgif($file);
-				$img = $this->ResizeImg($img, $nx, $ny);
+				$img = FilterGallery::ResizeImg($img, $nx, $ny);
 				imagegif($img, $dt);
 			break;
 		}
@@ -263,7 +263,7 @@ class FilterGallery extends FilterDefault
 	 * @param int $ny
 	 * @return resource
 	 */
-	function ResizeImg($img, $nx, $ny)
+	static function ResizeImg($img, $nx, $ny)
 	{
 		$sx  = ImageSX($img);
 		$sy = ImageSY($img);
