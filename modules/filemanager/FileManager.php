@@ -770,15 +770,6 @@ class FileManager extends Module
 
 		$relpath = Server::GetRelativePath(dirname(__FILE__));
 
-		if (!isset($GLOBALS['page_head'])) $GLOBALS['page_head'] = '';
-		$GLOBALS['page_head'] .= <<<EOF
-<script type="text/javascript">
-window.onload = function() {
-	$('#{$this->Name}_mass_options').hide();
-}
-</script>
-EOF;
-
 		$this->mass_avail = $this->Behavior->MassAvailable();
 
 		//TODO: Get rid of this.
@@ -786,6 +777,12 @@ EOF;
 
 		global $me;
 		$this->vars['target'] = $this->Behavior->Target;
+
+		$ex = HM::ParseURL($this->Behavior->Target);
+		$ex['args'][$this->Name.'_action'] = 'upload';
+		$ex['args']['PHPSESSID'] = Server::GetVar('PHPSESSID');
+		$this->vars['java_target'] = HM::URL($ex['url'], $ex['args']);
+
 		$this->vars['root'] = $this->Root;
 		$this->vars['cf'] = $this->cf;
 
