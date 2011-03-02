@@ -1,0 +1,9 @@
+<form action="{{Name}}/send" method="post">
+<fieldset>
+<legend>Contact Form</legend>
+<ul>
+	<field><li><label for="{{id}}">{{name}}</label>{{field}}</li></field>
+	<li><label for="submit">&nbsp;</label><input type="submit" id="submit" value="Send" /></li>
+</ul>
+</fieldset>
+</form>
