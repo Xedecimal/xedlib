@@ -11,7 +11,7 @@ class ModPage extends Module
 		if ($name == 'part') $name = $_d['q'][1];
 		$file = "content/{$name}.xml";
 
-		if ($_d['page.opts'][$name] == 'xml')
+		if (@$_d['page.opts'][$name] == 'xml')
 		{
 			$t = new Template($_d);
 			$content = $t->ParseFile($file);
