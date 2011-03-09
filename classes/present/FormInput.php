@@ -113,6 +113,20 @@ class FormInput
 		return $ret.' />';
 	}
 
+	function Validate()
+	{
+		if ($this->atrs['TYPE'] == 'captcha')
+		{
+			$ret = recaptcha_check_answer($this->atrs['VALUE']['private'],
+				$_SERVER['REMOTE_ADDR'], $_POST["recaptcha_challenge_field"],
+				$_POST["recaptcha_response_field"]);
+			return $ret->is_valid;
+		}
+
+		# By default we pass validation.
+		return true;
+	}
+
 	/**
 	 * Returns this input object rendered in html.
 	 *
@@ -125,6 +139,10 @@ class FormInput
 		if (!empty($this->atrs['ID']))
 			$this->atrs['ID'] = $this->GetCleanID($parent);
 
+		if ($this->atrs['TYPE'] == 'captcha')
+		{
+			return recaptcha_get_html($this->atrs['VALUE']['public']);
+		}
 		if ($this->atrs['TYPE'] == 'spamblock')
 		{
 			$this->atrs['TYPE'] = 'text';
@@ -318,6 +336,12 @@ class FormInput
 					Server::GetVars($this->atrs['NAME'], @$this->atrs['VALUE']) :
 					@$this->atrs['VALUE']);
 		}
+	}
+
+	function IsSignificant()
+	{
+		if ($this->atrs['TYPE'] == 'captcha') return false;
+		return true;
 	}
 
 	function GetCleanID($parent)

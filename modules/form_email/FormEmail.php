@@ -9,12 +9,14 @@ class FormEmail extends Module
 	{
 		$this->CheckActive($this->Name);
 		$this->_template = Module::L('form_email/form.xml');
+		$this->_template_send = Module::L('form_email/send.xml');
 		$this->_email_template = Module::L('form_email/email.xml');
 		$this->_fields = array(
 			'Name' => new FormInput('Name', null, 'name'),
 			'Email' => new FormInput('Email', null, 'email'),
 			'Message' => new FormInput('Message', 'area', 'message')
 		);
+		$this->send = false;
 	}
 
 	function Prepare()
@@ -32,8 +34,12 @@ class FormEmail extends Module
 			$headers[] = 'From: '.$this->_from;
 			$headers[] = 'Reply-To: '.$this->_from;
 
+			$this->send = true;
+			foreach ($this->_fields as $f) if (!$f->Validate()) $send = false;
+
+			if (!$this->send) return;
+
 			$t->ReWrite('field', array(&$this, 'TagEmailField'));
-			die($t->ParseFile($this->_email_template));
 			mail($this->_to, $this->_subject,
 				$t->ParseFile($this->_email_template),
 				implode($headers, "\r\n"));
@@ -46,6 +52,7 @@ class FormEmail extends Module
 		$t = new Template;
 		$t->ReWrite('field', array(&$this, 'TagField'));
 		$t->Set($this);
+		if ($this->send) return $t->ParseFile($this->_template_send);
 		return $t->ParseFile($this->_template);
 	}
 
@@ -64,6 +71,8 @@ class FormEmail extends Module
 	{
 		foreach ($this->_fields as $n => $f)
 		{
+			if (!$f->IsSignificant()) continue;
+
 			$row['name'] = $n;
 			$row['value'] = Server::GetVar($f->name);
 			$rows[] = $row;

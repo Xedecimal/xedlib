@@ -1,4 +1,4 @@
-<form action="{{Name}}/send" method="post">
+<form action="{{app_abs}}/{{Name}}/send" method="post" class="form-email">
 <fieldset>
 <legend>Contact Form</legend>
 <ul>
