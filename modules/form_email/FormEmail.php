@@ -35,11 +35,12 @@ class FormEmail extends Module
 			$headers[] = 'Reply-To: '.$this->_from;
 
 			$this->send = true;
-			foreach ($this->_fields as $f) if (!$f->Validate()) $send = false;
+			foreach ($this->_fields as $f) if (!$f->Validate()) $this->send = false;
 
 			if (!$this->send) return;
 
 			$t->ReWrite('field', array(&$this, 'TagEmailField'));
+			die($t->ParseFile($this->_email_template));
 			mail($this->_to, $this->_subject,
 				$t->ParseFile($this->_email_template),
 				implode($headers, "\r\n"));
@@ -62,6 +63,7 @@ class FormEmail extends Module
 		{
 			$row['name'] = $n;
 			$row['field'] = $f->Get();
+			if ($f->attr('TYPE') == 'captcha') $row['style'] = ' display: none';
 			$rows[] = $row;
 		}
 		return VarParser::Concat($g, $rows);

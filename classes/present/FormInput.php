@@ -117,10 +117,8 @@ class FormInput
 	{
 		if ($this->atrs['TYPE'] == 'captcha')
 		{
-			$ret = recaptcha_check_answer($this->atrs['VALUE']['private'],
-				$_SERVER['REMOTE_ADDR'], $_POST["recaptcha_challenge_field"],
-				$_POST["recaptcha_response_field"]);
-			return $ret->is_valid;
+			$v = Server::GetVar('c');
+			if (!empty($v)) return false;
 		}
 
 		# By default we pass validation.
@@ -141,7 +139,7 @@ class FormInput
 
 		if ($this->atrs['TYPE'] == 'captcha')
 		{
-			return recaptcha_get_html($this->atrs['VALUE']['public']);
+			return '<input type="text" name="c" value="" />';
 		}
 		if ($this->atrs['TYPE'] == 'spamblock')
 		{
