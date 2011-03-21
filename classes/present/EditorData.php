@@ -1063,7 +1063,7 @@ class EditorData
 			if (!empty($PERSISTS)) $url_defaults = array_merge($url_defaults,
 				$PERSISTS);
 
-			$p = Server::GetRelativePath(dirname(__FILE__));
+			global $_d;
 
 			if ($this->Behavior->AllowEdit)
 			{
@@ -1074,11 +1074,11 @@ class EditorData
 					$this->Name.'_action' => 'delete',
 					$this->Name.'_ci' => $cnode->id), $url_defaults));
 				$row[] = "<a href=\"$url_edit#box_{$this->Name}_forms\"><img
-					src=\"{$p}/images/edit.png\" alt=\"Edit\"
+					src=\"{$_d['xl_abs']}/images/edit.png\" alt=\"Edit\"
 					title=\"".$this->View->TextEdit."\" class=\"png\" /></a>";
 				$row[] = "<a href=\"$url_del#{$this->Name}_table\"
 					onclick=\"return confirm('Are you sure?')\"><img
-					src=\"{$p}/images/delete.png\" alt=\"Delete\"
+					src=\"{$_d['xl_abs']}/images/delete.png\" alt=\"Delete\"
 					title=\"".$this->View->TextDelete."\" class=\"png\" /></a>";
 			}
 
