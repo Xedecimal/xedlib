@@ -438,7 +438,7 @@ class EditorData
 					$value = Server::GetVar($this->Name.'_'.$col);
 					if ($in->attr('TYPE') == 'date')
 					{
-						$insert[$col] = $value[2].'-'.$value[0].'-'.$value[1];
+						$insert[$col] = Database::TimestampToMySql(strtotime($value));
 					}
 					else if($in->attr('TYPE') == 'datetime')
 					{
@@ -1226,7 +1226,8 @@ class EditorData
 						else if (isset($sel[0][$col]))
 						{
 							if ($in->attr('TYPE') == 'date')
-								$in->attr('VALUE', Database::MyDateTimestamp($sel[0][$col]));
+								$in->attr('VALUE', strftime('%x',
+									Database::MyDateTimestamp($sel[0][$col])));
 							else if ($in->attr('TYPE') == 'datetime')
 								$in->attr('VALUE', Database::MyDateTimestamp($sel[0][$col], true));
 							else $in->attr('VALUE', $sel[0][$col]);
