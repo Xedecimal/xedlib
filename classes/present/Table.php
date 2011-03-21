@@ -85,7 +85,6 @@ class Table
 		{
 			$ret .= "<thead><tr>\n";
 			$ix = 0;
-			var_dump($this->atrs);
 			foreach ($this->cols as $col)
 			{
 				if (isset($this->atrs)) $atrs = " ".
