@@ -1,17 +1,20 @@
 <div class="data-search">
-
+<style type="text/css">
+.actions { border-bottom: 1px solid #000; }
+.actions a { padding: 20px; }
+</style>
 <results>
 <div>
 <result>
 	<fieldset id="result-{{id}}"><legend>{{name}}</legend>
-	<div class="actions">
-		<result_button><a>{{text}}</a></result_button>
-	</div>
 	<ul>
 	<result_field>
 		<li><label>{{text}}</label>{{val}}</li>
 	</result_field>
 	</ul>
+	<div class="actions">
+		<result_button><a>{{text}}</a></result_button>
+	</div>
 	</fieldset>
 </result>
 &laquo;

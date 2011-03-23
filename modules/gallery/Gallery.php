@@ -45,6 +45,8 @@ class Gallery extends Module
 	{
 		$this->Behavior = new GalleryBehavior();
 		$this->Display = new GalleryDisplay();
+
+		$this->CheckActive($this->Name);
 	}
 
 	function TagHeader($t, $guts)
@@ -182,6 +184,9 @@ EOF;
 	function Get()
 	{
 		global $me;
+
+		if (!$this->Active) return;
+
 		$this->f = new FilterGallery();
 
 		require_once(dirname(__FILE__).'/../filemanager/FileManager.php');

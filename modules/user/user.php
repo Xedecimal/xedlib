@@ -6,7 +6,7 @@ $_d['user.session.user'] = 'sess_user';
 $_d['user.session.pass'] = 'sess_pass';
 $_d['user.cols.access'] = 'usr_access';
 
-class ModUser extends Module
+class User extends Module
 {
 	/**
 	 * @var LoginManager Associated login manager.
@@ -92,8 +92,7 @@ class ModUser extends Module
 				$body = "Your new password is: $pass";
 				$this->dsUser->Update(array('usr_email' => $em),
 					array('usr_pass' => md5($pass)));
-				U::VarInfo($body);
-				#mail($em, 'Forgotten Password', $body);
+				mail($em, 'Forgotten Password', $body);
 			}
 		}
 	}
