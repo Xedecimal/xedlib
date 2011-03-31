@@ -94,7 +94,7 @@ class FormInput
 	function attr($attr = null, $val = null)
 	{
 		if (!isset($attr)) return $this->atrs;
-		if (isset($val)) $this->atrs[$attr] = $val;
+		if (isset($val)) return $this->atrs[$attr] = $val;
 		if (isset($this->atrs[$attr])) return $this->atrs[$attr];
 	}
 
@@ -113,6 +113,18 @@ class FormInput
 		return $ret.' />';
 	}
 
+	function Validate()
+	{
+		if ($this->atrs['TYPE'] == 'captcha')
+		{
+			$v = Server::GetVar('c');
+			if (!empty($v)) return false;
+		}
+
+		# By default we pass validation.
+		return true;
+	}
+
 	/**
 	 * Returns this input object rendered in html.
 	 *
@@ -125,6 +137,10 @@ class FormInput
 		if (!empty($this->atrs['ID']))
 			$this->atrs['ID'] = $this->GetCleanID($parent);
 
+		if ($this->atrs['TYPE'] == 'captcha')
+		{
+			return '<input type="text" name="c" value="" />';
+		}
 		if ($this->atrs['TYPE'] == 'spamblock')
 		{
 			$this->atrs['TYPE'] = 'text';
@@ -175,7 +191,7 @@ class FormInput
 			if (empty($this->atrs['CLASS'])) $this->atrs['CLASS'] = 'input_area';
 			$natrs = $this->atrs;
 			unset($natrs['TYPE']);
-			$atrs = GetAttribs($natrs);
+			$atrs = HM::GetAttribs($natrs);
 			return "<textarea$atrs>".$this->GetValue($persist).'</textarea>';
 		}
 		if ($this->atrs['TYPE'] == 'checkbox')
@@ -195,7 +211,7 @@ class FormInput
 					@$this->atrs['CLASS'] .= ' checks';
 					$divAtrs = $this->atrs;
 					unset($divAtrs['TYPE'], $divAtrs['VALUE'], $divAtrs['NAME']);
-					$ret .= '<div'.GetAttribs($divAtrs).'>';
+					$ret .= '<div'.HM::GetAttribs($divAtrs).'>';
 					$newsels = $this->GetValue($persist);
 					foreach ($newsels as $id => $val)
 						$ret .= $val->RenderCheck(array(
@@ -318,6 +334,12 @@ class FormInput
 					Server::GetVars($this->atrs['NAME'], @$this->atrs['VALUE']) :
 					@$this->atrs['VALUE']);
 		}
+	}
+
+	function IsSignificant()
+	{
+		if ($this->atrs['TYPE'] == 'captcha') return false;
+		return true;
 	}
 
 	function GetCleanID($parent)
@@ -464,7 +486,7 @@ class FormInput
 		if (!isset($args['ts'])) $args['ts'] = time();
 		$divAtrs = $args['atrs'];
 		unset($divAtrs['NAME'],$divAtrs['TYPE']);
-		# $strout = '<div'.GetAttribs(@$divAtrs).'>';
+		# $strout = '<div'.HM::GetAttribs(@$divAtrs).'>';
 		$strout = FormInput::GetMonthSelect(@$args['atrs']['NAME'].'[]',
 			date('n', $args['ts']));
 		$strout .= '/ <input type="text" size="2" name="'.@$args['atrs']['NAME'].'[]" value="'.
@@ -550,6 +572,12 @@ class FormInput
 		else if ($field->type == 'boolean') return $val == 1 ? 'yes' : 'no';
 		else if ($field->type == 'select') return $field->valu[$val]->text;
 		else Error("Unknown field type.");
+	}
+
+	/** Display Column Select Option Callback */
+	static function DisplayColumnSelectCallback($ds, $data, $col, $sqlcol)
+	{
+		return $ds->FieldInputs[$sqlcol]->atrs['VALUE'][$data[$col]]->text;
 	}
 }
 

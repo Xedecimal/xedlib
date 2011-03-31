@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Enter description here...
  */
@@ -73,8 +72,16 @@ class VarParser
 		else if (isset($$tvar)) return $$tvar;
 		else if (defined($tvar)) return constant($tvar);
 		else if (isset($this->data[$tvar])) return $this->data[$tvar];
-		else if ($this->Behavior->UseGetVar) return GetVar($tvar);
+		else if ($this->Behavior->UseGetVar) return Server::GetVar($tvar);
 		return null;
+	}
+
+	static function Concat($t, $items)
+	{
+		$vp = new VarParser();
+		$ret = '';
+		foreach ($items as $i['id'] => $i) $ret .= $vp->ParseVars($t, $i);
+		return $ret;
 	}
 }
 

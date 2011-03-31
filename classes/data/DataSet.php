@@ -1,7 +1,6 @@
 <?php
 
 require_once(dirname(__FILE__).'/Database.php');
-require_once(dirname(__FILE__).'/Relation.php');
 require_once(dirname(__FILE__).'/Join.php');
 
 /**
@@ -135,17 +134,6 @@ class DataSet
 		$this->table = $table;
 		$this->id = $id;
 		$this->joins = array();
-	}
-
-	/**
-	 * Adds a child relation to this DataSet for recursion.
-	 *
-	 * @param Relation $relation
-	 * @see EditorData
-	 */
-	function AddChild($relation)
-	{
-		$this->children[] = $relation;
 	}
 
 	function AddJoin($join)
@@ -413,7 +401,8 @@ class DataSet
 				# Comparison operator comes before value.
 				if (!empty($val['cmp']))
 					$val['val'] = " {$val['cmp']} {$val['val']}";
-				else $val['val'] = " = {$val['val']}";
+				else if (@$val['opt'] != SQLOPT_UNQUOTE)
+					$val['val'] = " = {$val['val']}";
 
 				return $val['val'];
 			}
@@ -553,6 +542,7 @@ class DataSet
 		# otherwise.
 		if ($update_existing)
 		{
+			$q['limit'] = 1;
 			$q['columns']['id'] = Database::SqlUnquote('LAST_INSERT_ID()');
 			$res = $this->Get($q);
 			return $res[0]['id'];

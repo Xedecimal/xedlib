@@ -2,16 +2,16 @@
 
 require_once(dirname(__FILE__).'/../../classes/Str.php');
 
+$_d['user.session.user'] = 'sess_user';
+$_d['user.session.pass'] = 'sess_pass';
+$_d['user.cols.access'] = 'usr_access';
+
 class ModUser extends Module
 {
 	/**
 	 * @var LoginManager Associated login manager.
 	 * 
 	 */
-	private $lm;
-
-	public $_ds = array();
-
 	public $Block = 'user';
 
 	public $fields = array(
@@ -32,18 +32,6 @@ class ModUser extends Module
 		)
 	);
 
-	static function RequireAccess($level)
-	{
-		global $_d;
-		if (@$_d['user'][$_d['user.cols.access']] >= $level) return true;
-		return false;
-	}
-
-	static function GetAccess()
-	{
-		return @$GLOBALS['_d']['cl']['usr_access'];
-	}
-
 	function __construct()
 	{
 		$this->Behavior = new ModUserBehavior();
@@ -60,7 +48,7 @@ class ModUser extends Module
 	{
 		global $_d;
 
-		if (!empty($_d['user']) && empty($_d['user.hide_logout']))
+		if (!empty($_d['user.user']) && empty($_d['user.hide_logout']))
 		{
 			global $rw;
 
@@ -154,7 +142,7 @@ class ModUser extends Module
 
 		# Nobody is logged in.
 
-		if (empty($_d['user.user']))
+		if (empty($_d['user.user']) && @$_d['user.login'])
 		{
 			$t = new Template();
 			$t->ReWrite('links', array(&$this, 'TagLinks'));
@@ -164,6 +152,16 @@ class ModUser extends Module
 		}
 
 		return $ret;
+	}
+
+	function Simple($pass)
+	{
+		global $_d;
+
+		unset($this->fields['user']);
+		$this->Behavior->CreateAccount = false;
+		$this->Behavior->ForgotPassword = false;
+		$_d['user.datasets'][] = array($pass, array('usr_access' => 1));
 	}
 
 	function TagUser($t, $g)
@@ -179,75 +177,8 @@ class ModUser extends Module
 			$nav['Create an account'] = '{{app_abs}}/user/create';
 		if ($this->Behavior->ForgotPassword)
 			$nav['Forgot your password?'] = '{{app_abs}}/user/forgot-password';
-		return ModNav::GetLinks(ModNav::LinkTree($nav));
-	}
-
-	static function AddUserDataSet($ds, $passcol, $usercol)
-	{
-		global $_d;
-		$_d['user.datasets'][] = array($ds, $passcol, $usercol);
-	}
-
-	static function Authenticate()
-	{
-		global $_d;
-
-		# Process state changes
-
-		$check_user = Server::GetVar($_d['user.session.user']);
-		$check_pass = Server::GetVar($_d['user.session.pass']);
-		$act = Server::GetVar('user_action');
-
-		if ($act == 'login')
-		{
-			$check_user = Server::SetVar($_d['user.session.user'],
-				Server::GetVar('user'));
-			$check_pass = Server::SetVar($_d['user.session.pass'],
-				md5(Server::GetVar('pass')));
-		}
-		if ($act == 'logout')
-		{
-			$check_pass = null;
-			Server::UnsetVar($_d['user.session.pass']);
-		}
-
-		# Check existing data sources
-
-		foreach ($_d['user.datasets'] as $ds)
-		{
-			if (!isset($ds[0]))
-				Error("<br />What: Dataset is not set.
-				<br />Who: ModUser::Prepare()
-				<br />Why: You may have set an incorrect dataset in the
-				creation of this LoginManager.");
-
-			# Simple login.
-
-			$item = null;
-
-			if (is_string($ds[0]))
-			{
-				if (strlen($ds[0]) != 32)
-					die('Plaintext pass, use: '.md5($ds[0]));
-				if ($ds[0] === $check_pass) $item = $ds[1];
-			}
-
-			# Database login
-
-			else
-			{
-				$query['match'] = array(
-					$ds[1] => $check_pass,
-					$ds[2] => Database::SqlAnd($check_user)
-				);
-
-				$item = $ds[0]->GetOne($query);
-			}
-
-			$u = $_d['user.user'] = $item;
-		}
-
-		return $u;
+		if (!empty($nav))
+			return ModNav::GetLinks(ModNav::LinkTree($nav));
 	}
 
 	function TagFieldLogin($t, $g)
@@ -308,10 +239,93 @@ class ModUser extends Module
 		return $ret;
 	}
 
+	static function RequireAccess($level)
+	{
+		global $_d;
+		if (@$_d['user.user'][$_d['user.cols.access']] >= $level) return true;
+		return false;
+	}
+
+	static function GetAccess()
+	{
+		return @$GLOBALS['_d']['cl']['usr_access'];
+	}
+
 	static function TagAccess($t, $g, $a)
 	{
 		global $_d;
 		if (@$_d['user'][$_d['user.cols.access']] >= @$a['REQUIRE']) return $g;
+	}
+
+	static function AddUserDataSet($ds, $passcol, $usercol)
+	{
+		global $_d;
+		$_d['user.datasets'][] = array($ds, $passcol, $usercol);
+	}
+
+	static function Authenticate()
+	{
+		global $_d;
+
+		# Process state changes
+
+		$check_user = Server::GetVar($_d['user.session.user']);
+		$check_pass = Server::GetVar($_d['user.session.pass']);
+		$act = Server::GetVar('user_action');
+
+		if ($act == 'login')
+		{
+			$check_user = Server::SetVar($_d['user.session.user'],
+				Server::GetVar('user'));
+			$check_pass = Server::SetVar($_d['user.session.pass'],
+				md5(Server::GetVar('pass')));
+		}
+		if ($act == 'logout')
+		{
+			$check_pass = null;
+			Server::UnsetVar($_d['user.session.pass']);
+		}
+
+		# Check existing data sources
+
+		$u = null;
+
+		if (!empty($_d['user.datasets']))
+		foreach ($_d['user.datasets'] as $ds)
+		{
+			if (!isset($ds[0]))
+				Error("<br />What: Dataset is not set.
+				<br />Who: ModUser::Prepare()
+				<br />Why: You may have set an incorrect dataset in the
+				creation of this LoginManager.");
+
+			# Simple login.
+
+			$item = null;
+
+			if (is_string($ds[0]))
+			{
+				if (strlen($ds[0]) != 32)
+					die('Plaintext pass, use: '.md5($ds[0]));
+				if ($ds[0] === $check_pass) $item = $ds[1];
+			}
+
+			# Database login
+
+			else
+			{
+				$query['match'] = array(
+					$ds[1] => $check_pass,
+					$ds[2] => Database::SqlAnd($check_user)
+				);
+
+				$item = $ds[0]->GetOne($query);
+			}
+
+			$u = $_d['user.user'] = $item;
+		}
+
+		return $u;
 	}
 }
 

@@ -58,7 +58,9 @@ class FormOption extends TreeNode
 		else
 		{
 			$valu = isset($this->valu) ? ' value="'.$this->valu.'"' : null;
-			return '<label><input type="checkbox" value="'.$this->valu.'"'.GetAttribs($atrs).' />'.htmlspecialchars($this->text).'</label>';
+			return '<label><input type="checkbox" value="'.$this->valu.'"'
+				.HM::GetAttribs($atrs).' />'.htmlspecialchars($this->text)
+					.'</label>';
 		}
 	}
 
@@ -154,7 +156,7 @@ class FormOption extends TreeNode
 				$strout .= "<strong><em>{$option->text}</em></strong><br />\n";
 			else
 				$strout .= '<label><input type="checkbox" value="'
-					.$id.'"'.GetAttribs($atrs).$selected.$disabled.' />'.$option->text
+					.$id.'"'.HM::GetAttribs($atrs).$selected.$disabled.' />'.$option->text
 					.'</label>'."<br/>\n";
 			$selected = null;
 		}

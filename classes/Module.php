@@ -17,6 +17,8 @@ class Module
 			$_d['template.transforms']['form'] = array('Module', 'TransPath', 'ACTION');
 		}
 
+		$_d['xl_dir'] = realpath(dirname(__FILE__).'/../');
+		$_d['xl_abs'] = Server::GetRelativePath($_d['xl_dir']);
 		$_d['app_dir'] = $root_path;
 		if (!isset($_d['app_abs']))
 			$_d['app_abs'] = Server::GetRelativePath($root_path);
@@ -58,7 +60,7 @@ class Module
 			return;
 
 		$mod = new $name(file_exists('settings.ini'));
-		if ($mod->Auth()) $GLOBALS['mods'][$name] = $mod;
+		$GLOBALS['mods'][$name] = $mod;
 	}
 
 	static function TransPath($a, $t)
@@ -97,10 +99,8 @@ class Module
 			U::RunCallbacks(@$_d['index.cb.prelink']);
 
 			foreach ($mods as $n => $mod)
-			{
-				Server::Trace("Linking module: {$n}");
-				$mod->Link();
-			}
+				if (!$mod->Auth()) unset($mods[$n]);
+			foreach ($mods as $n => $mod) $mod->Link();
 			foreach ($mods as $n => $mod) $mod->Prepare();
 			foreach ($mods as $n => $mod)
 			{
@@ -188,7 +188,11 @@ class Module
 
 	function CheckActive($name)
 	{
-		if (@$GLOBALS['_d']['q'][0] == $name) $this->Active = true;
+		$items = explode('/', $name);
+		$this->Active = true;
+		foreach ($items as $ix => $i)
+			if (@$GLOBALS['_d']['q'][$ix] != $i)
+				$this->Active = false;
 	}
 
 	function Auth() { return true; }

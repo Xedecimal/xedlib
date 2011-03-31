@@ -81,14 +81,27 @@ class HM
 		return $ret;
 	}
 
+	static function ParseURL($url)
+	{
+		$up = parse_url($url);
+		$ret['url'] = $up['path'];
+		foreach (preg_split('/&|\?/', $up['query']) as $parm)
+		{
+			list($var, $val) = explode('=', $parm);
+			$ret['args'][$var] = $val;
+		}
+		return $ret;
+	}
+
+	#TODO: This does not parse a url idiot, it BUILDS ONE!
 	/**
- * Parses an object or array for serialization to a uri.
- *
- * @param string $key Parent key for the current series to iterate.
- * @param mixed $val Object or array to iterate.
- * @param bool $start Whether or not this is the first item being parsed.
- * @return string Rendered url string.
- */
+	 * Parses an object or array for serialization to a uri.
+	 *
+	 * @param string $key Parent key for the current series to iterate.
+	 * @param mixed $val Object or array to iterate.
+	 * @param bool $start Whether or not this is the first item being parsed.
+	 * @return string Rendered url string.
+	 */
 	static function URLParse($key, $val, $start = false)
 	{
 		$ret = null;

@@ -1,14 +1,13 @@
 <?php
 
 require_once(dirname(__FILE__).'/../classes/TreeNode.php');
+require_once(dirname(__FILE__).'/../classes/HM.php');
 
 class ModNav extends Module
 {
 	public $Block = 'nav';
 
 	/**
-	*
-	*
 	* @param TreeNode $link
 	* @param int $depth
 	*/
@@ -23,7 +22,13 @@ class ModNav extends Module
 			foreach ($link->children as $c)
 			{
 				$ret .= '<li>';
-				if (!empty($c->data)) $ret .= '<a href="'.$c->data.'">';
+				if (!empty($c->data))
+				{
+					if (is_array($c->data))
+						$atrs = HM::GetAttribs($c->data);
+					else $atrs = HM::GetAttribs(array('href' => $c->data));
+					$ret .= "<a$atrs>";
+				}
 				$ret .= $c->id;
 				if (!empty($c->data)) $ret .= '</a>';
 				$ret .= ModNav::GetLinks($c, $depth+1);
