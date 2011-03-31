@@ -73,6 +73,8 @@ class EditorSearch extends Module
 
 			foreach (array_keys($this->_ds->DisplayColumns) as $col)
 			{
+				if (!isset($this->_ds->FieldInputs[$col])) continue;
+
 				$fi = $this->_ds->FieldInputs[$col];
 				if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
 					$query['cols'][$ms[2]] = "GROUP_CONCAT(DISTINCT {$col})";
@@ -191,8 +193,6 @@ class EditorSearch extends Module
 				'field' => $field
 			));
 		}
-		else
-			Server::Error("Could not find the field input for {$sf}.");
 		return $ret;
 	}
 
