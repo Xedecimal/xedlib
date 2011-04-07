@@ -9,6 +9,7 @@ class FormEmail extends Module
 	{
 		$this->CheckActive($this->Name);
 		$this->_template = Module::L('form_email/form.xml');
+		$this->_subject = 'Web Contact Submission';
 		$this->_email_template = Module::L('form_email/email.xml');
 		$this->_fields = array(
 			'Name' => new FormInput('Name', null, 'name'),
