@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__).'/../Str.php');
+
 require_once(dirname(__FILE__).'/Template.php');
 require_once(dirname(__FILE__).'/Form.php');
 require_once(dirname(__FILE__).'/Table.php');
@@ -437,7 +438,7 @@ class EditorData
 					$value = Server::GetVar($this->Name.'_'.$col);
 					if ($in->attr('TYPE') == 'date')
 					{
-						$insert[$col] = $value[2].'-'.$value[0].'-'.$value[1];
+						$insert[$col] = Database::TimestampToMySql(strtotime($value));
 					}
 					else if($in->attr('TYPE') == 'datetime')
 					{
@@ -1062,7 +1063,7 @@ class EditorData
 			if (!empty($PERSISTS)) $url_defaults = array_merge($url_defaults,
 				$PERSISTS);
 
-			$p = Server::GetRelativePath(dirname(__FILE__));
+			global $_d;
 
 			if ($this->Behavior->AllowEdit)
 			{
@@ -1073,11 +1074,11 @@ class EditorData
 					$this->Name.'_action' => 'delete',
 					$this->Name.'_ci' => $cnode->id), $url_defaults));
 				$row[] = "<a href=\"$url_edit#box_{$this->Name}_forms\"><img
-					src=\"{$p}/images/edit.png\" alt=\"Edit\"
+					src=\"{$_d['xl_abs']}/images/edit.png\" alt=\"Edit\"
 					title=\"".$this->View->TextEdit."\" class=\"png\" /></a>";
 				$row[] = "<a href=\"$url_del#{$this->Name}_table\"
 					onclick=\"return confirm('Are you sure?')\"><img
-					src=\"{$p}/images/delete.png\" alt=\"Delete\"
+					src=\"{$_d['xl_abs']}/images/delete.png\" alt=\"Delete\"
 					title=\"".$this->View->TextDelete."\" class=\"png\" /></a>";
 			}
 
@@ -1225,7 +1226,8 @@ class EditorData
 						else if (isset($sel[0][$col]))
 						{
 							if ($in->attr('TYPE') == 'date')
-								$in->attr('VALUE', Database::MyDateTimestamp($sel[0][$col]));
+								$in->attr('VALUE', strftime('%x',
+									Database::MyDateTimestamp($sel[0][$col])));
 							else if ($in->attr('TYPE') == 'datetime')
 								$in->attr('VALUE', Database::MyDateTimestamp($sel[0][$col], true));
 							else $in->attr('VALUE', $sel[0][$col]);

@@ -196,7 +196,6 @@ class Calendar
 		$this->month = new CalendarMonth($this->ts);
 
 		$t->ReWrite('input', array('Form', 'TagInput'));
-		$t->ReWrite('form', array('Form', 'TagForm'));
 		$t->ReWrite('month', array(&$this, 'TagMonth'));
 		$t->ReWrite('week', array(&$this, 'TagWeek'));
 

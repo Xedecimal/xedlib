@@ -25,6 +25,11 @@ class U
 			'AE' => 'Armed Forces Africa / Canada / Europe / Middle East');
 	}
 
+	static function DOut($text)
+	{
+		file_put_contents('debug.txt', $text, FILE_APPEND);
+	}
+
 	/**
 	 * Returns information on a given variable in human readable form.
 	 *

@@ -29,8 +29,9 @@ class FilterGallery extends FilterDefault
 
 		$dir = $fi->dir;
 		$abs = "{$dir}/t_{$fi->filename}";
-		$rel = dirname($fi->path).'/t_'.$fi->filename;
-		if (file_exists($rel)) $fi->icon = '<img src="'.htmlspecialchars($rel).'" />';
+		#$rel = dirname($fi->path).'/t_'.$fi->filename;
+		$rel = Server::GetRelativePath($abs);
+		if (file_exists($abs)) $fi->icon = '<img src="'.htmlspecialchars($rel).'" />';
 
 		if (is_dir($fi->path))
 		{
@@ -193,7 +194,7 @@ class FilterGallery extends FilterDefault
 	{
 		parent::Upload($file, $target);
 		$tdest = 't_'.substr($file, 0, strrpos($file, '.'));
-		$this->ResizeFile($target->path.$file, $target->path.$tdest,
+		$this->ResizeFile($target->path.'/'.$file, $target->path.'/'.$tdest,
 			$target->info['thumb_width'], $target->info['thumb_height']);
 	}
 
@@ -228,7 +229,7 @@ class FilterGallery extends FilterDefault
 	/**
 	 * Extension will be automatically appended to $dest filename.
 	 */
-	function ResizeFile($file, $dest, $nx, $ny)
+	static function ResizeFile($file, $dest, $nx, $ny)
 	{
 		$pinfo = pathinfo($file);
 		$dt = $dest.'.'.$pinfo['extension'];
@@ -238,17 +239,17 @@ class FilterGallery extends FilterDefault
 			case "jpg":
 			case "jpeg":
 				$img = imagecreatefromjpeg($file);
-				$img = $this->ResizeImg($img, $nx, $ny);
+				$img = FilterGallery::ResizeImg($img, $nx, $ny);
 				imagejpeg($img, $dt);
 			break;
 			case "png":
 				$img = imagecreatefrompng($file);
-				$img = $this->ResizeImg($img, $nx, $ny);
+				$img = FilterGallery::ResizeImg($img, $nx, $ny);
 				imagepng($img, $dt);
 			break;
 			case "gif":
 				$img = imagecreatefromgif($file);
-				$img = $this->ResizeImg($img, $nx, $ny);
+				$img = FilterGallery::ResizeImg($img, $nx, $ny);
 				imagegif($img, $dt);
 			break;
 		}
@@ -262,7 +263,7 @@ class FilterGallery extends FilterDefault
 	 * @param int $ny
 	 * @return resource
 	 */
-	function ResizeImg($img, $nx, $ny)
+	static function ResizeImg($img, $nx, $ny)
 	{
 		$sx  = ImageSX($img);
 		$sy = ImageSY($img);

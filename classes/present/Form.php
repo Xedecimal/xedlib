@@ -392,8 +392,7 @@ class Form extends LayeredOutput
 		global $PERSISTS;
 		$frm = new Form(@$a['ID']);
 		$t->Push($frm);
-		if (is_array($this->formAttribs)) $a += $this->formAttribs;
-		$ret = '<form'.HM::GetAttribs($a).'>';
+		$ret = '<form'.HM::GetAttribs($a).HM::GetAttribs($this->formAttribs).'>';
 		if (is_array($PERSISTS))
 		foreach ($PERSISTS as $n => $v)
 			$ret .= '<input type="hidden" name="'.$n.'" value="'.$v.'" />';
