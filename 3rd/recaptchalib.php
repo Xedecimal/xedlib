@@ -54,8 +54,6 @@ function _recaptcha_qsencode ($data) {
         return $req;
 }
 
-
-
 /**
  * Submits an HTTP POST to a reCAPTCHA server
  * @param string $host
@@ -91,8 +89,6 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
         return $response;
 }
 
-
-
 /**
  * Gets the challenge HTML (javascript and non-javascript version).
  * This is called from the browser, and the resulting reCAPTCHA HTML widget
@@ -103,7 +99,7 @@ function _recaptcha_http_post($host, $path, $data, $port = 80) {
 
  * @return string - The HTML to be embedded in the user's form.
  */
-function recaptcha_get_html ($pubkey, $error = null, $use_ssl = false)
+function recaptcha_get_html($pubkey, $error = null, $use_ssl = false)
 {
 	if ($pubkey == null || $pubkey == '') {
 		die ("To use reCAPTCHA you must get an API key from <a href='https://www.google.com/recaptcha/admin/create'>https://www.google.com/recaptcha/admin/create</a>");
@@ -128,9 +124,6 @@ function recaptcha_get_html ($pubkey, $error = null, $use_ssl = false)
 	</noscript>';
 }
 
-
-
-
 /**
  * A ReCaptchaResponse is returned from recaptcha_check_answer()
  */
@@ -138,7 +131,6 @@ class ReCaptchaResponse {
         var $is_valid;
         var $error;
 }
-
 
 /**
   * Calls an HTTP POST function to verify if the user's guess was correct
@@ -210,7 +202,6 @@ function _recaptcha_aes_pad($val) {
 }
 
 /* Mailhide related code */
-
 function _recaptcha_aes_encrypt($val,$ky) {
 	if (! function_exists ("mcrypt_encrypt")) {
 		die ("To use reCAPTCHA Mailhide, you need to have the mcrypt php module installed.");
@@ -220,7 +211,6 @@ function _recaptcha_aes_encrypt($val,$ky) {
 	$val=_recaptcha_aes_pad($val);
 	return mcrypt_encrypt($enc, $ky, $val, $mode, "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0");
 }
-
 
 function _recaptcha_mailhide_urlbase64 ($x) {
 	return strtr(base64_encode ($x), '+/', '-_');

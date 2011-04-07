@@ -188,7 +188,11 @@ class Module
 
 	function CheckActive($name)
 	{
-		if (@$GLOBALS['_d']['q'][0] == $name) $this->Active = true;
+		$items = explode('/', $name);
+		$this->Active = true;
+		foreach ($items as $ix => $i)
+			if (@$GLOBALS['_d']['q'][$ix] != $i)
+				$this->Active = false;
 	}
 
 	function Auth() { return true; }
