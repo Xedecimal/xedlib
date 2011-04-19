@@ -222,7 +222,7 @@ class FormInput
 			case 'custom':
 				return call_user_func($this->atrs['VALUE'], $this);
 
-			// Dates
+			# Dates
 
 			case 'date':
 				$this->labl = false;
@@ -283,7 +283,7 @@ class FormInput
 				return $ret.'</select>';
 		}
 
-		//$val = $this->GetValue($persist && $this->atrs['TYPE'] != 'radio');
+		if (empty($this->atrs['TYPE'])) $this->atrs['TYPE'] = 'text';
 		$atrs = HM::GetAttribs($this->atrs);
 		return "<input {$atrs} />";
 	}
