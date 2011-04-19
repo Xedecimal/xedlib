@@ -53,7 +53,7 @@ class FilterDefault
 	 */
 	function Upload($file, $target)
 	{
-		$this->UpdateMTime($target->path.$file);
+		$this->UpdateMTime($target->path.'/'.$file);
 	}
 
 	/**
@@ -100,7 +100,7 @@ class FilterDefault
 			if (file_exists($r_target)) unlink($r_target);
 			rename($fi->path, $fi->dir.'/.deleted_'.$fi->filename);
 		}
-		else if (is_dir($fi->path)) DelTree($fi->path);
+		else if (is_dir($fi->path)) File::DelTree($fi->path);
 		else unlink($fi->path);
 	}
 

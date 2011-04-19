@@ -1,11 +1,13 @@
 <?php
 
+require_once(dirname(__FILE__).'/Form.php');
+
 class EditorText
 {
 	public $Name;
 	private $item;
 
-	function EditorText($name, $item)
+	function __construct($name, $item)
 	{
 		$this->Name = $name;
 		$this->item = str_replace('\\', '', $item);
@@ -21,7 +23,7 @@ class EditorText
 
 		if ($action == 'update')
 		{
-			$this->item = SecurePath(Server::GetVar($this->Name.'_ci'));
+			$this->item = File::SecurePath(Server::GetVar($this->Name.'_ci'));
 			file_put_contents($this->item, Server::GetVar($this->Name.'_body'));
 		}
 	}

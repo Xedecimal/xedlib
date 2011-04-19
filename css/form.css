@@ -1,11 +1,10 @@
 fieldset { border: 0; margin-top: 1em; }
-fieldset legend { font-weight: bold; }
+fieldset legend { font-size: larger; font-weight: bold; }
 
 /* Vertical List Style Forms */
 
 fieldset ul { list-style: none; padding: 0; margin: 0; }
 fieldset li { margin: 1em 0; }
-fieldset li label { display: block; font-size: large;  }
 fieldset li select { width: 100%; }
 fieldset li input { width: 100%; }
 fieldset li textarea { width: 100%; }

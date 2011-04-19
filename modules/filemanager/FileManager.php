@@ -108,37 +108,11 @@ class FileManager extends Module
 	 * @param string $root Highlest folder level allowed.
 	 * @param array $filters Directory filters allowed.
 	 */
-	function __construct($name, $root, $filters = null)
+	function __construct()
 	{
-		# TODO: Don't run cleanID here!
-		$this->Name = HM::CleanID($name);
-		$this->Root = $root;
-		$this->filters = $filters;
-
 		$this->Behavior = new FileManagerBehavior();
 		$this->View = new FileManagerView();
-
 		$this->Template = dirname(__FILE__).'/FileManager.xml';
-
-		if (!file_exists($root))
-			die("FileManager::FileManager(): Root ($root) directory does
-			not exist.");
-
-		//Append trailing slash.
-		if (substr($this->Root, -1) != '/') $this->Root .= '/';
-		$this->cf = File::SecurePath(Server::GetState($this->Name.'_cf'));
-		if (!file_exists($this->Root.$this->cf))
-		{
-			Server::Error('Directory does not exist:'.$this->Root.$this->cf);
-			$this->cf = '';
-		}
-
-		if (is_dir($this->Root.$this->cf)
-			&& strlen($this->cf) > 0
-			&& substr($this->cf, -1) != '/')
-			$this->cf .= '/';
-
-		$rp = Server::GetRelativePath(dirname(__FILE__));
 	}
 
 	/**
@@ -149,6 +123,7 @@ class FileManager extends Module
 	function Prepare()
 	{
 		$act = Server::GetVar($this->Name.'_action');
+		$this->cf = Server::GetVar($this->Name.'_cf');
 
 		//Don't allow renaming the root or the file manager will throw errors
 		//ever after.
@@ -158,8 +133,8 @@ class FileManager extends Module
 
 		if ($act == 'Upload' && $this->Behavior->AllowUpload)
 		{
-			$fi = new FileInfo($this->Root.$this->cf);
-			$filter = FileInfo::GetFilter($fi, $this->Root, $this->filters);
+			$fi = new FileInfo($this->Root.'/'.$this->cf);
+			$filter = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 
 			// Completed chunked upload.
 			if (Server::GetVar('cm') == 'done')
@@ -189,17 +164,15 @@ class FileManager extends Module
 			foreach ($_FILES['cu']['name'] as $ix => $name)
 			{
 				$tname = $_FILES['cu']['tmp_name'][$ix];
-				move_uploaded_file($tname, $this->Root.$this->cf.$name);
+				$target = $this->Root.'/'.$this->cf.'/'.$name;
+				move_uploaded_file($tname, $target);
 
-				ob_start();
-				var_dump($_POST);
-				file_put_contents('debug.txt', ob_get_clean(), FILE_APPEND);
 				if (!preg_match('#^\.\[[0-9]+\]_.*#', $name))
 				{
 					$filter->Upload($name, $fi);
 					if (!empty($this->Behavior->Watchers))
 						U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
-							$this->Root.$this->cf.$name);
+							$target);
 				}
 			}
 		}
@@ -249,9 +222,9 @@ class FileManager extends Module
 		else if ($act == 'Rename')
 		{
 			if (!$this->Behavior->AllowRename) return;
-			$fi = new FileInfo($this->Root.$this->cf, $this->filters);
+			$fi = new FileInfo($this->Root.'/'.$this->cf, $this->filters);
 			$name = Server::GetVar($this->Name.'_rname');
-			$f = FileInfo::GetFilter($fi, $this->Root, $this->filters);
+			$f = FileManager::GetFilter($fi, $this->Root, $this->filters);
 			$f->Rename($fi, $name);
 			$this->cf = substr($fi->path, strlen($this->Root)).'/';
 			if (!empty($this->Behavior->Watchers))
@@ -266,7 +239,7 @@ class FileManager extends Module
 			foreach ($sels as $file)
 			{
 				$fi = new FileInfo(stripslashes($file), $this->filters);
-				$f = FileInfo::GetFilter($fi, $this->Root, $this->filters);
+				$f = Filemanager::GetFilter($fi, $this->Root, $this->Filters);
 				$break = false;
 				if (!empty($this->Behavior->Watchers))
 				{
@@ -285,7 +258,7 @@ class FileManager extends Module
 		else if ($act == 'Create')
 		{
 			if (!$this->Behavior->AllowCreateDir) return;
-			$p = $this->Root.$this->cf.Server::GetVar($this->Name.'_cname');
+			$p = $this->Root.$this->cf.'/'.Server::GetVar($this->Name.'_cname');
 			mkdir($p);
 			chmod($p, 0755);
 			FilterDefault::UpdateMTime($p);
@@ -394,6 +367,23 @@ class FileManager extends Module
 			$fp = fopen($finfo->path, 'r');
 			while ($out = fread($fp, 4096))	echo $out;
 			die();
+		}
+
+		$this->cf = File::SecurePath(Server::GetState($this->Name.'_cf'));
+
+		if (is_dir($this->Root.$this->cf)
+			&& strlen($this->cf) > 0
+			&& substr($this->cf, -1) != '/')
+			$this->cf .= '/';
+
+		# Append trailing slash.
+		if (substr($this->Root, -1) != '/') $this->Root .= '/';
+
+		# Verify that this root exists.
+		if (!file_exists($this->Root.$this->cf))
+		{
+			Server::Error('Directory does not exist:'.$this->Root.$this->cf);
+			$this->cf = '';
 		}
 
 		if (is_dir($this->Root.$this->cf)) $this->files = $this->GetDirectory();
@@ -510,7 +500,7 @@ class FileManager extends Module
 		if (!empty($this->files['folders']))
 		foreach ($this->files['folders'] as $f)
 		{
-			FileInfo::GetFilter($f, $this->Root, $this->filters, $f->dir);
+			FileManager::GetFilter($f, $this->Root, $this->Filters, $f->dir);
 			if (!$f->show) continue;
 			if (!$this->GetVisible($f)) continue;
 
@@ -586,7 +576,7 @@ class FileManager extends Module
 		$ix = 0;
 
 		$fi = new FileInfo($this->Root.$this->cf);
-		$filter = FileInfo::GetFilter($fi, $this->Root, $this->filters);
+		$filter = Filemanager::GetFilter($fi, $this->Root, $this->Filters);
 
 		if (!empty($this->files['files']))
 		foreach ($this->files['files'] as $f)
@@ -713,7 +703,7 @@ class FileManager extends Module
 		}
 		else $def = null;
 
-		$f = FileInfo::GetFilter($fi, $this->Root, $this->filters, $fi->info);
+		$f = FileManager::GetFilter($fi, $this->Root, $this->Filters, $fi->info);
 
 		if ($this->Behavior->AllowSetType && count($this->filters) > 1 && is_dir($fi->path))
 		{
@@ -780,15 +770,6 @@ class FileManager extends Module
 
 		$relpath = Server::GetRelativePath(dirname(__FILE__));
 
-		if (!isset($GLOBALS['page_head'])) $GLOBALS['page_head'] = '';
-		$GLOBALS['page_head'] .= <<<EOF
-<script type="text/javascript">
-window.onload = function() {
-	$('#{$this->Name}_mass_options').hide();
-}
-</script>
-EOF;
-
 		$this->mass_avail = $this->Behavior->MassAvailable();
 
 		//TODO: Get rid of this.
@@ -796,6 +777,12 @@ EOF;
 
 		global $me;
 		$this->vars['target'] = $this->Behavior->Target;
+
+		$ex = HM::ParseURL($this->Behavior->Target);
+		$ex['args'][$this->Name.'_action'] = 'upload';
+		$ex['args']['PHPSESSID'] = Server::GetVar('PHPSESSID');
+		$this->vars['java_target'] = HM::URL($ex['url'], $ex['args']);
+
 		$this->vars['root'] = $this->Root;
 		$this->vars['cf'] = $this->cf;
 
@@ -841,6 +828,7 @@ EOF;
 		$ret['head'] = '<script type="text/javascript"
 				src="{{xl_abs}}/modules/FileManager/FileManager.js"></script>';
 		$ret['default'] = $t->ParseFile($this->Template);
+
 		return $ret;
 	}
 
@@ -1025,7 +1013,7 @@ EOF;
 			if ($file[0] == '.') continue;
 			//TODO: Should handle this on a filter level.
 			if (substr($file, 0, 2) == 't_') continue;
-			$newfi = new FileInfo($this->Root.$this->cf.$file, $this->filters);
+			$newfi = new FileInfo($this->Root.$this->cf.'/'.$file, $this->Filters);
 			if (!$newfi->show) continue;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
 			{
@@ -1116,6 +1104,45 @@ EOF;
 			$ret .= "<a href=\"{$uri}\">{$text}</a>";
 		}
 		return $ret;
+	}
+
+	/**
+	 * Returns the filter that was explicitely set on this object, object's
+	 * directory, or fall back on the default filter.
+	 *
+	 * @param string $path Path to file to get filter of.
+	 * @param string $default Default filter to fall back on.
+	 * @return FilterDefault Or a derivitive.
+	 */
+	static function GetFilter(&$fi, $root, $defaults)
+	{
+		$ft = $fi;
+
+		# Either file or no filter here.
+		while (is_file($fi->path) || empty($fi->info['type']))
+		{
+			# TODO: Infinite loop here.
+			if (File::IsIn($ft->dir, $root))
+				$ft = new FileInfo(realpath($ft->dir));
+			else
+			{
+				if (isset($defaults[0]))
+					$fname = 'Filter'.$defaults[0];
+				else
+					$fname = 'FilterDefault';
+				$f = new $fname();
+				$f->GetInfo($fi);
+				return $f;
+			}
+		}
+
+		if (in_array($ft->info['type'], $defaults))
+			$fname = 'Filter'.$ft->info['type'];
+		else $fname = 'Filter'.$defaults[0];
+
+		$f = new $fname();
+		$f->GetInfo($fi);
+		return $f;
 	}
 }
 

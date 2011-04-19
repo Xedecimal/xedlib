@@ -45,14 +45,16 @@ class Table
 	/**
 	 * Instantiates this table with the specified attributes.
 	 * @param string $name Unique name only used in Html comments for identification.
-	 * @param array $cols Default columns headers to display ( eg. array("Column1", "Column2") ).
-	 * @param array $attributes An array of attributes for each column ( eg. array('width="100%"', 'valign="top"') ).
+	 * @param array $cols Default columns headers to display ( eg.
+	 * array("Column1", "Column2") ).
+	 * @param array $col_attribs An array of attributes for each column ( eg.
+	 * array('width="100%"', 'valign="top"') ).
 	 */
-	function Table($name, $cols, $attributes = NULL)
+	function __construct($name, $cols, $col_attribs = NULL)
 	{
 		$this->name = $name;
 		$this->cols = $cols;
-		$this->atrs = $attributes;
+		$this->atrs = $col_attribs;
 	}
 
 	/**
@@ -75,13 +77,11 @@ class Table
 	function Get($attributes = null)
 	{
 		$ret = "<!-- Start Table: {$this->name} -->\n";
-		$ret .= '<table';
-		$ret .= HM::GetAttribs($attributes);
-		$ret .= ">\n";
+		$ret .= '<table'.HM::GetAttribs($attributes).">\n";
 
 		$atrs = null;
 
-		if ($this->cols)
+		if (!empty($this->cols))
 		{
 			$ret .= "<thead><tr>\n";
 			$ix = 0;
@@ -95,7 +95,7 @@ class Table
 			$ret .= "</tr></thead>\n";
 		}
 
-		if ($this->rows)
+		if (!empty($this->rows))
 		{
 			$ret .= "<tbody>\n";
 			if (!isset($this->cols))
@@ -112,8 +112,7 @@ class Table
 				$ret .= ">\n";
 				if (count($row) < count($this->cols))
 					$span = " colspan=\"".
-						(count($this->cols) - count($row) + 1)
-						/*."\"{$this->rowattribs[$ix]}"*/;
+						(count($this->cols) - count($row) + 1);
 				else $span = '';
 				$x = 0;
 				$atrs = null;

@@ -94,7 +94,7 @@ class FormInput
 	function attr($attr = null, $val = null)
 	{
 		if (!isset($attr)) return $this->atrs;
-		if (isset($val)) $this->atrs[$attr] = $val;
+		if (isset($val)) return $this->atrs[$attr] = $val;
 		if (isset($this->atrs[$attr])) return $this->atrs[$attr];
 	}
 
@@ -113,6 +113,18 @@ class FormInput
 		return $ret.' />';
 	}
 
+	function Validate()
+	{
+		if ($this->atrs['TYPE'] == 'captcha')
+		{
+			$v = Server::GetVar('c');
+			if (!empty($v)) return false;
+		}
+
+		# By default we pass validation.
+		return true;
+	}
+
 	/**
 	 * Returns this input object rendered in html.
 	 *
@@ -125,6 +137,10 @@ class FormInput
 		if (!empty($this->atrs['ID']))
 			$this->atrs['ID'] = $this->GetCleanID($parent);
 
+		if ($this->atrs['TYPE'] == 'captcha')
+		{
+			return '<input type="text" name="c" value="" />';
+		}
 		if ($this->atrs['TYPE'] == 'spamblock')
 		{
 			$this->atrs['TYPE'] = 'text';
@@ -318,6 +334,12 @@ class FormInput
 					Server::GetVars($this->atrs['NAME'], @$this->atrs['VALUE']) :
 					@$this->atrs['VALUE']);
 		}
+	}
+
+	function IsSignificant()
+	{
+		if ($this->atrs['TYPE'] == 'captcha') return false;
+		return true;
 	}
 
 	function GetCleanID($parent)
