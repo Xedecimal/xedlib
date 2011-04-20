@@ -1,7 +1,6 @@
 <?php
 
 require_once(dirname(__FILE__).'/Database.php');
-require_once(dirname(__FILE__).'/Relation.php');
 require_once(dirname(__FILE__).'/Join.php');
 
 /**
@@ -135,17 +134,6 @@ class DataSet
 		$this->table = $table;
 		$this->id = $id;
 		$this->joins = array();
-	}
-
-	/**
-	 * Adds a child relation to this DataSet for recursion.
-	 *
-	 * @param Relation $relation
-	 * @see EditorData
-	 */
-	function AddChild($relation)
-	{
-		$this->children[] = $relation;
 	}
 
 	function AddJoin($join)

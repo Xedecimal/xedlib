@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__).'/../classes/TreeNode.php');
+require_once(dirname(__FILE__).'/../classes/HM.php');
 
 class ModNav extends Module
 {
