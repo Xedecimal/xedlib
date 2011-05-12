@@ -95,7 +95,7 @@ class Module
 				foreach (array_keys($_d['module.disable']) as $m)
 					unset($mods[$m]);
 
-			#uksort($mods, array('Module', 'cmp_mod'));
+			uksort($mods, array('Module', 'cmp_mod'));
 			U::RunCallbacks(@$_d['index.cb.prelink']);
 
 			foreach ($mods as $n => $mod)
