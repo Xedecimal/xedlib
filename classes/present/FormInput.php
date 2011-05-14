@@ -134,7 +134,7 @@ class FormInput
 	 */
 	function Get($parent = null, $persist = true)
 	{
-		if (!empty($this->atrs['ID']))
+		if (empty($this->atrs['ID']))
 			$this->atrs['ID'] = $this->GetCleanID($parent);
 
 		if ($this->atrs['TYPE'] == 'captcha')
