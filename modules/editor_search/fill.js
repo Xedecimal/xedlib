@@ -5,22 +5,21 @@ record = 0
 
 function fill(ix, element) {
 	input = $(this);
-	// form[{1}]
-	if ((m = $(this).attr('name').match(/form\[([^\]]+)\]/)))
+
+	if ((m = $(this).prop('name').match(/form\[([^\]]+)\]/)))
 	{
-		// Checkboxes must be a sub-table
-		if (input.attr('type') == 'checkbox')
-		{
-			m = input.attr('name').match(/form\[([^\]]+)\]\[([^\]]+)\]/);
-			col = m[1].match(/[^.]+\.([^\]]+)/)[1];
-			val = m[2];
+		// Checkbox from sub-table
+		if (input.attr('type') == 'checkbox' &&
+			(msub = input.attr('name').match(/form\[([^\]]+)\]\[([^\]]+)\]/))) {
+			col = msub[1].match(/[^.]+\.([^\]]+)/)[1];
+			val = msub[2];
 			$(json).each(function (ix, row) {
-				if (row[col] == val) input.attr('checked', 'checked');
+				if (row[col] == val) input.click();
 			});
 		}
-		else if (input.attr('type') == 'radio')
+		else if (input.attr('type') == 'radio' || input.attr('type') == 'checkbox')
 		{
-			if (json[record][m[1]] == input.val()) input.attr('checked', 'checked');
+			if (json[record][m[1]] == input.val()) input.click();
 		}
 		else
 		{
@@ -39,22 +38,21 @@ function fill(ix, element) {
 }
 
 $(function () {
+	$('.noview').hide();
+
 	// Populate the remains.
 	$('input,textarea,select').each(fill);
 
 	//Populate the repeatable entries.
-	$('.repeatable').each(function () {
-		rep = this;
-		$(rep.children[0]).hide();
-		col = rep.id.match(/repeat:(.*)/)[1];
-		ids = {};
+	$('.repeater').each(function () {
+		rep = $(this);
 		$(json).each(function (ix, row) {
-			if (!ids[row[col]] && row[col] != null) {
-				obj = $(rep.children[0]).repeat($(rep));
-				record = ix;
-				obj.find('input,textarea,select').each(fill);
-				ids[row[col]] = 1;
-			}
+			ent = rep.find('.entry:last');
+			ent.after(ent.clone());
+			ent.find('input,select').each(function () {
+				idx = $(this).attr('name').match(/[^[]+\[([^[]+)\]/)[1];
+				$(this).val(row[idx]);
+			});
 		});
 	});
 });
