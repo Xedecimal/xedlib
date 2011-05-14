@@ -146,7 +146,6 @@ class FormInput
 			$this->atrs['TYPE'] = 'text';
 			$this->atrs['CLASS'] = 'input_generic';
 			$this->atrs['VALUE'] = $this->GetValue($persist);
-			$this->atrs['ID'] = $this->GetCleanID($parent);
 			$this->labl = false;
 			$atrs = HM::GetAttribs($this->atrs);
 			return '<label>To verify your request, please type the word <u>'.
