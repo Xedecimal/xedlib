@@ -2,12 +2,12 @@
 
 class FormEmail extends Module
 {
-	public $Name = 'email';
+	public static $Name = 'email';
 	protected $_template;
 
 	function __construct()
 	{
-		$this->CheckActive($this->Name);
+		$this->CheckActive(self::$Name);
 		$this->title = 'Contact Form';
 		$this->_template = Module::L('form_email/form.xml');
 		$this->_subject = 'Web Contact Submission';
