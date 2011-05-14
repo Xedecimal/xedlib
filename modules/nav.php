@@ -25,9 +25,18 @@ class ModNav extends Module
 				if (!empty($c->data))
 				{
 					if (is_array($c->data))
+					{
+						# Raw content
+						if (isset($c->data['raw']))
+							$ret .= $c->data['raw'];
+						# Attributes Specified
 						$atrs = HM::GetAttribs($c->data);
-					else $atrs = HM::GetAttribs(array('href' => $c->data));
-					$ret .= "<a$atrs>";
+					}
+					else
+					{
+						$atrs = HM::GetAttribs(array('href' => $c->data));
+						$ret .= "<a$atrs>";
+					}
 				}
 				$ret .= $c->id;
 				if (!empty($c->data)) $ret .= '</a>';

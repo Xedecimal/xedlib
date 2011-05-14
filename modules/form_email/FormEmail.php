@@ -8,6 +8,7 @@ class FormEmail extends Module
 	function __construct()
 	{
 		$this->CheckActive($this->Name);
+		$this->title = 'Contact Form';
 		$this->_template = Module::L('form_email/form.xml');
 		$this->_subject = 'Web Contact Submission';
 		$this->_template_send = Module::L('form_email/send.xml');
@@ -64,10 +65,12 @@ class FormEmail extends Module
 		{
 			$row['name'] = $n;
 			$row['field'] = $f->Get();
+			$row['fid'] = $f->atrs['ID'];
 			if ($f->attr('TYPE') == 'captcha') $row['style'] = ' display: none';
-			$rows[] = $row;
+			else $row['style'] = '';
+			$rows[$n] = $row;
 		}
-		return VarParser::Concat($g, $rows);
+		return VarParser::Concat($g, $rows, false);
 	}
 
 	function TagEmailField($t, $g)

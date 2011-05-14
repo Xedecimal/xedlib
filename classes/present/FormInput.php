@@ -134,7 +134,7 @@ class FormInput
 	 */
 	function Get($parent = null, $persist = true)
 	{
-		if (!empty($this->atrs['ID']))
+		if (empty($this->atrs['ID']))
 			$this->atrs['ID'] = $this->GetCleanID($parent);
 
 		if ($this->atrs['TYPE'] == 'captcha')
@@ -146,7 +146,6 @@ class FormInput
 			$this->atrs['TYPE'] = 'text';
 			$this->atrs['CLASS'] = 'input_generic';
 			$this->atrs['VALUE'] = $this->GetValue($persist);
-			$this->atrs['ID'] = $this->GetCleanID($parent);
 			$this->labl = false;
 			$atrs = HM::GetAttribs($this->atrs);
 			return '<label>To verify your request, please type the word <u>'.
@@ -222,7 +221,7 @@ class FormInput
 			case 'custom':
 				return call_user_func($this->atrs['VALUE'], $this);
 
-			// Dates
+			# Dates
 
 			case 'date':
 				$this->labl = false;
@@ -283,7 +282,7 @@ class FormInput
 				return $ret.'</select>';
 		}
 
-		//$val = $this->GetValue($persist && $this->atrs['TYPE'] != 'radio');
+		if (empty($this->atrs['TYPE'])) $this->atrs['TYPE'] = 'text';
 		$atrs = HM::GetAttribs($this->atrs);
 		return "<input {$atrs} />";
 	}

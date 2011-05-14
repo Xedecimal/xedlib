@@ -76,9 +76,10 @@ class VarParser
 		return null;
 	}
 
-	static function Concat($t, $items)
+	static function Concat($t, $items, $bleed = true)
 	{
 		$vp = new VarParser();
+		$vp->Behavior->Bleed = $bleed;
 		$ret = '';
 		foreach ($items as $i['id'] => $i) $ret .= $vp->ParseVars($t, $i);
 		return $ret;
