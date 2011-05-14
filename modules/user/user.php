@@ -135,6 +135,7 @@ class ModUser extends Module
 
 		if ($this->Active && @$_d['q'][1] == 'forgot-password')
 		{
+			if (!empty($_d['user.disable_signup'])) return;
 			$t = new Template();
 			$t->ReWrite('field', array(&$this, 'TagFieldForgot'));
 			$ret['default'] = $t->ParseFile(Module::L('user/forgot.xml'));
