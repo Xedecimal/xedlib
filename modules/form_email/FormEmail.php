@@ -42,7 +42,6 @@ class FormEmail extends Module
 			if (!$this->send) return;
 
 			$t->ReWrite('field', array(&$this, 'TagEmailField'));
-			die($t->ParseFile($this->_email_template));
 			mail($this->_to, $this->_subject,
 				$t->ParseFile($this->_email_template),
 				implode($headers, "\r\n"));
