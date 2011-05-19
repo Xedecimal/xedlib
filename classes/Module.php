@@ -153,7 +153,7 @@ class Module
 	/** @var boolean */
 	public $Active;
 
-	protected static $Name = 'module';
+	public static $Name = 'module';
 
 	function DataError($errno)
 	{
