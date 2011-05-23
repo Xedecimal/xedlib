@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__).'/../../classes/present/FormInput.php');
+
 class FormEmail extends Module
 {
 	public static $Name = 'email';
