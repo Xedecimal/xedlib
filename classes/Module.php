@@ -186,13 +186,24 @@ class Module
 		}
 	}
 
-	function CheckActive($name)
+	function CheckActive($name, $return = false)
 	{
+		if (is_array($name))
+		{
+			foreach ($name as $n)
+				if ($this->CheckActive($n, true)) $this->Active = true;
+
+			return;
+		}
 		$items = explode('/', $name);
-		$this->Active = true;
+
+		$active = true;
 		foreach ($items as $ix => $i)
 			if (@$GLOBALS['_d']['q'][$ix] != $i)
-				$this->Active = false;
+				$active = false;
+
+		if (!$return) $this->Active = $active;
+		return $active;
 	}
 
 	function Auth() { return true; }
