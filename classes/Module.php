@@ -132,7 +132,7 @@ class Module
 	{
 		global $_d;
 
-		if (isset($_d['module.order'][$x], $_d['module.order'][$y]))
+		if (isset($_d['module.order'][$x]) || isset($_d['module.order'][$y]))
 			return @$_d['module.order'][$x] < @$_d['module.order'][$y];
 		return 0;
 	}
