@@ -1,14 +1,16 @@
 <?php
 
+require_once(dirname(__FILE__).'/../../classes/present/FormInput.php');
+
 class FormEmail extends Module
 {
-	public static $Name = 'email';
+	public $Name = 'email';
+	public $Title = 'Contact Form';
 	protected $_template;
 
 	function __construct()
 	{
-		$this->CheckActive(self::$Name);
-		$this->title = 'Contact Form';
+		$this->CheckActive($this->Name);
 		$this->_template = Module::L('form_email/form.xml');
 		$this->_subject = 'Web Contact Submission';
 		$this->_template_send = Module::L('form_email/send.xml');

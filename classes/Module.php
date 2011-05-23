@@ -132,7 +132,7 @@ class Module
 	{
 		global $_d;
 
-		if (isset($_d['module.order'][$x], $_d['module.order'][$y]))
+		if (isset($_d['module.order'][$x]) || isset($_d['module.order'][$y]))
 			return @$_d['module.order'][$x] < @$_d['module.order'][$y];
 		return 0;
 	}
@@ -153,7 +153,7 @@ class Module
 	/** @var boolean */
 	public $Active;
 
-	public static $Name = 'module';
+	public $Name = 'module';
 
 	function DataError($errno)
 	{
@@ -186,13 +186,24 @@ class Module
 		}
 	}
 
-	function CheckActive($name)
+	function CheckActive($name, $return = false)
 	{
+		if (is_array($name))
+		{
+			foreach ($name as $n)
+				if ($this->CheckActive($n, true)) $this->Active = true;
+
+			return;
+		}
 		$items = explode('/', $name);
-		$this->Active = true;
+
+		$active = true;
 		foreach ($items as $ix => $i)
 			if (@$GLOBALS['_d']['q'][$ix] != $i)
-				$this->Active = false;
+				$active = false;
+
+		if (!$return) $this->Active = $active;
+		return $active;
 	}
 
 	function Auth() { return true; }

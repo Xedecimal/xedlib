@@ -66,6 +66,19 @@ class VarParser
 
 	function FindVar($tvar)
 	{
+		# Periods break into recursion.
+		if (preg_match('/\./', $tvar))
+		{
+			$tree = explode('.', $tvar);
+			$cv = $this->FindVar($tree[0]);
+			for ($ix = 1; $ix < count($tree); $ix++)
+			{
+				$cv = $cv[$tree[$ix]];
+				var_dump($cv);
+			}
+
+			return $cv;
+		}
 		global $$tvar;
 		if (is_object($this->vars)) return @$this->vars->$tvar;
 		if (!empty($this->vars) && key_exists($tvar, $this->vars))

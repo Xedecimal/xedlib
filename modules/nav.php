@@ -13,14 +13,19 @@ class ModNav extends Module
 	*/
 	static function GetLinks($link, $depth = -1)
 	{
+		global $_d;
+
 		# Iterate Children, skip root node as it's just a container.
 
 		$ret = null;
 		if (!empty($link->children))
 		{
 			$ret .= '<ul class="nav">';
+			$ix = 0;
 			foreach ($link->children as $c)
 			{
+				if ($ix++ > 0 && !empty($_d['nav.sep']) && $depth < 0)
+					$ret .= $_d['nav.sep'];
 				$ret .= '<li>';
 				if (!empty($c->data))
 				{
