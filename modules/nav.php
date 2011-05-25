@@ -1,29 +1,48 @@
 <?php
 
 require_once(dirname(__FILE__).'/../classes/TreeNode.php');
+require_once(dirname(__FILE__).'/../classes/HM.php');
 
 class ModNav extends Module
 {
 	public $Block = 'nav';
 
 	/**
-	*
-	*
 	* @param TreeNode $link
 	* @param int $depth
 	*/
 	static function GetLinks($link, $depth = -1)
 	{
+		global $_d;
+
 		# Iterate Children, skip root node as it's just a container.
 
 		$ret = null;
 		if (!empty($link->children))
 		{
 			$ret .= '<ul class="nav">';
+			$ix = 0;
 			foreach ($link->children as $c)
 			{
+				if ($ix++ > 0 && !empty($_d['nav.sep']) && $depth < 0)
+					$ret .= $_d['nav.sep'];
 				$ret .= '<li>';
-				if (!empty($c->data)) $ret .= '<a href="'.$c->data.'">';
+				if (!empty($c->data))
+				{
+					if (is_array($c->data))
+					{
+						# Raw content
+						if (isset($c->data['raw']))
+							$ret .= $c->data['raw'];
+						# Attributes Specified
+						$atrs = HM::GetAttribs($c->data);
+					}
+					else
+					{
+						$atrs = HM::GetAttribs(array('href' => $c->data));
+						$ret .= "<a$atrs>";
+					}
+				}
 				$ret .= $c->id;
 				if (!empty($c->data)) $ret .= '</a>';
 				$ret .= ModNav::GetLinks($c, $depth+1);

@@ -86,11 +86,13 @@ class Template extends LayeredOutput
 		if (isset($args[0]))
 		{
 			$data = &$args[0];
-			$this->data = &$data;
+			if (is_object($data)) $this->data = array_merge(
+				get_class_vars(get_class($data)), get_object_vars($data));
+			else $this->data = &$data;
 
 			// Handle Global Rewrites
-			if (!empty($data['rewrites']))
-			foreach ($data['rewrites'] as $rw) $this->ReWrite($rw[0], $rw[1]);
+			if (!empty($this->data['rewrites']))
+			foreach ($this->data['rewrites'] as $rw) $this->ReWrite($rw[0], $rw[1]);
 		}
 		$this->objs = array();
 		$this->vars = array();
@@ -563,8 +565,9 @@ class Template extends LayeredOutput
 
 	static function TagCallback($t, $g, $a)
 	{
-		$ds = @$GLOBALS[$a['DS']];
-		return U::RunCallbacks(@$ds[$a['NAME']], $t);
+		$ds = $GLOBALS[$a['DS']];
+		if (!empty($ds[$a['NAME']]))
+			return U::RunCallbacks($ds[$a['NAME']], $t);
 	}
 
 	static function TagNEmpty($t, $g, $a)

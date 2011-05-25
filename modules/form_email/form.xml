@@ -1,0 +1,10 @@
+<form action="{{app_abs}}/{{_d.q.0}}/send" method="post" class="form-email">
+<fieldset>
+<legend>{{Title}}</legend>
+<ul>
+	<field><li style="{{style}}"><label for="{{fid}}">{{name}}</label>{{field}}</li>
+</field>
+	<li><label for="submit">&nbsp;</label><input type="submit" id="submit" value="Send" /></li>
+</ul>
+</fieldset>
+</form>

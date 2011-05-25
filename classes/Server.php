@@ -11,7 +11,6 @@ class Server
 	{
 		if (!empty($file)) $GLOBALS['__err_file'] = $file;
 		else ini_set('display_errors', 1);
-		$ver = phpversion();
 		ini_set('error_log', 'errors_php.txt');
 		set_error_handler(array('Server', 'ErrorHandler'));
 	}
@@ -107,7 +106,10 @@ class Server
 	 * @param string $msg Message to the user.
 	 * @param int $level How critical this error is.
 	 */
-	static function Error($msg, $level = E_USER_ERROR) { trigger_error($msg, $level); }
+	static function Error($msg, $level = E_USER_ERROR)
+	{
+		trigger_error($msg, $level);
+	}
 
 	/**
 	 * Use this when you wish to output debug information only when $debug is

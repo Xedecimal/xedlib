@@ -1,5 +1,7 @@
 <?php
 
+require_once(dirname(__FILE__).'/File.php');
+
 /**
  * Collects information for a SINGLE file OR folder.
  */
@@ -85,7 +87,7 @@ class FileInfo
 	{
 		global $user_root;
 		if (!file_exists($source))
-			Error("FileInfo: File/Directory does not exist. ({$source})<br/>\n");
+			Server::Error("FileInfo: File/Directory does not exist. ({$source})<br/>\n");
 
 		if (!empty($user_root))
 			$this->owned = strlen(strstr($source, $user_root)) > 0;
@@ -107,46 +109,6 @@ class FileInfo
 	}
 
 	/**
-	 * Returns the filter that was explicitely set on this object, object's
-	 * directory, or fall back on the default filter.
-	 *
-	 * @param string $path Path to file to get filter of.
-	 * @param string $default Default filter to fall back on.
-	 * @return FilterDefault Or a derivitive.
-	 */
-	static function GetFilter(&$fi, $root, $defaults)
-	{
-		# Either file or no filter here.
-
-		$ft = $fi;
-
-		while (is_file($fi->path) || empty($fi->info['type']))
-		{
-			# TODO: Infinite loop here.
-			if (File::IsIn($ft->dir, $root))
-				$ft = new FileInfo(realpath($ft->dir));
-			else
-			{
-				if (isset($defaults[0]))
-					$fname = 'Filter'.$defaults[0];
-				else
-					$fname = 'FilterDefault';
-				$f = new $fname();
-				$f->GetInfo($fi);
-				return $f;
-			}
-		}
-
-		if (in_array($ft->info['type'], $defaults))
-			$fname = 'Filter'.$ft->info['type'];
-		else $fname = 'Filter'.$defaults[0];
-
-		$f = new $fname();
-		$f->GetInfo($fi);
-		return $f;
-	}
-
-	/**
 	 * Gets a bit of a path, a bit is anything between the path separators
 	 * ('/').
 	 *
@@ -155,9 +117,8 @@ class FileInfo
 	 */
 	function GetBit($off)
 	{
-		$items = explode('/', $this->path);
-		if ($off < count($items)) return $items[$off];
-		return null;
+		$items = preg_split('#\/|\\\#', $this->path);
+		return @$items[$off];
 	}
 
 	/**
@@ -173,9 +134,6 @@ class FileInfo
 		$fp = fopen($info, 'w+');
 		fwrite($fp, serialize($this->info));
 		fclose($fp);
-		//This can cause issues if trying to chmod in the root. If the webserver
-		//created the file, it should already be writeable.
-		//chmod($info, 0777);
 	}
 }
 

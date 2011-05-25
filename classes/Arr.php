@@ -62,6 +62,11 @@ class Arr
 
 		return $ret;
 	}
+
+	static function FromXML($xml)
+	{
+		return json_decode(json_encode((array)simplexml_load_string($xml)), 1);
+	}
 }
 
 ?>

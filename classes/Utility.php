@@ -25,6 +25,11 @@ class U
 			'AE' => 'Armed Forces Africa / Canada / Europe / Middle East');
 	}
 
+	static function DOut($text)
+	{
+		file_put_contents('debug.txt', $text, FILE_APPEND);
+	}
+
 	/**
 	 * Returns information on a given variable in human readable form.
 	 *
@@ -123,7 +128,17 @@ class U
 	 */
 	static function GetDateOffset($ts)
 	{
-		$ss = time()-$ts;
+		$start = time()-$ts;
+		if ($start < 0) $nstart = abs($start);
+		else $nstart = $start;
+		$ret = U::DateRangeToString($nstart);
+		if ($start < 0) return 'in '.$ret;
+		else return $ret.' ago';		
+	}
+	
+	static function DateRangeToString($secs)
+	{
+		$ss = $secs;
 		$mm = (int)($ss / 60);
 		$hh = (int)($mm / 60);
 
@@ -140,7 +155,7 @@ class U
 		else if ($hh >= 1) $ret = $hh.' hour'.($hh > 1 ? 's' : null);
 		else if ($mm >= 1) $ret = $mm.' minute'.($mm > 1 ? 's' : null);
 		else $ret = $ss.' second'.($ss > 1 ? 's' : null);
-		return $ret.' ago';
+		return $ret;
 	}
 }
 

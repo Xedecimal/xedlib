@@ -17,6 +17,8 @@ class Module
 			$_d['template.transforms']['form'] = array('Module', 'TransPath', 'ACTION');
 		}
 
+		$_d['xl_dir'] = realpath(dirname(__FILE__).'/../');
+		$_d['xl_abs'] = Server::GetRelativePath($_d['xl_dir']);
 		$_d['app_dir'] = $root_path;
 		if (!isset($_d['app_abs']))
 			$_d['app_abs'] = Server::GetRelativePath($root_path);
@@ -58,7 +60,7 @@ class Module
 			return;
 
 		$mod = new $name(file_exists('settings.ini'));
-		if ($mod->Auth()) $GLOBALS['mods'][$name] = $mod;
+		$GLOBALS['mods'][$name] = $mod;
 	}
 
 	static function TransPath($a, $t)
@@ -93,14 +95,12 @@ class Module
 				foreach (array_keys($_d['module.disable']) as $m)
 					unset($mods[$m]);
 
-			#uksort($mods, array('Module', 'cmp_mod'));
+			uksort($mods, array('Module', 'cmp_mod'));
 			U::RunCallbacks(@$_d['index.cb.prelink']);
 
 			foreach ($mods as $n => $mod)
-			{
-				Server::Trace("Linking module: {$n}");
-				$mod->Link();
-			}
+				if (!$mod->Auth()) unset($mods[$n]);
+			foreach ($mods as $n => $mod) $mod->Link();
 			foreach ($mods as $n => $mod) $mod->Prepare();
 			foreach ($mods as $n => $mod)
 			{
@@ -132,7 +132,7 @@ class Module
 	{
 		global $_d;
 
-		if (isset($_d['module.order'][$x], $_d['module.order'][$y]))
+		if (isset($_d['module.order'][$x]) || isset($_d['module.order'][$y]))
 			return @$_d['module.order'][$x] < @$_d['module.order'][$y];
 		return 0;
 	}
@@ -153,7 +153,7 @@ class Module
 	/** @var boolean */
 	public $Active;
 
-	protected $Name = 'module';
+	public $Name = 'module';
 
 	function DataError($errno)
 	{
@@ -186,9 +186,24 @@ class Module
 		}
 	}
 
-	function CheckActive($name)
+	function CheckActive($name, $return = false)
 	{
-		if (@$GLOBALS['_d']['q'][0] == $name) $this->Active = true;
+		if (is_array($name))
+		{
+			foreach ($name as $n)
+				if ($this->CheckActive($n, true)) $this->Active = true;
+
+			return;
+		}
+		$items = explode('/', $name);
+
+		$active = true;
+		foreach ($items as $ix => $i)
+			if (@$GLOBALS['_d']['q'][$ix] != $i)
+				$active = false;
+
+		if (!$return) $this->Active = $active;
+		return $active;
 	}
 
 	function Auth() { return true; }

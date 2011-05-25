@@ -1,4 +1,4 @@
-<form action="{{app_abs}}/{{rw}}" method="post">
+<form action="{{app_abs}}/{{rw}}" method="post" class="form-login">
 <input type="hidden" name="user_action" value="login" />
 <fieldset>
 <ul>

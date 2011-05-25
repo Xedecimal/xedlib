@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Enter description here...
  */
@@ -67,6 +66,19 @@ class VarParser
 
 	function FindVar($tvar)
 	{
+		# Periods break into recursion.
+		if (preg_match('/\./', $tvar))
+		{
+			$tree = explode('.', $tvar);
+			$cv = $this->FindVar($tree[0]);
+			for ($ix = 1; $ix < count($tree); $ix++)
+			{
+				$cv = $cv[$tree[$ix]];
+				var_dump($cv);
+			}
+
+			return $cv;
+		}
 		global $$tvar;
 		if (!empty($this->vars) && key_exists($tvar, $this->vars))
 			return $this->vars[$tvar];
@@ -75,6 +87,15 @@ class VarParser
 		else if (isset($this->data[$tvar])) return $this->data[$tvar];
 		else if ($this->Behavior->UseGetVar) return Server::GetVar($tvar);
 		return null;
+	}
+
+	static function Concat($t, $items, $bleed = true)
+	{
+		$vp = new VarParser();
+		$vp->Behavior->Bleed = $bleed;
+		$ret = '';
+		foreach ($items as $i['id'] => $i) $ret .= $vp->ParseVars($t, $i);
+		return $ret;
 	}
 }
 
