@@ -217,7 +217,10 @@ class FilterGallery extends FilterDefault
 	{
 		$files = glob($path."*.*");
 		$fi = new FileInfo($path);
-		$fi->info['thumb_width'] = $fi->info['thumb_height'] = 200;
+		if (empty($fi->info['thumb_width']))
+			$fi->info['thumb_width'] = 200;
+		if (empty($fi->info['thumb_height']))
+			$fi->info['thumb_height'] = 200;
 		foreach ($files as $file)
 		{
 			if (substr($file, 0, 2) == 't_') continue;
