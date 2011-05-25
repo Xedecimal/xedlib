@@ -37,7 +37,6 @@ class FilterGallery extends FilterDefault
 
 		$dir = $fi->dir;
 		$abs = "{$dir}/t_{$fi->filename}";
-		#$rel = dirname($fi->path).'/t_'.$fi->filename;
 		$rel = Server::GetRelativePath($abs);
 		if (file_exists($abs)) $fi->icon =
 			'<img src="'.htmlspecialchars($rel).'"

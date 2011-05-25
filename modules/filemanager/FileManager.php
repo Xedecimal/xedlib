@@ -1121,7 +1121,6 @@ class FileManager extends Module
 		# Either file or no filter here.
 		while (is_file($fi->path) || empty($fi->info['type']))
 		{
-			# TODO: Infinite loop here.
 			if (File::IsIn($ft->dir, $root))
 				$ft = new FileInfo(realpath($ft->dir));
 			else
