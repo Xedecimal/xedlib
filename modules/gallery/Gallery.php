@@ -45,6 +45,7 @@ class Gallery extends Module
 	{
 		$this->Behavior = new GalleryBehavior();
 		$this->Display = new GalleryDisplay();
+		$this->Template = Module::L('gallery/gallery.xml');
 	}
 
 	function TagHeader($t, $guts)
@@ -276,7 +277,7 @@ EOF;
 <script type="text/javascript" src="{{app_abs}}/xedlib/js/jquery.flyout.js"></script>
 <script type="text/javascript" src="{{app_abs}}/xedlib/modules/gallery/gallery.js"></script>
 EOF;
-		$ret['gallery'] = $t->ParseFile(Module::L('gallery/gallery.xml'));
+		$ret['gallery'] = $t->ParseFile($this->Template);
 		return $ret;
 	}
 
