@@ -39,7 +39,10 @@ class FilterGallery extends FilterDefault
 		$abs = "{$dir}/t_{$fi->filename}";
 		#$rel = dirname($fi->path).'/t_'.$fi->filename;
 		$rel = Server::GetRelativePath($abs);
-		if (file_exists($abs)) $fi->icon = '<img src="'.htmlspecialchars($rel).'" />';
+		if (file_exists($abs)) $fi->icon =
+			'<img src="'.htmlspecialchars($rel).'"
+			width="'.$fi->info['thumb_width'].'"
+			height="'.$fi->info['thumb_height'].'" alt="thumbnail" />';
 
 		if (is_dir($fi->path))
 		{
