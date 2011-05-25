@@ -179,9 +179,9 @@ class FileManager extends Module
 		else if ($act == 'Save')
 		{
 			if (!$this->Behavior->AllowEdit) return;
-			$info = new FileInfo($this->Root.$this->cf, $this->filters);
+			$info = new FileInfo($this->Root.$this->cf, $this->Filters);
 			$newinfo = Server::GetVar('info');
-			$f = FileInfo::GetFilter($info, $this->Root, $this->filters);
+			$f = FileManager::GetFilter($info, $this->Root, $this->Filters);
 			$f->Updated($this, $info, $newinfo);
 			$this->Behavior->Update($newinfo);
 
@@ -212,10 +212,10 @@ class FileManager extends Module
 			if (!empty($caps))
 			foreach ($caps as $file => $cap)
 			{
-				$fi = new FileInfo($this->Root.$this->cf.$file, $this->filters);
+				$fi = new FileInfo($this->Root.'/'.$this->cf.$file, $this->filters);
 				$fi->info['title'] = $cap;
-				$f = FileInfo::GetFilter($fi, $this->Root, $this->filters);
-				$f->Updated($fi, $fi->info);
+				$f = FileManager::GetFilter($fi, $this->Root, $this->filters);
+				$f->Updated($this, $fi, $fi->info);
 				$fi->SaveInfo();
 			}
 		}
