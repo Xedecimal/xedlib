@@ -53,9 +53,8 @@ class FormEmail extends Module
 	function Get()
 	{
 		if (!$this->Active) return;
-		$t = new Template;
+		$t = new Template($this);
 		$t->ReWrite('field', array(&$this, 'TagField'));
-		$t->Set($this);
 		if ($this->send) return $t->ParseFile($this->_template_send);
 		return $t->ParseFile($this->_template);
 	}

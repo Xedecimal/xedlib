@@ -80,6 +80,7 @@ class VarParser
 			return $cv;
 		}
 		global $$tvar;
+		if (is_object($this->vars)) return @$this->vars->$tvar;
 		if (!empty($this->vars) && key_exists($tvar, $this->vars))
 			return $this->vars[$tvar];
 		else if (isset($$tvar)) return $$tvar;
