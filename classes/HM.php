@@ -85,6 +85,7 @@ class HM
 	{
 		$up = parse_url($url);
 		$ret['url'] = $up['path'];
+		if (!empty($up['query']))
 		foreach (preg_split('/&|\?/', $up['query']) as $parm)
 		{
 			list($var, $val) = explode('=', $parm);
