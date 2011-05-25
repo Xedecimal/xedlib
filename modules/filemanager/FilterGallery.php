@@ -22,8 +22,16 @@ class FilterGallery extends FilterDefault
 	{
 		parent::GetInfo($fi);
 		if (substr($fi->filename, 0, 2) == 't_') $fi->show = false;
-		if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = 200;
-		if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = 200;
+
+		if (is_file($fi->path))
+			$dinfo = $this->GetInfo(new FileInfo($fi->dir))->info;
+		else $dinfo = $fi->info;
+
+		if (empty($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
+		if (empty($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
+		
+		if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = $dinfo['thumb_width'];
+		if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = $dinfo['thumb_height'];
 
 		global $_d;
 
