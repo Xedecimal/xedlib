@@ -1,17 +1,11 @@
 <?php
 
-require_once(dirname(__FILE__).'/Form.php');
+require_once(dirname(__FILE__).'/../classes/present/Form.php');
 
-class EditorText
+class EditorText extends Module
 {
-	public $Name;
-	private $item;
-
-	function __construct($name, $item)
-	{
-		$this->Name = $name;
-		$this->item = str_replace('\\', '', $item);
-	}
+	public $Name = 'text';
+	protected $item;
 
 	function Prepare()
 	{
@@ -28,7 +22,7 @@ class EditorText
 		}
 	}
 
-	function Get($target)
+	function Get()
 	{
 		$frmRet = new Form($this->Name);
 		$frmRet->AddHidden($this->Name.'_action', 'update');
@@ -39,7 +33,7 @@ class EditorText
 				array('ROWS' => 30, 'COLS' => 30, 'style' => 'width: 100%')));
 		$frmRet->AddInput(new FormInput(null, 'submit', 'butSubmit', 'Update'));
 
-		return $frmRet->Get('method="post" action="'.$target.'/'.$this->Name.'/update"');
+		return $frmRet->Get('method="post" action="{{app_abs}}/'.$this->Name.'/update"');
 	}
 }
 
