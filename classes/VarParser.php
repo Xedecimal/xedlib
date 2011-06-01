@@ -1,7 +1,10 @@
 <?php
 
 /**
- * Enter description here...
+ * Variable Parser, this will locate variables and include them in strings using
+ * the format {{name}} or {{name.index.etc}} to traverse arrays. They are
+ * usually supplied using $_d, the varparser constructor, or the Template
+ * constructor.
  */
 class VarParser
 {

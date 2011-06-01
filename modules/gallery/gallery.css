@@ -8,3 +8,5 @@ a img { border: 0; }
 	float: left;
 	vertical-align: top;
 }
+
+.caption { text-align: center; }

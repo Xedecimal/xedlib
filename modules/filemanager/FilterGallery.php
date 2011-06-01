@@ -22,16 +22,26 @@ class FilterGallery extends FilterDefault
 	{
 		parent::GetInfo($fi);
 		if (substr($fi->filename, 0, 2) == 't_') $fi->show = false;
-		if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = 200;
-		if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = 200;
+
+		if (is_file($fi->path))
+			$dinfo = $this->GetInfo(new FileInfo($fi->dir))->info;
+		else $dinfo = $fi->info;
+
+		if (empty($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
+		if (empty($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
+		
+		if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = $dinfo['thumb_width'];
+		if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = $dinfo['thumb_height'];
 
 		global $_d;
 
 		$dir = $fi->dir;
 		$abs = "{$dir}/t_{$fi->filename}";
-		#$rel = dirname($fi->path).'/t_'.$fi->filename;
 		$rel = Server::GetRelativePath($abs);
-		if (file_exists($abs)) $fi->icon = '<img src="'.htmlspecialchars($rel).'" />';
+		if (file_exists($abs)) $fi->icon =
+			'<img src="'.htmlspecialchars($rel).'"
+			width="'.$fi->info['thumb_width'].'"
+			height="'.$fi->info['thumb_height'].'" alt="thumbnail" />';
 
 		if (is_dir($fi->path))
 		{
@@ -118,7 +128,7 @@ class FilterGallery extends FilterDefault
 				$h = $info['thumb_height'];
 				$src = $fir->path;
 				$dst = $fir->dir.'/t_'.File::GetFile($fir->filename);
-				$this->ResizeFile($src, $dst, $w, $h);
+				$this->ResizeFile($src, $dst, $w, $h, true);
 			}
 		}
 	}
@@ -206,7 +216,10 @@ class FilterGallery extends FilterDefault
 	{
 		$files = glob($path."*.*");
 		$fi = new FileInfo($path);
-		$fi->info['thumb_width'] = $fi->info['thumb_height'] = 200;
+		if (empty($fi->info['thumb_width']))
+			$fi->info['thumb_width'] = 200;
+		if (empty($fi->info['thumb_height']))
+			$fi->info['thumb_height'] = 200;
 		foreach ($files as $file)
 		{
 			if (substr($file, 0, 2) == 't_') continue;
@@ -229,7 +242,7 @@ class FilterGallery extends FilterDefault
 	/**
 	 * Extension will be automatically appended to $dest filename.
 	 */
-	static function ResizeFile($file, $dest, $nx, $ny)
+	static function ResizeFile($file, $dest, $nx, $ny, $literal = false)
 	{
 		$pinfo = pathinfo($file);
 		$dt = $dest.'.'.$pinfo['extension'];
@@ -239,17 +252,17 @@ class FilterGallery extends FilterDefault
 			case "jpg":
 			case "jpeg":
 				$img = imagecreatefromjpeg($file);
-				$img = FilterGallery::ResizeImg($img, $nx, $ny);
+				$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
 				imagejpeg($img, $dt);
 			break;
 			case "png":
 				$img = imagecreatefrompng($file);
-				$img = FilterGallery::ResizeImg($img, $nx, $ny);
+				$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
 				imagepng($img, $dt);
 			break;
 			case "gif":
 				$img = imagecreatefromgif($file);
-				$img = FilterGallery::ResizeImg($img, $nx, $ny);
+				$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
 				imagegif($img, $dt);
 			break;
 		}
@@ -263,21 +276,29 @@ class FilterGallery extends FilterDefault
 	 * @param int $ny
 	 * @return resource
 	 */
-	static function ResizeImg($img, $nx, $ny)
+	static function ResizeImg($img, $nx, $ny, $literal = false)
 	{
 		$sx  = ImageSX($img);
 		$sy = ImageSY($img);
 		if ($sx < $nx && $sy < $ny) return $img;
 
-		if ($sx < $sy)
+		if ($literal)
 		{
-			$dx = $nx * $sx / $sy;
+			$dx = $nx;
 			$dy = $ny;
 		}
 		else
 		{
-			$dx = $nx;
-			$dy = $ny * $sy / $sx;
+			if ($sx < $sy)
+			{
+				$dx = $nx * $sx / $sy;
+				$dy = $ny;
+			}
+			else
+			{
+				$dx = $nx;
+				$dy = $ny * $sy / $sx;
+			}
 		}
 		$dimg = imagecreatetruecolor($dx, $dy);
 		ImageCopyResampled($dimg, $img, 0, 0, 0, 0, $dx, $dy, $sx, $sy);

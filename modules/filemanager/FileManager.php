@@ -38,7 +38,7 @@ class FileManager extends Module
 	 *
 	 * @var string
 	 */
-	public $Name;
+	public $Name = 'files';
 
 	/**
 	 * Behavior of this filemanager.
@@ -100,6 +100,8 @@ class FileManager extends Module
 	* @var int
 	*/
 	public $uid;
+	
+	public $Filters = array('Default');
 
 	/**
 	 * Enter description here...
@@ -122,6 +124,8 @@ class FileManager extends Module
 	 */
 	function Prepare()
 	{
+		if (!$this->Active) return;
+
 		$act = Server::GetVar($this->Name.'_action');
 		$this->cf = Server::GetVar($this->Name.'_cf');
 
@@ -179,9 +183,9 @@ class FileManager extends Module
 		else if ($act == 'Save')
 		{
 			if (!$this->Behavior->AllowEdit) return;
-			$info = new FileInfo($this->Root.$this->cf, $this->filters);
+			$info = new FileInfo($this->Root.$this->cf, $this->Filters);
 			$newinfo = Server::GetVar('info');
-			$f = FileInfo::GetFilter($info, $this->Root, $this->filters);
+			$f = FileManager::GetFilter($info, $this->Root, $this->Filters);
 			$f->Updated($this, $info, $newinfo);
 			$this->Behavior->Update($newinfo);
 
@@ -212,10 +216,10 @@ class FileManager extends Module
 			if (!empty($caps))
 			foreach ($caps as $file => $cap)
 			{
-				$fi = new FileInfo($this->Root.$this->cf.$file, $this->filters);
+				$fi = new FileInfo($this->Root.'/'.$this->cf.$file, $this->filters);
 				$fi->info['title'] = $cap;
-				$f = FileInfo::GetFilter($fi, $this->Root, $this->filters);
-				$f->Updated($fi, $fi->info);
+				$f = FileManager::GetFilter($fi, $this->Root, $this->filters);
+				$f->Updated($this, $fi, $fi->info);
 				$fi->SaveInfo();
 			}
 		}
@@ -658,7 +662,7 @@ class FileManager extends Module
 		if (is_dir($this->Root.$this->cf)) return;
 		$vp = new VarParser();
 		$this->vars['date'] = gmdate("M j Y H:i:s ", filectime($this->Root.$this->cf));
-		$this->vars['size'] = GetSizeString(filesize($this->Root.$this->cf));
+		$this->vars['size'] = File::SizeToString(filesize($this->Root.$this->cf));
 		return $vp->ParseVars($g, $this->vars);
 	}
 
@@ -765,6 +769,8 @@ class FileManager extends Module
 	*/
 	function Get()
 	{
+		if (!$this->Active) return;
+
 		if (!file_exists($this->Root.$this->cf))
 			return "FileManager::Get(): File doesn't exist ({$this->Root}{$this->cf}).<br/>\n";
 
@@ -1121,7 +1127,6 @@ class FileManager extends Module
 		# Either file or no filter here.
 		while (is_file($fi->path) || empty($fi->info['type']))
 		{
-			# TODO: Infinite loop here.
 			if (File::IsIn($ft->dir, $root))
 				$ft = new FileInfo(realpath($ft->dir));
 			else
