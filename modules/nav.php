@@ -36,6 +36,7 @@ class ModNav extends Module
 							$ret .= $c->data['raw'];
 						# Attributes Specified
 						$atrs = HM::GetAttribs($c->data);
+						$ret .= "<a$atrs>";
 					}
 					else
 					{
