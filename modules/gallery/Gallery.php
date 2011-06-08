@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/../filemanager/FileManager.php');
-require_once(dirname(__FILE__).'/../filemanager/FilterGallery.php');
+require_once(dirname(__FILE__).'/../file_manager/file_manager.php');
+require_once(dirname(__FILE__).'/../file_manager/filter_gallery.php');
 
 /**
  * @package Gallery
@@ -179,7 +179,7 @@ EOF;
 		global $me;
 		$this->f = new FilterGallery();
 
-		require_once(dirname(__FILE__).'/../filemanager/FileManager.php');
+		require_once(dirname(__FILE__).'/../file_manager/file_manager.php');
 		require_once(dirname(__FILE__).'/../../classes/present/Template.php');
 
 		$path = Server::GetVar('galcf');

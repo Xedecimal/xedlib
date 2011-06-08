@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/FilterDefault.php');
+require_once(dirname(__FILE__).'/filter_default.php');
 
 class FilterGallery extends FilterDefault
 {
@@ -29,7 +29,7 @@ class FilterGallery extends FilterDefault
 
 		if (empty($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
 		if (empty($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
-		
+
 		if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = $dinfo['thumb_width'];
 		if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = $dinfo['thumb_height'];
 

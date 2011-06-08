@@ -8,8 +8,8 @@ require_once(dirname(__FILE__).'/../../classes/Utility.php');
 require_once(dirname(__FILE__).'/../../classes/present/Form.php');
 require_once(dirname(__FILE__).'/../../classes/present/Template.php');
 
-require_once(dirname(__FILE__).'/FilterDefault.php');
-require_once(dirname(__FILE__).'/FilterGallery.php');
+require_once(dirname(__FILE__).'/filter_default.php');
+require_once(dirname(__FILE__).'/filter_gallery.php');
 
 /**
  * @package File Management
@@ -100,7 +100,7 @@ class FileManager extends Module
 	* @var int
 	*/
 	public $uid;
-	
+
 	public $Filters = array('Default');
 
 	/**
