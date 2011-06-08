@@ -11,7 +11,7 @@ class ModNav extends Module
 	* @param TreeNode $link
 	* @param int $depth
 	*/
-	static function GetLinks($link, $depth = -1)
+	static function GetLinks($link, $class = 'nav', $depth = -1)
 	{
 		global $_d;
 
@@ -20,7 +20,7 @@ class ModNav extends Module
 		$ret = null;
 		if (!empty($link->children))
 		{
-			$ret .= '<ul class="nav">';
+			$ret .= '<ul class="'.$class.'">';
 			$ix = 0;
 			foreach ($link->children as $c)
 			{
@@ -46,7 +46,7 @@ class ModNav extends Module
 				}
 				$ret .= $c->id;
 				if (!empty($c->data)) $ret .= '</a>';
-				$ret .= ModNav::GetLinks($c, $depth+1);
+				$ret .= ModNav::GetLinks($c, $class, $depth+1);
 				$ret .= '</li>';
 			}
 			$ret .= '</ul>';
