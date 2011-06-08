@@ -39,8 +39,6 @@ class Module
 	}
 
 	/**
-	* 
-	*
 	* @param string $name Class name of defined module class.
 	* @param array $deps Depended modules eg. array('ModName', 'ModName2')
 	*/
@@ -153,7 +151,7 @@ class Module
 	/** @var boolean */
 	public $Active;
 
-	public $Name = 'module';
+	public static $Name = 'module';
 
 	function DataError($errno)
 	{
@@ -238,7 +236,7 @@ class Module
 	function InstallFields(&$frm) { }
 
 	function AddDataset($name, $ds) { $GLOBALS['_d']['datasets'][$name] = $ds; }
-	
+
 	/**
 	 * Request a previously stored dataset.
 	 *
@@ -246,9 +244,9 @@ class Module
 	 * @return DataSet Named dataset requested.
 	 */
 	function GetDataSet($name) { return $GLOBALS['_d']['datasets'][$name]; }
-	
+
 	function GetDatabase() { return $GLOBALS['_d']['db']; }
-	
+
 	static function P($path)
 	{
 		// Only translate finished paths.
