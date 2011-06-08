@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__).'/../../classes/present/Form.php');
 require_once(dirname(__FILE__).'/../../classes/present/FormInput.php');
 
 class FormEmail extends Module
@@ -7,6 +8,9 @@ class FormEmail extends Module
 	public $Name = 'email';
 	public $Title = 'Contact Form';
 	protected $_template;
+	protected $_from = 'nobody@nowhere.com';
+	protected $_to = 'nobody@nowhere.com';
+	protected $_source = 'form';
 
 	function __construct()
 	{
@@ -31,7 +35,7 @@ class FormEmail extends Module
 
 		if (@$_d['q'][1] == 'send')
 		{
-			$this->_from = Server::GetVar('from');
+			$this->_data = Server::GetVar($this->_source);
 			$t = new Template();
 			$t->use_getvar = true;
 
@@ -39,14 +43,35 @@ class FormEmail extends Module
 			$headers[] = 'Reply-To: '.$this->_from;
 
 			$this->send = true;
-			foreach ($this->_fields as $f) if (!$f->Validate()) $this->send = false;
+
+			# Handle Captcha
+			$c = Server::GetVar('c');
+			if (!empty($c)) $this->send = false;
 
 			if (!$this->send) return;
 
+			$sx = simplexml_load_string(file_get_contents($this->_template));
+
+			# Find all label text
+			foreach ($sx->xpath('//label[@for]') as $id)
+				$this->_labels[(string)$id['for']] = (string)$id;
+			# Find all elements with an id
+			foreach ($sx->xpath('//*[@id]') as $in)
+				$this->_inputs[(string)$in['id']] = (string)$in['name'];
+
 			$t->ReWrite('field', array(&$this, 'TagEmailField'));
-			mail($this->_to, $this->_subject,
-				$t->ParseFile($this->_email_template),
-				implode($headers, "\r\n"));
+			$body = $t->ParseFile($this->_email_template);
+
+			if (!empty($this->debug))
+			{
+				var_dump("To: {$this->_to}");
+				var_dump("Subject: {$this->_subject}");
+				var_dump($headers);
+				echo "<pre>$body</pre>";
+				die();
+			}
+
+			mail($this->_to, $this->_subject, $body, implode($headers, "\r\n"));
 		}
 	}
 
@@ -54,6 +79,7 @@ class FormEmail extends Module
 	{
 		if (!$this->Active) return;
 		$t = new Template($this);
+		$t->ReWrite('input', array('Form', 'TagInput'));
 		$t->ReWrite('field', array(&$this, 'TagField'));
 		if ($this->send) return $t->ParseFile($this->_template_send);
 		return $t->ParseFile($this->_template);
@@ -75,12 +101,20 @@ class FormEmail extends Module
 
 	function TagEmailField($t, $g)
 	{
-		foreach ($this->_fields as $n => $f)
+		# Preg out and find all elements we're working with
+		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
+		foreach ($this->_inputs as $i => $n)
+		//foreach ($this->_fields as $n => $f)
 		{
-			if (!$f->IsSignificant()) continue;
+			if (!preg_match($preg, $n, $m)) continue;
 
-			$row['name'] = $n;
-			$row['value'] = Server::GetVar($f->name);
+			$row['name'] = $this->_labels[$i];
+			$row['value'] = $this->_data[$m[1]];
+
+			//if (!$f->IsSignificant()) continue;
+
+			//$row['name'] = $n;
+			//$row['value'] = Server::GetVar($f->name);
 			$rows[] = $row;
 		}
 		return VarParser::Concat($g, $rows);

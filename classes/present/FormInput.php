@@ -135,11 +135,14 @@ class FormInput
 	function Get($parent = null, $persist = true)
 	{
 		if (empty($this->atrs['ID']))
-			$this->atrs['ID'] = $this->GetCleanID($parent);
+		{
+			$id = $this->GetCleanID($parent);
+			if (!empty($id)) $this->atrs['ID'] = $id;
+		}
 
 		if ($this->atrs['TYPE'] == 'captcha')
 		{
-			return '<input type="text" name="c" value="" />';
+			return '<input type="text" name="c" value="" style="display: none;" />';
 		}
 		if ($this->atrs['TYPE'] == 'spamblock')
 		{
@@ -344,7 +347,10 @@ class FormInput
 	function GetCleanID($parent)
 	{
 		$id = !empty($parent) ? $parent.'_' : null;
-		$id .= !empty($this->atrs['ID']) ? $this->atrs['ID'] : @$this->atrs['NAME'];
+		if (!empty($this->atrs['ID']))
+			$id .= $this->atrs['ID'];
+		else if (!empty($this->atrs['NAME']))
+			$id .= $this->atrs['NAME'];
 		return HM::CleanID($id);
 	}
 

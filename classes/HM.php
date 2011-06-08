@@ -15,6 +15,7 @@ class HM
 	 */
 	static function CleanID($id)
 	{
+		if (!isset($id)) return;
 		return str_replace('[', '_', str_replace(']', '', str_replace(' ', '_', $id)));
 	}
 
