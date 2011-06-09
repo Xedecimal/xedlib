@@ -9,7 +9,7 @@
 </folder>
 
 <file>
-<div class="file">
+<div class="file{{class}}">
 <a href="{{fullname}}" class="gal">{{icon}}</a>
 <div class="caption">{{name}}</div>
 </div> <!-- file -->

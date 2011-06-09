@@ -88,6 +88,9 @@ class Gallery extends Module
 			$this->f->GetInfo($fi);
 			if (!$fi->show || empty($fi->icon)) continue;
 
+			if ($ix >= count($this->files['files'])-1) $d['class'] = ' last';
+			else $d['class'] = '';
+
 			$d['fullname'] = $fi->path;
 			$d['idx'] = $ix;
 			$d['name'] = $this->GetCaption($fi);

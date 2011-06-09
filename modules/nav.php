@@ -26,26 +26,12 @@ class ModNav extends Module
 			{
 				if ($ix++ > 0 && !empty($_d['nav.sep']) && $depth < 0)
 					$ret .= $_d['nav.sep'];
-				$ret .= '<li>';
-				if (!empty($c->data))
-				{
-					if (is_array($c->data))
-					{
-						# Raw content
-						if (isset($c->data['raw']))
-							$ret .= $c->data['raw'];
-						# Attributes Specified
-						$atrs = HM::GetAttribs($c->data);
-						$ret .= "<a$atrs>";
-					}
-					else
-					{
-						$atrs = HM::GetAttribs(array('href' => $c->data));
-						$ret .= "<a$atrs>";
-					}
-				}
-				$ret .= $c->id;
-				if (!empty($c->data)) $ret .= '</a>';
+				if (is_string($c->data))
+					$link = '<a href="'.$c->data.'">'.$c->id.'</a>';
+				else if (isset($c->data['raw'])) $link = $c->data['raw'];
+				else if (is_array($c->data))
+					$link = '<a'.HM::GetAttribs($c->data).'>'.$c->id.'</a>';
+				$ret .= '<li>'.$link;
 				$ret .= ModNav::GetLinks($c, $class, $depth+1);
 				$ret .= '</li>';
 			}
