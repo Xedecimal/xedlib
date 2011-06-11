@@ -11,6 +11,11 @@ class FilterGallery extends FilterDefault
 	 */
 	public $Name = 'Gallery';
 
+	function __construct(&$fm)
+	{
+		$this->Behavior = new FilterGalleryBehavior($fm->FilterConfig);
+	}
+
 	/**
 	 * Appends the width, height, thumbnail and any other image related
 	 * information on this file.
@@ -21,7 +26,6 @@ class FilterGallery extends FilterDefault
 	function GetInfo(&$fi)
 	{
 		parent::GetInfo($fi);
-		if (substr($fi->filename, 0, 2) == 't_') $fi->show = false;
 
 		if (is_file($fi->path))
 			$dinfo = $this->GetInfo(new FileInfo($fi->dir))->info;
@@ -36,12 +40,22 @@ class FilterGallery extends FilterDefault
 		global $_d;
 
 		$dir = $fi->dir;
-		$abs = "{$dir}/t_{$fi->filename}";
-		$rel = Server::GetRelativePath($abs);
+		if ($this->Behavior->UseThumbs)
+			$abs = "{$dir}/t_{$fi->filename}";
+		else
+			$abs = "$dir/{$fi->filename}";
+
+		$atrs['SRC'] = Server::GetRelativePath($abs);
+
+		if ($this->Behavior->UseThumbs)
+		{
+			$atrs['WIDTH'] = $fi->info['thumb_width'];
+			$atrs['HEIGHT'] = $fi->info['thumb_height'];
+		}
+		$atrs['ALT'] = 'icon';
+
 		if (file_exists($abs)) $fi->icon =
-			'<img src="'.htmlspecialchars($rel).'"
-			width="'.$fi->info['thumb_width'].'"
-			height="'.$fi->info['thumb_height'].'" alt="thumbnail" />';
+			'<img'.HM::GetAttribs($atrs).' />';
 
 		if (is_dir($fi->path))
 		{
@@ -74,13 +88,12 @@ class FilterGallery extends FilterDefault
 			foreach ($files as $f) unlink($f);
 		}
 		// Selected folder image.
-		else if (!empty($img)) $newimg = $fi->path.$img;
+		else if (!empty($img)) $newimg = $fi->path.'/'.$img;
 
 		// Uploaded folder image.
 		if (!empty($newimg))
 		{
-			$this->ResizeFile($newimg,
-				"{$fi->path}/.t_image",
+			$this->ResizeFile($newimg, "{$fi->path}/.t_image",
 				$newinfo['thumb_width'], $newinfo['thumb_height']);
 		}
 		if (!empty($upimg['name']))
@@ -154,10 +167,13 @@ class FilterGallery extends FilterDefault
 				$selImages[htmlspecialchars($fiImg->filename)] = new FormOption($fiImg->filename);
 			}
 
-			$new[] = new FormInput('Thumbnail Width', 'text',
-				'info[thumb_width]', $fi->info['thumb_width']);
-			$new[] = new FormInput('Thumbnail Height', 'text',
-				'info[thumb_height]', $fi->info['thumb_height']);
+			if ($this->Behavior->UseThumbs)
+			{
+				$new[] = new FormInput('Thumbnail Width', 'text',
+					'info[thumb_width]', $fi->info['thumb_width']);
+				$new[] = new FormInput('Thumbnail Height', 'text',
+					'info[thumb_height]', $fi->info['thumb_height']);
+			}
 			$new[] = new FormInput('Gallery Image', 'select',
 				'image', $selImages);
 			$new[] = new FormInput('or Upload', 'file',
@@ -203,9 +219,13 @@ class FilterGallery extends FilterDefault
 	function Upload($file, $target)
 	{
 		parent::Upload($file, $target);
-		$tdest = 't_'.substr($file, 0, strrpos($file, '.'));
-		$this->ResizeFile($target->path.'/'.$file, $target->path.'/'.$tdest,
-			$target->info['thumb_width'], $target->info['thumb_height']);
+
+		if ($this->Behavior->UseThumbs)
+		{
+			$tdest = 't_'.substr($file, 0, strrpos($file, '.'));
+			$this->ResizeFile($target->path.'/'.$file, $target->path.'/'.$tdest,
+				$target->info['thumb_width'], $target->info['thumb_height']);
+		}
 	}
 
 	/**
@@ -303,6 +323,17 @@ class FilterGallery extends FilterDefault
 		$dimg = imagecreatetruecolor($dx, $dy);
 		ImageCopyResampled($dimg, $img, 0, 0, 0, 0, $dx, $dy, $sx, $sy);
 		return $dimg;
+	}
+}
+
+class FilterGalleryBehavior
+{
+	public $UseThumbs = true;
+
+	function __construct($config)
+	{
+		foreach ($config as $k => $v)
+			$this->$k = $v;
 	}
 }
 

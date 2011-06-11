@@ -40,6 +40,7 @@ class Gallery extends Module
 		$this->Behavior = new GalleryBehavior();
 		$this->Display = new GalleryDisplay();
 		$this->Template = Module::L('gallery/gallery.xml');
+		$this->FileManager = new FileManager();
 	}
 
 	function TagHeader($t, $guts)
@@ -180,19 +181,19 @@ EOF;
 	function Get()
 	{
 		global $me;
-		$this->f = new FilterGallery();
+		$this->f = new FilterGallery($this->FileManager);
 
 		require_once(dirname(__FILE__).'/../file_manager/file_manager.php');
 		require_once(dirname(__FILE__).'/../../classes/present/Template.php');
 
 		$path = Server::GetVar('galcf');
-		$fm = new FileManager();
-		$fm->Name = $this->Name;
-		$fm->Filters = array('Gallery');
-		$fm->Root = $this->Root.$path;
-		$fm->Behavior->ShowAllFiles = true;
-		$fm->View->Sort = $this->Display->Sort;
-		$this->files = $fm->GetDirectory();
+
+		$this->FileManager->Name = $this->Name;
+		$this->FileManager->Filters = array('Gallery');
+		$this->FileManager->Root = $this->Root.$path;
+		$this->FileManager->Behavior->ShowAllFiles = true;
+		$this->FileManager->View->Sort = $this->Display->Sort;
+		$this->files = $this->FileManager->GetDirectory();
 
 		$t = new Template();
 		$this->path = $path;
@@ -261,7 +262,7 @@ EOF;
 
 		//Gallery settings
 		$fig = new FileInfo($this->Root);
-		Filemanager::GetFilter($fig, $this->Root, array('Gallery'));
+		$this->FileManager->GetFilter($fig, $this->Root, array('Gallery'));
 		$t->Set('file_thumb_width', $fig->info['thumb_width']+10);
 		$t->Set('file_thumb_height', $fig->info['thumb_height']+50);
 

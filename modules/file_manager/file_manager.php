@@ -81,12 +81,14 @@ class FileManager extends Module
 	 * @var array
 	 */
 	public $DefaultOptionHandler;
+
 	/**
 	 * An array of files and folders.
 	 *
 	 * @var array
 	 */
 	public $files;
+
 	/**
 	 * Whether or not mass options are available and should be output.
 	 *
@@ -102,6 +104,8 @@ class FileManager extends Module
 	public $uid;
 
 	public $Filters = array('Default');
+
+	public $FilterConfig = array();
 
 	/**
 	 * Enter description here...
@@ -196,7 +200,7 @@ class FileManager extends Module
 				{
 					$f->Cleanup($info->path);
 					$type = "Filter".$newinfo['type'];
-					$newfilter = new $type();
+					$newfilter = new $type($this);
 					$newfilter->Install($info->path);
 				}
 
@@ -407,10 +411,9 @@ class FileManager extends Module
 			'doc' => Module::P('filemanager/icons/word.png'),
 			'docx' => Module::P('filemanager/icons/word.png')
 		);
-		if (!empty($f->vars['icon']))
-			return $f->vars['icon'];
-		else if (isset($icons[$f->type]))
-			$ret = $icons[$f->type];
+
+		if (!empty($f->vars['icon'])) return $f->vars['icon'];
+		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
 		else return null;
 		return '<img src="'.$ret.'" alt="icon" />';
 	}
@@ -1017,8 +1020,7 @@ class FileManager extends Module
 		while ($file = readdir($dp))
 		{
 			if ($file[0] == '.') continue;
-			//TODO: Should handle this on a filter level.
-			if (substr($file, 0, 2) == 't_') continue;
+
 			$newfi = new FileInfo($this->Root.$this->cf.'/'.$file, $this->Filters);
 			if (!$newfi->show) continue;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
@@ -1120,7 +1122,7 @@ class FileManager extends Module
 	 * @param string $default Default filter to fall back on.
 	 * @return FilterDefault Or a derivitive.
 	 */
-	static function GetFilter(&$fi, $root, $defaults)
+	function GetFilter(&$fi, $root, $defaults)
 	{
 		$ft = $fi;
 
@@ -1135,7 +1137,7 @@ class FileManager extends Module
 					$fname = 'Filter'.$defaults[0];
 				else
 					$fname = 'FilterDefault';
-				$f = new $fname();
+				$f = new $fname($this);
 				$f->GetInfo($fi);
 				return $f;
 			}

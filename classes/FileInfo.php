@@ -83,7 +83,7 @@ class FileInfo
 	 * @param string $source Filename to gather information on.
 	 * @param array $filters Array of available filters.
 	 */
-	function FileInfo($source)
+	function __construct($source)
 	{
 		global $user_root;
 		if (!file_exists($source))
