@@ -118,7 +118,7 @@ class ModArticleAdmin extends Module
 	*/
 	private $edNews;
 
-	protected $Name = 'news';
+	public $Name = 'news';
 	protected $ID = 'nws_id';
 
 	function __construct()
