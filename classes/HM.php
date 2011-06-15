@@ -60,7 +60,7 @@ class HM
 	 */
 	static function URL($url, $uri = null)
 	{
-		$ret = $url; # This should be encoded elsewhere and not here.
+		$ret = $url;
 
 		global $PERSISTS;
 		$nuri = array();
@@ -85,7 +85,8 @@ class HM
 	static function ParseURL($url)
 	{
 		$up = parse_url($url);
-		$ret['url'] = $up['path'];
+		if (!empty($up['path'])) $ret['url'] = $up['path'];
+		else $ret['url'] = '/';
 		if (!empty($up['query']))
 		foreach (preg_split('/&|\?/', $up['query']) as $parm)
 		{
