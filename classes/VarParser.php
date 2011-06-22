@@ -38,6 +38,12 @@ class VarParser
 			array(&$this, 'var_parser'), $data);
 	}
 
+	static function Parse($string, $vars)
+	{
+		$vp = new VarParser();
+		return $vp->ParseVars($string, $vars);
+	}
+
 	/**
 	 * Callback for each regex match, not for external use.
 	 *
