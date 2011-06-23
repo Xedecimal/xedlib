@@ -31,6 +31,8 @@ class ModNav extends Module
 				else if (isset($c->data['raw'])) $link = $c->data['raw'];
 				else if (is_array($c->data))
 					$link = '<a'.HM::GetAttribs($c->data).'>'.$c->id.'</a>';
+				else if (is_string($c)) $link = $c;
+				else $link = $c->id;
 				$ret .= '<li>'.$link;
 				$ret .= ModNav::GetLinks($c, $class, $depth+1);
 				$ret .= '</li>';
