@@ -40,7 +40,7 @@ class HM
 		if (empty($atrs)) return;
 		$m = null;
 		preg_match_all('/([^= ]+)="([^"]+)"/', $atrs, $m);
-		for ($ix = 0; $ix < count($m[1]); $ix++) $ret[$m[1][$ix]] = $m[2][$ix];
+		for ($ix = 0; $ix < count($m[1]); $ix++) $ret[strtoupper($m[1][$ix])] = $m[2][$ix];
 		return $ret;
 	}
 
