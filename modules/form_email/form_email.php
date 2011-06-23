@@ -91,9 +91,9 @@ class FormEmail extends Module
 		{
 			$row['name'] = $n;
 			$row['field'] = $f->Get();
-			$row['fid'] = $f->atrs['ID'];
+			$row['fid'] = @$f->atrs['ID'];
 			if ($f->attr('TYPE') == 'captcha') $row['style'] = ' display: none';
-			else $row['style'] = '';
+			else $row['style'] = !empty($this->_styles[$n]) ? $this->_styles[$n] : '';
 			$rows[$n] = $row;
 		}
 		return VarParser::Concat($g, $rows, false);
