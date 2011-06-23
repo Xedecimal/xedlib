@@ -374,7 +374,7 @@ class DataSet
 
 	/**
 	 * This will convert a single value into SQL notation.
-	 * 
+	 *
 	 * @param mixed $val Either a string or a result of Database::Sql*
 	 * functions.
 	 * @param boolean $tbl Whether or not we're dealing with tables here.
@@ -933,9 +933,9 @@ class DataSet
 		return $cursor[0];
 	}
 
-	static function BuildTree($items, $parent, $assoc = null)
+	static function BuildTree($items, $parent, $assoc)
 	{
-		$flats = LinkList($items, $parent, $assoc);
+		$flats = DataSet::LinkList($items, $parent, $assoc);
 
 		$root = new TreeNode();
 
@@ -954,7 +954,7 @@ class DataSet
 
 	static function LinkList($items, $parent, $assoc = null)
 	{
-		//Build Flat
+		# Build Flat
 		foreach ($items as $i)
 		{
 			$tn = new TreeNode($i);
@@ -962,15 +962,6 @@ class DataSet
 			$ret[$i[$parent]] = $tn;
 		}
 
-		foreach ($ret as $id => $i)
-		{
-			$p = $i->data[$assoc];
-			if (isset($ret[$p]))
-			{
-				$ret[$p]->children[$id] = $i;
-				$i->parent = $ret[$p];
-			}
-		}
 		return $ret;
 	}
 
