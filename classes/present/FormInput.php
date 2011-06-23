@@ -317,7 +317,7 @@ class FormInput
 			//Multi Selectables...
 			case 'selects':
 			case 'checks':
-				$newsels = array_clone($this->atrs['VALUE']);
+				$newsels = Arr::Cln($this->atrs['VALUE']);
 				if ($persist)
 				{
 					$svalus = Server::GetVar($this->name);
