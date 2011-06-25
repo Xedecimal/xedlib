@@ -125,6 +125,10 @@ class DataSet
 				$this->func_fetch = 'sqlite_fetch_array';
 				$this->func_rows = 'sqlite_num_rows';
 				break;
+			case DB_SL3:
+				$this->func_fetch = array(&$this, 'func_fetch_sqlite3');
+				$this->func_rows = array(&$this, 'func_rows_sqlite3');
+				break;
 			case DB_OD:
 				$this->func_fetch = 'odbc_fetch_array';
 				$this->func_rows = 'odbc_num_rows';
@@ -302,7 +306,7 @@ class DataSet
 	function GroupClause($group)
 	{
 		if (isset($group))
-		return "\n GROUP BY {$group}";
+			return "\n GROUP BY {$group}";
 		return null;
 	}
 
@@ -608,34 +612,26 @@ class DataSet
 		$query .= $this->OrderClause(@$opts['order']);
 		$query .= $this->AmountClause(@$opts['limit']);
 
-		//Execute Query
+		# Execute Query
 		$rows = $this->database->Query($query, $this->ErrorHandler);
 
-		//Prepare Data
-		$f = $this->func_rows;
+		# Prepare Data
 		switch ($this->database->type)
 		{
 			case DB_SL:
 				if ($f($rows) < 1) return array();
+				break;
+			case DB_SL3:
+				if (call_user_func($this->func_rows, $rows) < 1)
+					return array();
 				break;
 			default:
 				if ($f($this->database->link) < 1) return array();
 		}
 		$items = array();
 
-		$a = null;
-		if ($this->database->type == DB_MY)
-		{
-			$a = MYSQL_BOTH;
-			if (@$opts['args'] == GET_ASSOC) $a = MYSQL_ASSOC;
-		}
-		else if ($this->database->type == DB_MI)
-		{
-			$a = MYSQLI_BOTH;
-			if (@$opts['args'] == GET_ASSOC) $a = MYSQLI_ASSOC;
-		}
-
-		while (($row = call_user_func($this->func_fetch, $rows, $a)))
+		if (empty($opts['args'])) $opts['args'] = 1;
+		while (($row = call_user_func($this->func_fetch, $rows, $opts['args'])))
 		{
 			$newrow = array();
 			foreach ($row as $key => $val)
@@ -1024,6 +1020,24 @@ class DataSet
 			$tnRoot->AddChild($rn);
 
 		return $tnRoot;
+	}
+
+	/**
+	 *
+	 * @param SQLite3Result $res Contextual result
+	 */
+	function func_rows_sqlite3($res)
+	{
+		return ($res->numColumns() > 0);
+	}
+
+	/**
+	 *
+	 * @param SQLite3Result $res Contextual Result
+	 */
+	function func_fetch_sqlite3($res, $args)
+	{
+		return $res->fetchArray($args);
 	}
 }
 
