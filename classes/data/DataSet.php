@@ -1010,7 +1010,7 @@ class DataSet
 			# if parent (p) id of child ($c[1]) in parent node exists
 
 			if (isset($flats[$p][$row[$p]]) && $row[$c[1]] != $rootid)
-				$flats[$p][$row[$p]]->AddChild($flats[$c[0]][$row[$c[0]]]);
+				$flats[$p][$row[$p]]->AddChild($flats[$c[0]][$row[$c[1]]]);
 			else
 				$tnRoot->AddChild($flats[$p][$row[$p]]);
 		}
