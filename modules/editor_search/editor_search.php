@@ -3,7 +3,7 @@
 class EditorSearch extends Module
 {
 	/** @var string */
-	public static $Name;
+	public $Name;
 	/** @var EditorSearchBehavior */
 	public $Behavior;
 	/** @var array */
@@ -17,21 +17,20 @@ class EditorSearch extends Module
 
 	function __construct($name, &$ds)
 	{
-		self::$Name = $name;
+		$this->Name = $name;
 		$this->_ds = $ds;
 		$this->Behavior = new EditorSearchBehavior();
-		$n = self::$Name;
 		$this->Behavior->Buttons['View'] = array(
-			'href' => "{{app_abs}}/{$n}/view/{{id}}",
+			'href' => "{{app_abs}}/{$name}/view/{{id}}",
 			'target' => '_blank'
 		);
 		$this->Behavior->Buttons['Edit'] = array(
-			'href' => "{{app_abs}}/{$n}/edit/{{id}}",
+			'href' => "{{app_abs}}/{$name}/edit/{{id}}",
 			'target' => '_blank'
 		);
 		$this->Behavior->Buttons['Delete'] = array(
 			'class' => 'delResult',
-			'href' => "{{app_abs}}/{$n}/delete/{{id}}"
+			'href' => "{{app_abs}}/{$name}/delete/{{id}}"
 		);
 	}
 
@@ -41,7 +40,7 @@ class EditorSearch extends Module
 
 		$this->_q = array_reverse($_d['q']);
 
-		if (@$this->_q[3] == self::$Name)
+		if (@$this->_q[3] == $this->Name)
 		{
 			if (@$this->_q[2] == 'js')
 			{
@@ -58,17 +57,17 @@ class EditorSearch extends Module
 
 					$t->Set('json', json_encode($data));
 				}
-				$t->Set('name', self::$Name);
+				$t->Set('name', $this->Name);
 				die($t->ParseFile(Module::L('editor_search/'.@$this->_q[1].'.js')));
 			}
 		}
 
 		//Collect search data
 
-		if (@$this->_q[1] == self::$Name && @$this->_q[0] == 'search')
+		if (@$this->_q[1] == $this->Name && @$this->_q[0] == 'search')
 		{
-			$this->ss = Server::GetVar(self::$Name.'_search');
-			$this->ipp = Server::GetVar(self::$Name.'_ipp', 10);
+			$this->ss = Server::GetVar($this->Name.'_search');
+			$this->ipp = Server::GetVar($this->Name.'_ipp', 10);
 
 			$query['group'] = $this->_ds->id;
 
@@ -95,13 +94,24 @@ class EditorSearch extends Module
 				$query['cols'] = array(Database::SqlUnquote('SQL_CALC_FOUND_ROWS *'));
 				$this->items = $this->_ds->Get($query);
 
+				if (Server::GetVar('butSubmit') == 'Save Results as CSV')
+				{
+					Server::SendDownloadStart('results.csv');
+					echo '"'.implode('","', array_keys($this->items[0]))."\"\r\n";
+					foreach ($this->items as $item)
+					{
+						echo '"'.implode('","', $item)."\"\r\n";
+					}
+					die();
+				}
+
 				$count = $this->_ds->GetCustom('SELECT FOUND_ROWS()');
 				$this->count = $count[0][0];
 			}
 			else $this->items = array();
 		}
 
-		if (@$this->_q[2] == self::$Name && @$this->_q[1] == 'delete')
+		if (@$this->_q[2] == $this->Name && @$this->_q[1] == 'delete')
 		{
 			$id = $this->_q[0];
 			$this->_ds->Remove(array($this->_ds->id => $id));
@@ -122,7 +132,7 @@ class EditorSearch extends Module
 
 		$t->Set($_d);
 
-		if ($target == self::$Name && $act == 'view')
+		if ($target == $this->Name && $act == 'view')
 		{
 			$t->ReWrite('loop', 'TagLoop');
 			$t->ReWrite('input', array('Form', 'TagInput'));
@@ -132,7 +142,7 @@ class EditorSearch extends Module
 				.$ci.'"></script>';
 			return $ret.$t->ParseFile($this->Form);
 		}
-		if ($target == self::$Name && $act == 'edit'
+		if ($target == $this->Name && $act == 'edit'
 			&& $this->Behavior->AllowEdit)
 		{
 			$t->ReWrite('loop', 'TagLoop');
@@ -156,7 +166,7 @@ class EditorSearch extends Module
 	function TagSearch($t, $g, $a)
 	{
 		$tt = new Template();
-		$tt->Set('name', self::$Name);
+		$tt->Set('name', $this->Name);
 		$tt->Set('tempurl', Module::L('temps'));
 
 		$tt->ReWrite('searchfield', array(&$this, 'TagSearchField'));
@@ -186,7 +196,7 @@ class EditorSearch extends Module
 			$fi->attr('NAME', $sf);
 
 			if ($fi->attr('TYPE') == 'date') $fi->attr('TYPE', 'daterange');
-			$field = $fi->Get(self::$Name);
+			$field = $fi->Get($this->Name);
 
 			$ret .= $vp->ParseVars($g, array(
 				'id' => $fi->GetCleanID(null),
@@ -254,7 +264,7 @@ class EditorSearch extends Module
 
 			$ret = '';
 			$start = $this->Behavior->ItemsPerPage *
-				(Server::GetVar(self::$Name.'_page', 1) - 1);
+				(Server::GetVar($this->Name.'_page', 1) - 1);
 			for ($ix = 0; $ix < $this->Behavior->ItemsPerPage; $ix++)
 			#foreach ($this->items as $ix => $i)
 			{
@@ -342,7 +352,7 @@ class EditorSearch extends Module
 		$vp = new VarParser();
 		for ($ix = 0; $ix < $pages; $ix++)
 		{
-			$vars['url'] = HM::URL($_d['app_abs'].'/'.self::$Name
+			$vars['url'] = HM::URL($_d['app_abs'].'/'.$this->Name
 				.'/search', array_merge($_GET, $_POST));
 			$vars['num'] = $ix+1;
 			$ret .= $vp->ParseVars($g, $vars);

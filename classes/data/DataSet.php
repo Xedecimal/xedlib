@@ -616,14 +616,14 @@ class DataSet
 		$rows = $this->database->Query($query, $this->ErrorHandler);
 
 		# Prepare Data
+		$f = $this->func_rows;
 		switch ($this->database->type)
 		{
 			case DB_SL:
 				if ($f($rows) < 1) return array();
 				break;
 			case DB_SL3:
-				if (call_user_func($this->func_rows, $rows) < 1)
-					return array();
+				if (call_user_func($f, $rows) < 1) return array();
 				break;
 			default:
 				if ($f($this->database->link) < 1) return array();
