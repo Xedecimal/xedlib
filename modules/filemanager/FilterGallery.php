@@ -29,7 +29,7 @@ class FilterGallery extends FilterDefault
 
 		if (empty($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
 		if (empty($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
-		
+
 		if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = $dinfo['thumb_width'];
 		if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = $dinfo['thumb_height'];
 
@@ -41,7 +41,7 @@ class FilterGallery extends FilterDefault
 		if (file_exists($abs)) $fi->icon =
 			'<img src="'.htmlspecialchars($rel).'"
 			width="'.$fi->info['thumb_width'].'"
-			height="'.$fi->info['thumb_height'].'" alt="thumbnail" />';
+			height="'.$fi->info['thumb_height'].'" alt="'.$fi->info['title'].'" />';
 
 		if (is_dir($fi->path))
 		{
