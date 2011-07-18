@@ -33,7 +33,8 @@ class EditorText extends Module
 				array('ROWS' => 30, 'COLS' => 30, 'style' => 'width: 100%')));
 		$frmRet->AddInput(new FormInput(null, 'submit', 'butSubmit', 'Update'));
 
-		return $frmRet->Get('method="post" action="{{app_abs}}/'.$this->Name.'/update"');
+		$ret['default'] = $frmRet->Get('method="post" action="{{app_abs}}/'.$this->Name.'/update"');
+		return $ret;
 	}
 }
 
