@@ -94,7 +94,8 @@ class ModNav extends Module
 			$t = new Template();
 			$t->ReWrite('link', array($this, 'TagLink'));
 			$t->ReWrite('head', array($this, 'TagHead'));
-			return ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']));
+			return ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
+				!empty($_d['nav.class']) ? $_d['nav.class'] : 'nav');
 		}
 	}
 }
