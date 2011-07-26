@@ -1,10 +1,10 @@
 <?php
 
-require_once(dirname(__FILE__).'/../Str.php');
+require_once(dirname(__FILE__).'/../../classes/Str.php');
 
-require_once(dirname(__FILE__).'/Template.php');
-require_once(dirname(__FILE__).'/Form.php');
-require_once(dirname(__FILE__).'/Table.php');
+require_once(dirname(__FILE__).'/../../classes/present/Template.php');
+require_once(dirname(__FILE__).'/../../classes/present/Form.php');
+require_once(dirname(__FILE__).'/../../classes/present/Table.php');
 
 /**
  * @package Editor
@@ -271,7 +271,7 @@ class HandlerFile extends EditorHandler
 /**
  * A complex data editor.
  */
-class EditorData
+class EditorData extends Module
 {
 	/**
 	 * Unique name of this editor.
@@ -461,7 +461,7 @@ class EditorData
 
 						$moves[] = array(
 							'src' => $value['tmp_name'],
-							'dst' => $in->attr('VALUE').$ext
+							'dst' => $in->attr('VALUE')
 						);
 						//$insert[$col] = $ext;
 					}
@@ -685,8 +685,28 @@ class EditorData
 	 *
 	 * @return string
 	 */
-	function Get($assoc)
+	function Get()
 	{
+		$this->Behavior->Target = $this->Name;
+
+		$t = new Template();
+		$t->ReWrite('forms', array(&$this, 'TagForms'));
+		$t->ReWrite('search', array(&$this, 'TagSearch'));
+		$t->Set('target', $this->Behavior->Target);
+		$t->Set('name', $this->Name);
+		$t->Set('plural', Str::Plural($this->ds->Description));
+
+		if (!empty($this->ds))
+			$t->Set('table_title', Str::Plural($this->ds->Description));
+
+		$t->Set('table', $this->GetTable($this->Behavior->Target,
+			Server::GetState($this->Name.'_ci')));
+
+		$t->Set($this->View);
+		$t->Set('assoc', $this->Name);
+
+		return $t->ParseFile(Module::L('editor_data/editor.xml'));
+
 		$ret['name'] = $this->Name;
 
 		$act = Server::GetVar($this->Name.'_action');
@@ -1338,25 +1358,7 @@ class EditorData
 	 */
 	function GetUI($target = 'editor')
 	{
-		$this->Behavior->Target = $target;
 
-		$t = new Template();
-		$t->ReWrite('forms', array(&$this, 'TagForms'));
-		$t->ReWrite('search', array(&$this, 'TagSearch'));
-		$t->Set('target', $this->Behavior->Target);
-		$t->Set('name', $this->Name);
-		$t->Set('plural', Str::Plural($this->ds->Description));
-
-		if (!empty($this->ds))
-			$t->Set('table_title', Str::Plural($this->ds->Description));
-
-		$t->Set('table', $this->GetTable($this->Behavior->Target,
-			Server::GetState($this->Name.'_ci')));
-
-		$t->Set($this->View);
-		$t->Set('assoc', $target);
-
-		return $t->ParseFile(dirname(__FILE__).'/../../temps/editor.xml');
 	}
 
 	function Reset()
