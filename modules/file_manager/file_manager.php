@@ -119,6 +119,7 @@ class FileManager extends Module
 		$this->Behavior = new FileManagerBehavior();
 		$this->View = new FileManagerView();
 		$this->Template = dirname(__FILE__).'/file_manager.xml';
+		$this->CheckActive($this->Name);
 	}
 
 	/**
@@ -400,16 +401,16 @@ class FileManager extends Module
 	static function GetIcon($f)
 	{
 		$icons = array(
-			'folder' => Module::P('filemanager/icons/folder.png'),
-			'png' => Module::P('filemanager/icons/image.png'),
-			'jpg' => Module::P('filemanager/icons/image.png'),
-			'jpeg' => Module::P('filemanager/icons/image.png'),
-			'gif' => Module::P('filemanager/icons/image.png'),
-			'pdf' => Module::P('filemanager/icons/acrobat.png'),
-			'sql' => Module::P('filemanager/icons/db.png'),
-			'xls' => Module::P('filemanager/icons/excel.png'),
-			'doc' => Module::P('filemanager/icons/word.png'),
-			'docx' => Module::P('filemanager/icons/word.png')
+			'folder' => Module::P('file_manager/icons/folder.png'),
+			'png' => Module::P('file_manager/icons/image.png'),
+			'jpg' => Module::P('file_manager/icons/image.png'),
+			'jpeg' => Module::P('file_manager/icons/image.png'),
+			'gif' => Module::P('file_manager/icons/image.png'),
+			'pdf' => Module::P('file_manager/icons/acrobat.png'),
+			'sql' => Module::P('file_manager/icons/db.png'),
+			'xls' => Module::P('file_manager/icons/excel.png'),
+			'doc' => Module::P('file_manager/icons/word.png'),
+			'docx' => Module::P('file_manager/icons/word.png')
 		);
 
 		if (!empty($f->vars['icon'])) return $f->vars['icon'];
