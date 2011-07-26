@@ -37,7 +37,8 @@ fieldset .actions a { padding: 5px; }
 </searchfield>
 </table>
 </fieldset>
-<input type="submit" value="Search" />
+<input type="submit" name="butSubmit" value="Search" />
+<input type="submit" name="butSubmit" value="Save Results as CSV" />
 </form>
 </search>
 
