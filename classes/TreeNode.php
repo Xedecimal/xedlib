@@ -80,6 +80,22 @@ class TreeNode
 		}
 	}
 
+	function UFind($cb)
+	{
+		if (call_user_func($cb, $this)) return $this;
+
+		if (is_array($this->children))
+		foreach ($this->children as $c)
+		{
+			if (call_user_func($cb, $c)) return $c;
+			else
+			{
+				$ret = $c->UFind($cb);
+				if (isset($ret)) return $ret;
+			}
+		}
+	}
+
 	function Dump($in = 0)
 	{
 		foreach ($this->children as $c)
