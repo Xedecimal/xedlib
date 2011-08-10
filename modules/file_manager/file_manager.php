@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__).'/../../classes/File.php');
 require_once(dirname(__FILE__).'/../../classes/FileInfo.php');
 require_once(dirname(__FILE__).'/../../classes/HM.php');
-require_once(dirname(__FILE__).'/../../classes/Module.php');
+require_once(dirname(__FILE__).'/../../classes/module.php');
 require_once(dirname(__FILE__).'/../../classes/Utility.php');
 require_once(dirname(__FILE__).'/../../classes/present/Form.php');
 require_once(dirname(__FILE__).'/../../classes/present/Template.php');
