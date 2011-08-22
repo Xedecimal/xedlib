@@ -177,7 +177,7 @@ class DataSet
 					{
 						if (is_array($val))
 						{
-							$ret .= $col;
+							$ret .= "`{$col}`";
 							$ret .= $this->ProcessVal($val);
 						}
 						else
