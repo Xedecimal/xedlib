@@ -10,9 +10,10 @@ class ModUser extends Module
 {
 	/**
 	 * @var LoginManager Associated login manager.
-	 * 
+	 *
 	 */
 	public $Block = 'user';
+	public $Name = 'user';
 
 	public $fields = array(
 		'user' => array(
@@ -35,7 +36,7 @@ class ModUser extends Module
 	function __construct()
 	{
 		$this->Behavior = new ModUserBehavior();
-		$this->CheckActive('user');
+		$this->CheckActive($this->Name);
 
 		global $_d;
 		$_d['user.session.user'] = 'user_sessuser';
