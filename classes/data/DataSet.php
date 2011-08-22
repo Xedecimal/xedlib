@@ -467,7 +467,7 @@ class DataSet
 				$ret .= ($ix?',':null).	'('.$this->GetSingleValueString($v, $sep).')';
 			return $ret;
 		}
-		return '('.$this->GetSingleValueString($vals,$sep).')';
+		return $this->GetSingleValueString($vals,$sep);
 	}
 
 	/**
