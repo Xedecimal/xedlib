@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__).'/../../classes/Str.php');
+require_once(dirname(__FILE__).'/../nav.php');
 
 $_d['user.session.user'] = 'sess_user';
 $_d['user.session.pass'] = 'sess_pass';
@@ -176,9 +177,9 @@ class ModUser extends Module
 	function TagLinks()
 	{
 		if ($this->Behavior->CreateAccount)
-			$nav['Create an account'] = '{{app_abs}}/user/create';
+			$nav['Create an account'] = "{{app_abs}}/{$this->Name}/create";
 		if ($this->Behavior->ForgotPassword)
-			$nav['Forgot your password?'] = '{{app_abs}}/user/forgot-password';
+			$nav['Forgot your password?'] = "{{app_abs}}/{$this->Name}/forgot-password";
 		if (!empty($nav))
 			return ModNav::GetLinks(ModNav::LinkTree($nav));
 	}
