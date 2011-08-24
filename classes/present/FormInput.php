@@ -94,7 +94,7 @@ class FormInput
 	function attr($attr = null, $val = null)
 	{
 		if (!isset($attr)) return $this->atrs;
-		if (isset($val)) return $this->atrs[$attr] = $val;
+		if (isset($val)) return $this->atrs[strtoupper($attr)] = $val;
 		if (isset($this->atrs[$attr])) return $this->atrs[$attr];
 	}
 
