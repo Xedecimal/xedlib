@@ -237,8 +237,10 @@ class FormInput
 				$atrs['NAME'] .= '[]';
 				$atrs['TYPE'] = 'text';
 				$atrs['CLASS'] = 'date';
+				$atrs['VALUE'] = @$this->atrs['VALUE'][0];
 				$one = '<input '.HM::GetAttribs($atrs).' />';
 				if (isset($atrs['ID'])) $atrs['ID'] .= '2';
+				$atrs['VALUE'] = @$this->atrs['VALUE'][1];
 				$two = '<input '.HM::GetAttribs($atrs).' />';
 				return "$one to $two";
 			case 'time':
