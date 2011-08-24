@@ -54,7 +54,7 @@ class FormInput
 		$this->name = $name;
 		$this->help = $help;
 
-		// Consume these attributes
+		# Consume these attributes
 
 		if (is_array($atrs))
 		{
@@ -62,20 +62,20 @@ class FormInput
 			$this->invalid = Arr::Yank($atrs, 'INVALID');
 		}
 
-		// Propegate these attributes
+		# Propegate these attributes
 
 		if (is_array($atrs))
 			foreach ($atrs as $k => $v)
 				$this->atrs[strtoupper($k)] = $v;
 		else $this->atrs = HM::ParseAttribs($atrs);
 
-		// Analyze these attributes
+		# Analyze these attributes
 
 		$this->atrs['TYPE'] = $type;
 		if ($name != null) $this->atrs['NAME'] = $name;
 		if ($valu != null) $this->atrs['VALUE'] = $valu;
 
-		// @TODO: I don't believe these should be in the constructor.
+		# @TODO: I don't believe these should be in the constructor.
 
 		switch ($type)
 		{
