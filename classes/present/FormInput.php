@@ -54,7 +54,7 @@ class FormInput
 		$this->name = $name;
 		$this->help = $help;
 
-		// Consume these attributes
+		# Consume these attributes
 
 		if (is_array($atrs))
 		{
@@ -62,20 +62,20 @@ class FormInput
 			$this->invalid = Arr::Yank($atrs, 'INVALID');
 		}
 
-		// Propegate these attributes
+		# Propegate these attributes
 
 		if (is_array($atrs))
 			foreach ($atrs as $k => $v)
 				$this->atrs[strtoupper($k)] = $v;
 		else $this->atrs = HM::ParseAttribs($atrs);
 
-		// Analyze these attributes
+		# Analyze these attributes
 
 		$this->atrs['TYPE'] = $type;
 		if ($name != null) $this->atrs['NAME'] = $name;
 		if ($valu != null) $this->atrs['VALUE'] = $valu;
 
-		// @TODO: I don't believe these should be in the constructor.
+		# @TODO: I don't believe these should be in the constructor.
 
 		switch ($type)
 		{
@@ -94,7 +94,7 @@ class FormInput
 	function attr($attr = null, $val = null)
 	{
 		if (!isset($attr)) return $this->atrs;
-		if (isset($val)) return $this->atrs[$attr] = $val;
+		if (isset($val)) return $this->atrs[strtoupper($attr)] = $val;
 		if (isset($this->atrs[$attr])) return $this->atrs[$attr];
 	}
 
@@ -237,8 +237,10 @@ class FormInput
 				$atrs['NAME'] .= '[]';
 				$atrs['TYPE'] = 'text';
 				$atrs['CLASS'] = 'date';
+				$atrs['VALUE'] = @$this->atrs['VALUE'][0];
 				$one = '<input '.HM::GetAttribs($atrs).' />';
 				if (isset($atrs['ID'])) $atrs['ID'] .= '2';
+				$atrs['VALUE'] = @$this->atrs['VALUE'][1];
 				$two = '<input '.HM::GetAttribs($atrs).' />';
 				return "$one to $two";
 			case 'time':

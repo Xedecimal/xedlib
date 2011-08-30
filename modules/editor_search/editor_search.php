@@ -188,21 +188,35 @@ class EditorSearch extends Module
 		$vp = new VarParser();
 		$ret = null;
 
+		$checks = Server::GetVar($this->Name.'_search');
+
 		if (is_array($sf)) $sf = $ix;
 		if (array_key_exists($sf, $this->_ds->FieldInputs))
 		{
-			/** @var FormInput */
+			# Configure the search field.
+
 			$fi = $this->_ds->FieldInputs[$sf];
 			$fi->attr('NAME', $sf);
 
 			if ($fi->attr('TYPE') == 'date') $fi->attr('TYPE', 'daterange');
+			$fname = $fi->attr('NAME');
 			$field = $fi->Get($this->Name);
+			$fi->attr('value', Server::GetVar($fname));
+
+			# Configure the checkbox.
+
+			$cb = new FormInput($fi->text, 'checkbox', "{$this->Name}_search[{$fname}]");
+			$cb->attr('id', 'hider_'.$fname);
+			$cb->attr('class', 'hider');
+			if (isset($checks[$fname])) $cb->attr('checked', 'checked');
+
+			# Output the value.
 
 			$ret .= $vp->ParseVars($g, array(
-				'id' => $fi->GetCleanID(null),
+				'id' => $fname,
 				'text' => $fi->text,
-				'fname' => $fi->attr('NAME'),
-				'field' => $field
+				'checkbox' => $cb->Get(),
+				'field' => $fi->Get()
 			));
 		}
 		return $ret;
