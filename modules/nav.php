@@ -116,7 +116,7 @@ class ModNav extends Module
 		$ret = '';
 		while (!empty($walk->id))
 		{
-			if (!empty($ret)) $ret = ' &raquo; '.$ret;
+			if (!empty($ret)) $ret = ' » '.$ret;
 			$ret = '<a href="'.$walk->data.'">'.$walk->id.'</a>'.$ret;
 			$walk = $walk->parent;
 		}
