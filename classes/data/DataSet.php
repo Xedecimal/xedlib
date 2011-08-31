@@ -177,7 +177,7 @@ class DataSet
 					{
 						if (is_array($val))
 						{
-							$ret .= $col;
+							$ret .= "`{$col}`";
 							$ret .= $this->ProcessVal($val);
 						}
 						else
@@ -467,7 +467,7 @@ class DataSet
 				$ret .= ($ix?',':null).	'('.$this->GetSingleValueString($v, $sep).')';
 			return $ret;
 		}
-		return '('.$this->GetSingleValueString($vals,$sep).')';
+		return $this->GetSingleValueString($vals,$sep);
 	}
 
 	/**

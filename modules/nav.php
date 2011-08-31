@@ -43,6 +43,11 @@ class ModNav extends Module
 		return $ret;
 	}
 
+	/**
+	 *
+	 * @param type $nav
+	 * @return TreeNode
+	 */
 	static function LinkTree($nav)
 	{
 		$r = new TreeNode();
@@ -94,9 +99,35 @@ class ModNav extends Module
 			$t = new Template();
 			$t->ReWrite('link', array($this, 'TagLink'));
 			$t->ReWrite('head', array($this, 'TagHead'));
-			return ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
+			$ret['nav'] = ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
 				!empty($_d['nav.class']) ? $_d['nav.class'] : 'nav');
+
+			$ret['crumb'] = $this->GetCrumb();
 		}
+
+		return $ret;
+	}
+
+	function GetCrumb()
+	{
+		global $rw, $_d;
+		$tree = ModNav::LinkTree($_d['nav.links']);
+		$walk = $tree->UFind(array(&$this, 'cb_crumb'));
+		$ret = '';
+		while (!empty($walk->id))
+		{
+			if (!empty($ret)) $ret = ' » '.$ret;
+			$ret = '<a href="'.$walk->data.'">'.$walk->id.'</a>'.$ret;
+			$walk = $walk->parent;
+		}
+
+		return $ret;
+	}
+
+	function cb_crumb($item)
+	{
+		global $rw;
+		if (substr($item->data, -strlen($rw)) == $rw) return true;
 	}
 }
 
