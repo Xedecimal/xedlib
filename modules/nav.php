@@ -101,11 +101,14 @@ class ModNav extends Module
 			$t->ReWrite('head', array($this, 'TagHead'));
 			$ret['nav'] = ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
 				!empty($_d['nav.class']) ? $_d['nav.class'] : 'nav');
-
-			$ret['crumb'] = $this->GetCrumb();
 		}
 
 		return $ret;
+	}
+
+	function TagCrumb($t, $g)
+	{
+		return $this->GetCrumb();
 	}
 
 	function GetCrumb()
