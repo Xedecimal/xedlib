@@ -459,7 +459,10 @@ class EditorData extends Module
 						if (empty($value['tmp_name'])) continue;
 						$ext = strrchr($value['name'], '.');
 
-						$moves[] = array(
+						# We move files later because we do not have enough
+						# data to decide where to put them or what to name them.
+
+						$files[] = array(
 							'src' => $value['tmp_name'],
 							'dst' => $in->attr('VALUE')
 						);
@@ -492,14 +495,24 @@ class EditorData extends Module
 			$id = $context->ds->Add($insert);
 			$insert[$context->ds->id] = $id;
 
-			if (!empty($moves))
+			# Handle all uploads
+
+			if (!empty($files))
 			{
 				$vp = new VarParser();
-				foreach ($moves as $move)
+				foreach ($files as $file)
 				{
-					$dst = $vp->ParseVars($move['dst'], $insert);
-					move_uploaded_file($move['src'], $dst);
-					chmod($dst, 0777);
+					# Handler associated
+					if (is_object($file['dst']))
+					{
+						$file['dst']->Create($file['src'], $insert);
+					}
+					else # Move uploaded file
+					{
+						$dst = $vp->ParseVars($file['dst'], $insert);
+						move_uploaded_file($file['src'], $dst);
+						chmod($dst, 0777);
+					}
 				}
 			}
 
@@ -561,14 +574,18 @@ class EditorData extends Module
 						if (!empty($value['tmp_name']))
 						{
 							$vp = new VarParser();
-							#$files = glob($vp->ParseVars($in->attr('VALUE'),
-							#	$update).".*");
-							#foreach ($files as $file) unlink($file);
 							$src = $value['tmp_name'];
 							$vars = $update;
 							$vars[$this->ds->id] = $ci;
-							$dst = $vp->ParseVars($in->attr('VALUE'), $vars);
-							move_uploaded_file($src, $dst);
+							$val = $in->attr('VALUE');
+
+							# File Handler
+							if (is_object($val)) $val->Update($src, $vars);
+							else # String Based
+							{
+								$dst = $vp->ParseVars($val, $vars);
+								move_uploaded_file($src, $dst);
+							}
 							unset($update[$col]);
 						}
 					}
@@ -625,8 +642,15 @@ class EditorData extends Module
 					if ($in->attr('TYPE') == 'file')
 					{
 						$vp = new VarParser();
-						$files = glob($vp->ParseVars($in->attr('VALUE'), $data).".*");
-						foreach ($files as $file) unlink($file);
+						$val = $in->attr('VALUE');
+						# File handler
+						if (is_object($val))
+							$val->Delete($data);
+						else # Regular string file
+						{
+							$files = glob($vp->ParseVars($val, $data).".*");
+							foreach ($files as $file) unlink($file);
+						}
 					}
 				}
 			}

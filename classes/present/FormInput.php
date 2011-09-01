@@ -157,7 +157,7 @@ class FormInput
 		}
 		if ($this->atrs['TYPE'] == 'boolean')
 		{
-			return GetInputBoolean($parent, $this->atrs,
+			return FormInput::GetBoolean($parent, $this->atrs,
 				!isset($this->valu) ? Server::GetVar(@$this->atrs['NAME'])
 					: $this->valu);
 		}
@@ -531,7 +531,7 @@ class FormInput
 	 */
 	static function GetBoolean($parent, $attribs)
 	{
-		$id = CleanID((isset($parent) ? $parent.'_' : null).@$attribs['NAME']);
+		$id = HM::CleanID((isset($parent) ? $parent.'_' : null).@$attribs['NAME']);
 		if (!isset($attribs['ID'])) $attribs['ID'] = $id;
 		if (!isset($attribs['VALUE'])) $attribs['VALUE'] = 0;
 		if (!isset($attribs['TEXTNO'])) $attribs['TEXTNO'] = 'No';

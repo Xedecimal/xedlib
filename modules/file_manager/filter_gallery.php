@@ -264,28 +264,9 @@ class FilterGallery extends FilterDefault
 	 */
 	static function ResizeFile($file, $dest, $nx, $ny, $literal = false)
 	{
-		$pinfo = pathinfo($file);
-		$dt = $dest.'.'.$pinfo['extension'];
-
-		switch (strtolower($pinfo['extension']))
-		{
-			case "jpg":
-			case "jpeg":
-				$img = imagecreatefromjpeg($file);
-				$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-				imagejpeg($img, $dt);
-			break;
-			case "png":
-				$img = imagecreatefrompng($file);
-				$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-				imagepng($img, $dt);
-			break;
-			case "gif":
-				$img = imagecreatefromgif($file);
-				$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-				imagegif($img, $dt);
-			break;
-		}
+		$img = imagecreatefromstring(file_get_contents($file));
+		$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
+		imagejpeg($img, $dest);
 	}
 
 	/**
