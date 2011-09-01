@@ -65,7 +65,7 @@ class ModArticle extends Module
 	function __construct()
 	{
 		global $_d;
-		$this->_template = Module::L('temps/mod_article.xml');
+		$this->_template = Module::L('article/article.xml');
 		if (empty($this->_source))
 			$this->_source = new DataSet($_d['db'], $this->Name, $this->ID);
 	}
@@ -118,12 +118,12 @@ class ModArticleAdmin extends Module
 	*/
 	private $edNews;
 
-	protected $Name = 'news';
+	public $Name = 'news';
 	protected $ID = 'nws_id';
 
 	function __construct()
 	{
-		require_once('xedlib/a_editor.php');
+		require_once('xedlib/modules/editor_data/editor_data.php');
 		global $_d;
 
 		if (empty($this->_source))
