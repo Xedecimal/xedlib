@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/File.php');
+require_once(dirname(__FILE__).'/file.php');
 
 /**
  * Collects information for a SINGLE file OR folder.
