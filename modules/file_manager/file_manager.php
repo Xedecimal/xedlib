@@ -3,7 +3,7 @@
 require_once(dirname(__FILE__).'/../../classes/File.php');
 require_once(dirname(__FILE__).'/../../classes/FileInfo.php');
 require_once(dirname(__FILE__).'/../../classes/HM.php');
-require_once(dirname(__FILE__).'/../../classes/Module.php');
+require_once(dirname(__FILE__).'/../../classes/module.php');
 require_once(dirname(__FILE__).'/../../classes/Utility.php');
 require_once(dirname(__FILE__).'/../../classes/present/Form.php');
 require_once(dirname(__FILE__).'/../../classes/present/Template.php');
@@ -188,7 +188,7 @@ class FileManager extends Module
 		else if ($act == 'Save')
 		{
 			if (!$this->Behavior->AllowEdit) return;
-			$info = new FileInfo($this->Root.$this->cf, $this->Filters);
+			$info = new FileInfo($this->Root.'/'.$this->cf, $this->Filters);
 			$newinfo = Server::GetVar('info');
 			$f = FileManager::GetFilter($info, $this->Root, $this->Filters);
 			$f->Updated($this, $info, $newinfo);
@@ -530,6 +530,7 @@ class FileManager extends Module
 					array($this->Name.'_cf' =>
 					"{$this->cf}{$f->filename}"));
 
+			$this->vars['name'] = $f;
 			$this->vars['caption'] = $this->View->GetCaption($f);
 			$this->vars['filename'] = $f->filename;
 			$this->vars['fipath'] = $f->path;
@@ -1228,8 +1229,7 @@ class FileManagerView
 	 */
 	function GetCaption($file)
 	{
-		if ($this->ShowTitle
-			&& !empty($file->info['title']))
+		if (!empty($file->info['title']))
 			return stripslashes($file->info['title']);
 		else return $file->filename;
 	}
