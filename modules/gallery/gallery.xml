@@ -1,6 +1,13 @@
 <div id="gallery">
 <p><breadcrumb source="galcf" sep=" &raquo; " root="Gallery" /></p>
 
+<style type="text/css">
+.folder,.file {
+	width: {{file_thumb_width}}px;
+	height: {{file_thumb_height}}px;
+}
+</style>
+
 <folder>
 <div class="folder">
 <a href="{{url}}">{{icon}}</a>
@@ -15,7 +22,7 @@
 </div> <!-- file -->
 </file>
 
-<div class="clear" />
+<div class="clear">&nbsp;</div>
 
 <image>
 	{{butBack}}
