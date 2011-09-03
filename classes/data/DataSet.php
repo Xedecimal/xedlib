@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/Database.php');
-require_once(dirname(__FILE__).'/Join.php');
+require_once(dirname(__FILE__).'/database.php');
+require_once(dirname(__FILE__).'/join.php');
 
 /**
  * A general dataset, good for binding to a database's table.
