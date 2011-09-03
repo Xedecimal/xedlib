@@ -31,11 +31,11 @@ class FilterGallery extends FilterDefault
 			$dinfo = $this->GetInfo(new FileInfo($fi->dir))->info;
 		else $dinfo = $fi->info;
 
-		if (empty($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
-		if (empty($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
+		if (!isset($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
+		if (!isset($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
 
-		if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = $dinfo['thumb_width'];
-		if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = $dinfo['thumb_height'];
+		$fi->info['thumb_width'] = $dinfo['thumb_width'];
+		$fi->info['thumb_height'] = $dinfo['thumb_height'];
 
 		global $_d;
 
@@ -47,11 +47,11 @@ class FilterGallery extends FilterDefault
 
 		$atrs['SRC'] = Server::GetRelativePath($abs);
 
-		if ($this->Behavior->UseThumbs)
-		{
-			$atrs['WIDTH'] = $fi->info['thumb_width'];
-			$atrs['HEIGHT'] = $fi->info['thumb_height'];
-		}
+		//if ($this->Behavior->UseThumbs)
+		//{
+			//$atrs['WIDTH'] = $fi->info['thumb_width'];
+			//$atrs['HEIGHT'] = $fi->info['thumb_height'];
+		//}
 		$atrs['ALT'] = 'icon';
 
 		if (file_exists($abs)) $fi->icon =
@@ -141,7 +141,7 @@ class FilterGallery extends FilterDefault
 				$h = $info['thumb_height'];
 				$src = $fir->path;
 				$dst = $fir->dir.'/t_'.File::GetFile($fir->filename);
-				$this->ResizeFile($src, $dst, $w, $h, true);
+				$this->ResizeFile($src, $dst, $w, $h);
 			}
 		}
 	}
@@ -307,7 +307,7 @@ class FilterGallery extends FilterDefault
 			$dx = $nx;
 			$dy = $ny;
 		}
-		else
+		else # Not literal, maintain aspect ratio
 		{
 			if ($sx < $sy)
 			{
