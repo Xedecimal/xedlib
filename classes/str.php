@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/Utility.php');
+require_once(dirname(__FILE__).'/utility.php');
 
 /**
  * String manipulation.

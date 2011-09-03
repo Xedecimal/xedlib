@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/present/Template.php');
+require_once(dirname(__FILE__).'/present/template.php');
 
 class Module
 {

@@ -1,10 +1,10 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../classes/Str.php');
+require_once(dirname(__FILE__).'/../../classes/str.php');
 
-require_once(dirname(__FILE__).'/../../classes/present/Template.php');
-require_once(dirname(__FILE__).'/../../classes/present/Form.php');
-require_once(dirname(__FILE__).'/../../classes/present/Table.php');
+require_once(dirname(__FILE__).'/../../classes/present/template.php');
+require_once(dirname(__FILE__).'/../../classes/present/form.php');
+require_once(dirname(__FILE__).'/../../classes/present/table.php');
 
 /**
  * @package Editor
@@ -120,7 +120,7 @@ class EditorHandler
 /**
  * Check the example...
  *
- * @example doc/examples/HandlerFile.php
+ * @example doc/examples/handler_file.php
  *
  */
 class HandlerFile extends EditorHandler

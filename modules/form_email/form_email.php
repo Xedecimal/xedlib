@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../classes/present/Form.php');
-require_once(dirname(__FILE__).'/../../classes/present/FormInput.php');
+require_once(dirname(__FILE__).'/../../classes/present/form.php');
+require_once(dirname(__FILE__).'/../../classes/present/form_input.php');
 
 class FormEmail extends Module
 {

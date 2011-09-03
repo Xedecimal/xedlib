@@ -1,12 +1,12 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../classes/File.php');
-require_once(dirname(__FILE__).'/../../classes/FileInfo.php');
-require_once(dirname(__FILE__).'/../../classes/HM.php');
+require_once(dirname(__FILE__).'/../../classes/file.php');
+require_once(dirname(__FILE__).'/../../classes/file_info.php');
+require_once(dirname(__FILE__).'/../../classes/hm.php');
 require_once(dirname(__FILE__).'/../../classes/module.php');
-require_once(dirname(__FILE__).'/../../classes/Utility.php');
-require_once(dirname(__FILE__).'/../../classes/present/Form.php');
-require_once(dirname(__FILE__).'/../../classes/present/Template.php');
+require_once(dirname(__FILE__).'/../../classes/utility.php');
+require_once(dirname(__FILE__).'/../../classes/present/form.php');
+require_once(dirname(__FILE__).'/../../classes/present/template.php');
 
 require_once(dirname(__FILE__).'/filter_default.php');
 require_once(dirname(__FILE__).'/filter_gallery.php');
