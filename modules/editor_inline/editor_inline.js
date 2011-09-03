@@ -37,6 +37,6 @@ function inline_mce_save(ed)
 {
 	$.post('editor_inline/save', {file: ed.getElement().getAttribute('title'),
 		content: ed.getContent()}, function (data) {
-			alert('Result: '+data.msg);
+			if (data.msg == 'Success') window.location.reload();
 		}, 'json');
 }
