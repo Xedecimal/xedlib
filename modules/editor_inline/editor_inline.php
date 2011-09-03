@@ -1,13 +1,8 @@
 <?php
 
-class InlineEditor extends Module
+class EditorInline extends Module
 {
 	public $Name = 'editor_inline';
-
-	function __construct()
-	{
-		$this->CheckActive($this->Name);
-	}
 
 	function Link()
 	{
@@ -18,6 +13,7 @@ class InlineEditor extends Module
 
 	function Prepare()
 	{
+		$this->CheckActive($this->Name);
 		if (!$this->Active) return;
 		if (!ModUser::RequireAccess(1)) return;
 
@@ -57,6 +53,6 @@ EOF;
 	}
 }
 
-Module::Register('InlineEditor');
+Module::Register('EditorInline');
 
 ?>
