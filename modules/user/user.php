@@ -33,8 +33,6 @@ class ModUser extends Module
 		)
 	);
 
-	public $Name = 'user';
-
 	function __construct()
 	{
 		$this->Behavior = new ModUserBehavior();
