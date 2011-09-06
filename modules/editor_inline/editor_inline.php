@@ -1,6 +1,6 @@
 <?php
 
-class InlineEditor extends Module
+class EditorInline extends Module
 {
 	public $Name = 'editor_inline';
 
@@ -52,6 +52,6 @@ EOF;
 	}
 }
 
-Module::Register('InlineEditor');
+Module::Register('EditorInline');
 
 ?>

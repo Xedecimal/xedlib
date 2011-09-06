@@ -41,6 +41,7 @@ class Gallery extends Module
 		$this->Display = new GalleryDisplay();
 		$this->Template = Module::L('gallery/gallery.xml');
 		$this->FileManager = new FileManager();
+		$this->CheckActive($this->Name);
 	}
 
 	function TagHeader($t, $guts)
@@ -181,6 +182,8 @@ EOF;
 	function Get()
 	{
 		global $me;
+
+		if (!$this->Active) return;
 		$this->f = new FilterGallery($this->FileManager);
 
 		require_once(dirname(__FILE__).'/../file_manager/file_manager.php');
@@ -287,6 +290,7 @@ EOF;
 	 */
 	function GetCaption($file)
 	{
+		if ($this->Display->Captions == CAPTION_NONE) return '';
 		if ($this->InfoCaption
 			&& !empty($file->info['title'])
 			&& $this->Display->Captions == CAPTION_TITLE)
