@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/../classes/TreeNode.php');
-require_once(dirname(__FILE__).'/../classes/HM.php');
+require_once(dirname(__FILE__).'/../classes/tree_node.php');
+require_once(dirname(__FILE__).'/../classes/hm.php');
 
 class ModNav extends Module
 {
@@ -31,6 +31,8 @@ class ModNav extends Module
 				else if (isset($c->data['raw'])) $link = $c->data['raw'];
 				else if (is_array($c->data))
 					$link = '<a'.HM::GetAttribs($c->data).'>'.$c->id.'</a>';
+				else if (is_string($c)) $link = $c;
+				else $link = $c->id;
 				$ret .= '<li>'.$link;
 				$ret .= ModNav::GetLinks($c, $class, $depth+1);
 				$ret .= '</li>';
@@ -41,6 +43,11 @@ class ModNav extends Module
 		return $ret;
 	}
 
+	/**
+	 *
+	 * @param type $nav
+	 * @return TreeNode
+	 */
 	static function LinkTree($nav)
 	{
 		$r = new TreeNode();
@@ -92,8 +99,38 @@ class ModNav extends Module
 			$t = new Template();
 			$t->ReWrite('link', array($this, 'TagLink'));
 			$t->ReWrite('head', array($this, 'TagHead'));
-			return ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']));
+			$ret['nav'] = ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
+				!empty($_d['nav.class']) ? $_d['nav.class'] : 'nav');
 		}
+
+		return $ret;
+	}
+
+	function TagCrumb($t, $g)
+	{
+		return $this->GetCrumb();
+	}
+
+	function GetCrumb()
+	{
+		global $rw, $_d;
+		$tree = ModNav::LinkTree($_d['nav.links']);
+		$walk = $tree->UFind(array(&$this, 'cb_crumb'));
+		$ret = '';
+		while (!empty($walk->id))
+		{
+			if (!empty($ret)) $ret = ' » '.$ret;
+			$ret = '<a href="'.$walk->data.'">'.$walk->id.'</a>'.$ret;
+			$walk = $walk->parent;
+		}
+
+		return $ret;
+	}
+
+	function cb_crumb($item)
+	{
+		global $rw;
+		if (substr($item->data, -strlen($rw)) == $rw) return true;
 	}
 }
 

@@ -38,6 +38,12 @@ class VarParser
 			array(&$this, 'var_parser'), $data);
 	}
 
+	static function Parse($string, $vars)
+	{
+		$vp = new VarParser();
+		return $vp->ParseVars($string, $vars);
+	}
+
 	/**
 	 * Callback for each regex match, not for external use.
 	 *
@@ -93,12 +99,12 @@ class VarParser
 		return null;
 	}
 
-	static function Concat($t, $items, $bleed = true)
+	static function Concat($t, $items, $bleed = true, $ext_data = array())
 	{
 		$vp = new VarParser();
 		$vp->Behavior->Bleed = $bleed;
 		$ret = '';
-		foreach ($items as $i['id'] => $i) $ret .= $vp->ParseVars($t, $i);
+		foreach ($items as $i['vp-id'] => $i) $ret .= $vp->ParseVars($t, array_merge($i, $ext_data));
 		return $ret;
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/Database.php');
-require_once(dirname(__FILE__).'/Join.php');
+require_once(dirname(__FILE__).'/database.php');
+require_once(dirname(__FILE__).'/join.php');
 
 /**
  * A general dataset, good for binding to a database's table.
@@ -125,6 +125,10 @@ class DataSet
 				$this->func_fetch = 'sqlite_fetch_array';
 				$this->func_rows = 'sqlite_num_rows';
 				break;
+			case DB_SL3:
+				$this->func_fetch = array(&$this, 'func_fetch_sqlite3');
+				$this->func_rows = array(&$this, 'func_rows_sqlite3');
+				break;
 			case DB_OD:
 				$this->func_fetch = 'odbc_fetch_array';
 				$this->func_rows = 'odbc_num_rows';
@@ -173,7 +177,7 @@ class DataSet
 					{
 						if (is_array($val))
 						{
-							$ret .= $col;
+							$ret .= "`{$col}`";
 							$ret .= $this->ProcessVal($val);
 						}
 						else
@@ -302,7 +306,7 @@ class DataSet
 	function GroupClause($group)
 	{
 		if (isset($group))
-		return "\n GROUP BY {$group}";
+			return "\n GROUP BY {$group}";
 		return null;
 	}
 
@@ -374,7 +378,7 @@ class DataSet
 
 	/**
 	 * This will convert a single value into SQL notation.
-	 * 
+	 *
 	 * @param mixed $val Either a string or a result of Database::Sql*
 	 * functions.
 	 * @param boolean $tbl Whether or not we're dealing with tables here.
@@ -463,7 +467,7 @@ class DataSet
 				$ret .= ($ix?',':null).	'('.$this->GetSingleValueString($v, $sep).')';
 			return $ret;
 		}
-		return '('.$this->GetSingleValueString($vals,$sep).')';
+		return $this->GetSingleValueString($vals,$sep);
 	}
 
 	/**
@@ -608,34 +612,26 @@ class DataSet
 		$query .= $this->OrderClause(@$opts['order']);
 		$query .= $this->AmountClause(@$opts['limit']);
 
-		//Execute Query
+		# Execute Query
 		$rows = $this->database->Query($query, $this->ErrorHandler);
 
-		//Prepare Data
+		# Prepare Data
 		$f = $this->func_rows;
 		switch ($this->database->type)
 		{
 			case DB_SL:
 				if ($f($rows) < 1) return array();
 				break;
+			case DB_SL3:
+				if (call_user_func($f, $rows) < 1) return array();
+				break;
 			default:
 				if ($f($this->database->link) < 1) return array();
 		}
 		$items = array();
 
-		$a = null;
-		if ($this->database->type == DB_MY)
-		{
-			$a = MYSQL_BOTH;
-			if (@$opts['args'] == GET_ASSOC) $a = MYSQL_ASSOC;
-		}
-		else if ($this->database->type == DB_MI)
-		{
-			$a = MYSQLI_BOTH;
-			if (@$opts['args'] == GET_ASSOC) $a = MYSQLI_ASSOC;
-		}
-
-		while (($row = call_user_func($this->func_fetch, $rows, $a)))
+		if (empty($opts['args'])) $opts['args'] = 1;
+		while (($row = call_user_func($this->func_fetch, $rows, $opts['args'])))
 		{
 			$newrow = array();
 			foreach ($row as $key => $val)
@@ -933,9 +929,9 @@ class DataSet
 		return $cursor[0];
 	}
 
-	static function BuildTree($items, $parent, $assoc = null)
+	static function BuildTree($items, $parent, $assoc)
 	{
-		$flats = LinkList($items, $parent, $assoc);
+		$flats = DataSet::LinkList($items, $parent, $assoc);
 
 		$root = new TreeNode();
 
@@ -954,7 +950,7 @@ class DataSet
 
 	static function LinkList($items, $parent, $assoc = null)
 	{
-		//Build Flat
+		# Build Flat
 		foreach ($items as $i)
 		{
 			$tn = new TreeNode($i);
@@ -962,15 +958,6 @@ class DataSet
 			$ret[$i[$parent]] = $tn;
 		}
 
-		foreach ($ret as $id => $i)
-		{
-			$p = $i->data[$assoc];
-			if (isset($ret[$p]))
-			{
-				$ret[$p]->children[$id] = $i;
-				$i->parent = $ret[$p];
-			}
-		}
 		return $ret;
 	}
 
@@ -1023,7 +1010,7 @@ class DataSet
 			# if parent (p) id of child ($c[1]) in parent node exists
 
 			if (isset($flats[$p][$row[$p]]) && $row[$c[1]] != $rootid)
-				$flats[$p][$row[$p]]->AddChild($flats[$c[0]][$row[$c[0]]]);
+				$flats[$p][$row[$p]]->AddChild($flats[$c[0]][$row[$c[1]]]);
 			else
 				$tnRoot->AddChild($flats[$p][$row[$p]]);
 		}
@@ -1033,6 +1020,24 @@ class DataSet
 			$tnRoot->AddChild($rn);
 
 		return $tnRoot;
+	}
+
+	/**
+	 *
+	 * @param SQLite3Result $res Contextual result
+	 */
+	function func_rows_sqlite3($res)
+	{
+		return ($res->numColumns() > 0);
+	}
+
+	/**
+	 *
+	 * @param SQLite3Result $res Contextual Result
+	 */
+	function func_fetch_sqlite3($res, $args)
+	{
+		return $res->fetchArray($args);
 	}
 }
 

@@ -1,10 +1,10 @@
 <?php
 
-require_once(dirname(__FILE__).'/../Utility.php');
-require_once(dirname(__FILE__).'/../File.php');
-require_once(dirname(__FILE__).'/../LayeredOutput.php');
-require_once(dirname(__FILE__).'/../VarParser.php');
-require_once(dirname(__FILE__).'/Box.php');
+require_once(dirname(__FILE__).'/../utility.php');
+require_once(dirname(__FILE__).'/../file.php');
+require_once(dirname(__FILE__).'/../layered_output.php');
+require_once(dirname(__FILE__).'/../var_parser.php');
+require_once(dirname(__FILE__).'/box.php');
 
 /**
  * A template
@@ -220,6 +220,8 @@ class Template extends LayeredOutput
 		{
 			if (!empty($attribs['DOCTYPE']))
 			{
+				if ($attribs['DOCTYPE'] == 'html5')
+					$this->Out('<!DOCTYPE html>');
 				if ($attribs['DOCTYPE'] == 'strict')
 					$this->Out('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 						"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">');

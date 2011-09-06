@@ -1,7 +1,8 @@
 <?php
 
 /**
- * (eXtensible|Hyper Text) (Markup|Transfer) (Protocol|Language)
+ * (eXtensible|Hyper Text) (Markup|Transfer) (Protocol|Language), or just
+ * HyperMarkup in this case.
  */
 
 class HM
@@ -24,7 +25,10 @@ class HM
 		$ret = '';
 		if (is_array($attribs))
 		foreach ($attribs as $n => $v)
-			$ret .= ' '.strtolower($n).'="'.htmlspecialchars($v).'"';
+		{
+			if (is_string($v))
+				$ret .= ' '.strtolower($n).'="'.htmlspecialchars($v).'"';
+		}
 		else return ' '.$attribs;
 		return $ret;
 	}
@@ -40,7 +44,7 @@ class HM
 		if (empty($atrs)) return;
 		$m = null;
 		preg_match_all('/([^= ]+)="([^"]+)"/', $atrs, $m);
-		for ($ix = 0; $ix < count($m[1]); $ix++) $ret[$m[1][$ix]] = $m[2][$ix];
+		for ($ix = 0; $ix < count($m[1]); $ix++) $ret[strtoupper($m[1][$ix])] = $m[2][$ix];
 		return $ret;
 	}
 

@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/../Server.php');
-require_once(dirname(__FILE__).'/Form.php');
+require_once(dirname(__FILE__).'/../server.php');
+require_once(dirname(__FILE__).'/form.php');
 
 /**
  * @package Calendar
@@ -179,7 +179,7 @@ class Calendar
 	function Get($timestamp = null)
 	{
 		global $me;
-		require_once('Template.php');
+		require_once('template.php');
 
 		$vp = new VarParser();
 

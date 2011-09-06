@@ -1,4 +1,4 @@
-<div id="gallery">
+<div class="gallery">
 <p><breadcrumb source="galcf" sep=" &raquo; " root="Gallery" /></p>
 
 <folder>

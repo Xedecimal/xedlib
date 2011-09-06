@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/../Server.php');
-require_once(dirname(__FILE__).'/../Utility.php');
+require_once(dirname(__FILE__).'/../server.php');
+require_once(dirname(__FILE__).'/../utility.php');
 
 /**
  * on our way to the storage phase! We shall support the following!
@@ -21,18 +21,20 @@ require_once(dirname(__FILE__).'/../Utility.php');
  * Associative get, returns arrays as $item['column'] instead of $item[index].
  * @todo Don't use defines, defines aren't redeclareable.
  */
-define("GET_ASSOC", 1);
+define('GET_ASSOC', 1);
+define('GET_NUM', 2);
 /**
  * Both get, returns arrays as $item['column'] as well as $item[index] instead
  * of $item[index].
  * @todo Don't use defines, defines aren't redeclareable.
  */
-define("GET_BOTH", 3);
+define('GET_BOTH', 3);
 
-define('DB_MY', 0); //MySQL
-define('DB_MI', 1); //MySQLi
-define('DB_OD', 2); //ODBC
-define('DB_SL', 3); //SQLite
+define('DB_MY', 0); # MySQL
+define('DB_MI', 1); # MySQLi
+define('DB_OD', 2); # ODBC
+define('DB_SL', 3); # SQLite
+define('DB_SL3', 4); # SQLite 3
 
 define('ER_NO_SUCH_TABLE', 1146);
 define('ER_INVALID_LOGIN', 9999);
@@ -139,6 +141,14 @@ class Database
 		}
 	}
 
+	function CheckSQLite3Error($query, $handler)
+	{
+		if ($this->link->lastErrorCode())
+		{
+			echo "Sqlite3 error on: {$query}";
+		}
+	}
+
 	function Escape($val)
 	{
 		switch ($this->type)
@@ -202,8 +212,14 @@ class Database
 			case 'sqlite':
 				$this->ErrorHandler = array($this, 'CheckSQLiteError');
 				$this->func_aff = 'sqlite_num_rows';
-				$this->link = sqlite_open($m[5]);
+				$this->link = sqlite_open($m['path']);
 				$this->type = DB_SL;
+				break;
+			case 'sqlite3':
+				$this->ErrorHandler = array(&$this, 'CheckSQLite3Error');
+				$this->func_aff = 'sqlite3_num_rows';
+				$this->link = new SQLite3($m['path']);
+				$this->type = DB_SL3;
 				break;
 			default:
 				Server::Error("Invalid database type.");
@@ -238,6 +254,8 @@ class Database
 			case DB_SL:
 				$res = sqlite_query($this->link, $query);
 				break;
+			case DB_SL3:
+				$res = $this->link->query($query);
 		}
 		call_user_func($this->ErrorHandler, $query, $handler);
 		return $res;
@@ -316,7 +334,7 @@ class Database
 	static function SqlUnquote($data) { return array('val' => $data, 'opt' => SQLOPT_UNQUOTE); }
 	static function SqlBetween($from, $to) { return array('cmp' => 'BETWEEN', 'opt' => SQLOPT_UNQUOTE, 'val' => "'$from' AND '$to'"); }
 	static function SqlIs($val) { return array('cmp' => 'IS', 'opt' => SQLOPT_UNQUOTE, 'val' => $val); }
-	static function SqlNot($val) { return array('cmp' => 'NOT', 'val' => $val, 'opt' => SQLOPT_UNQUOTE); }
+	static function SqlNot($val) { return array('cmp' => '!=', 'val' => $val, 'opt' => SQLOPT_UNQUOTE); }
 	static function SqlAnd($val) { return array('inc' => 'AND', 'val' => $val); }
 	static function SqlOr($val) { return array('inc' => 'OR', 'val' => $val); }
 	static function SqlLess($val) { return array('cmp' => '<', 'val' => $val); }

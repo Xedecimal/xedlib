@@ -1,10 +1,10 @@
 <?php
 
-require_once(dirname(__FILE__).'/../Str.php');
+require_once(dirname(__FILE__).'/../../classes/str.php');
 
-require_once(dirname(__FILE__).'/Template.php');
-require_once(dirname(__FILE__).'/Form.php');
-require_once(dirname(__FILE__).'/Table.php');
+require_once(dirname(__FILE__).'/../../classes/present/template.php');
+require_once(dirname(__FILE__).'/../../classes/present/form.php');
+require_once(dirname(__FILE__).'/../../classes/present/table.php');
 
 /**
  * @package Editor
@@ -120,7 +120,7 @@ class EditorHandler
 /**
  * Check the example...
  *
- * @example doc/examples/HandlerFile.php
+ * @example doc/examples/handler_file.php
  *
  */
 class HandlerFile extends EditorHandler
@@ -271,7 +271,7 @@ class HandlerFile extends EditorHandler
 /**
  * A complex data editor.
  */
-class EditorData
+class EditorData extends Module
 {
 	/**
 	 * Unique name of this editor.
@@ -459,9 +459,12 @@ class EditorData
 						if (empty($value['tmp_name'])) continue;
 						$ext = strrchr($value['name'], '.');
 
-						$moves[] = array(
+						# We move files later because we do not have enough
+						# data to decide where to put them or what to name them.
+
+						$files[] = array(
 							'src' => $value['tmp_name'],
-							'dst' => $in->attr('VALUE').$ext
+							'dst' => $in->attr('VALUE')
 						);
 						//$insert[$col] = $ext;
 					}
@@ -492,14 +495,24 @@ class EditorData
 			$id = $context->ds->Add($insert);
 			$insert[$context->ds->id] = $id;
 
-			if (!empty($moves))
+			# Handle all uploads
+
+			if (!empty($files))
 			{
 				$vp = new VarParser();
-				foreach ($moves as $move)
+				foreach ($files as $file)
 				{
-					$dst = $vp->ParseVars($move['dst'], $insert);
-					move_uploaded_file($move['src'], $dst);
-					chmod($dst, 0777);
+					# Handler associated
+					if (is_object($file['dst']))
+					{
+						$file['dst']->Create($file['src'], $insert);
+					}
+					else # Move uploaded file
+					{
+						$dst = $vp->ParseVars($file['dst'], $insert);
+						move_uploaded_file($file['src'], $dst);
+						chmod($dst, 0777);
+					}
 				}
 			}
 
@@ -561,14 +574,18 @@ class EditorData
 						if (!empty($value['tmp_name']))
 						{
 							$vp = new VarParser();
-							#$files = glob($vp->ParseVars($in->attr('VALUE'),
-							#	$update).".*");
-							#foreach ($files as $file) unlink($file);
 							$src = $value['tmp_name'];
 							$vars = $update;
 							$vars[$this->ds->id] = $ci;
-							$dst = $vp->ParseVars($in->attr('VALUE'), $vars);
-							move_uploaded_file($src, $dst);
+							$val = $in->attr('VALUE');
+
+							# File Handler
+							if (is_object($val)) $val->Update($src, $vars);
+							else # String Based
+							{
+								$dst = $vp->ParseVars($val, $vars);
+								move_uploaded_file($src, $dst);
+							}
 							unset($update[$col]);
 						}
 					}
@@ -625,8 +642,15 @@ class EditorData
 					if ($in->attr('TYPE') == 'file')
 					{
 						$vp = new VarParser();
-						$files = glob($vp->ParseVars($in->attr('VALUE'), $data).".*");
-						foreach ($files as $file) unlink($file);
+						$val = $in->attr('VALUE');
+						# File handler
+						if (is_object($val))
+							$val->Delete($data);
+						else # Regular string file
+						{
+							$files = glob($vp->ParseVars($val, $data).".*");
+							foreach ($files as $file) unlink($file);
+						}
 					}
 				}
 			}
@@ -685,8 +709,28 @@ class EditorData
 	 *
 	 * @return string
 	 */
-	function Get($assoc)
+	function Get()
 	{
+		$this->Behavior->Target = $this->Name;
+
+		$t = new Template();
+		$t->ReWrite('forms', array(&$this, 'TagForms'));
+		$t->ReWrite('search', array(&$this, 'TagSearch'));
+		$t->Set('target', $this->Behavior->Target);
+		$t->Set('name', $this->Name);
+		$t->Set('plural', Str::Plural($this->ds->Description));
+
+		if (!empty($this->ds))
+			$t->Set('table_title', Str::Plural($this->ds->Description));
+
+		$t->Set('table', $this->GetTable($this->Behavior->Target,
+			Server::GetState($this->Name.'_ci')));
+
+		$t->Set($this->View);
+		$t->Set('assoc', $this->Name);
+
+		return $t->ParseFile(Module::L('editor_data/editor.xml'));
+
 		$ret['name'] = $this->Name;
 
 		$act = Server::GetVar($this->Name.'_action');
@@ -1338,25 +1382,7 @@ class EditorData
 	 */
 	function GetUI($target = 'editor')
 	{
-		$this->Behavior->Target = $target;
 
-		$t = new Template();
-		$t->ReWrite('forms', array(&$this, 'TagForms'));
-		$t->ReWrite('search', array(&$this, 'TagSearch'));
-		$t->Set('target', $this->Behavior->Target);
-		$t->Set('name', $this->Name);
-		$t->Set('plural', Str::Plural($this->ds->Description));
-
-		if (!empty($this->ds))
-			$t->Set('table_title', Str::Plural($this->ds->Description));
-
-		$t->Set('table', $this->GetTable($this->Behavior->Target,
-			Server::GetState($this->Name.'_ci')));
-
-		$t->Set($this->View);
-		$t->Set('assoc', $target);
-
-		return $t->ParseFile(dirname(__FILE__).'/../../temps/editor.xml');
 	}
 
 	function Reset()

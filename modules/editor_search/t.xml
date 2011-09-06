@@ -18,9 +18,9 @@ fieldset .actions a { padding: 5px; }
 	</ul>
 	</fieldset>
 </result>
-&laquo;
+«
 <page> <a href="{{url}}&amp;{{name}}_page={{num}}">{{num}}</a> </page>
-&raquo;
+»
 </div>
 </results>
 
@@ -31,13 +31,13 @@ fieldset .actions a { padding: 5px; }
 <legend>Select fields to search</legend>
 <table>
 <searchfield><tr><td>
-	<label><input type="checkbox" id="hider_{{id}}"
-	name="{{name}}_search[{{fname}}]" class="hider" />{{text}}</label></td><td
+	<label>{{checkbox}} {{text}}</label></td><td
 	class="hidden ds_field" id="hidden_{{id}}">{{field}}</td></tr>
 </searchfield>
 </table>
 </fieldset>
-<input type="submit" value="Search" />
+<input type="submit" name="butSubmit" value="Search" />
+<input type="submit" name="butSubmit" value="Save Results as CSV" />
 </form>
 </search>
 

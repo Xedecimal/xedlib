@@ -14,7 +14,7 @@
 	border-top:		none;
 }
 .sf-navbar li ul {
-	width:			44em; /*IE6 soils itself without this*/
+	width:			100%; /*IE6 soils itself without this*/
 }
 .sf-navbar li li {
 	background:		#BDD2FF;
