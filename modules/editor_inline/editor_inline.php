@@ -4,20 +4,15 @@ class InlineEditor extends Module
 {
 	public $Name = 'editor_inline';
 
-	function __construct()
-	{
-		$this->CheckActive($this->Name);
-	}
-
 	function Link()
 	{
 		global $_d;
-
 		$_d['template.rewrites']['inline'] = array(&$this, 'TagInlineEditor');
 	}
 
 	function Prepare()
 	{
+		$this->CheckActive($this->Name);
 		if (!$this->Active) return;
 		if (!ModUser::RequireAccess(1)) return;
 
@@ -38,8 +33,8 @@ class InlineEditor extends Module
 		$p_js = Module::P('editor_inline/editor_inline.js');
 		$ret['head'] = <<<EOF
 <link rel="stylesheet" type="text/css" href="{$p_css}" />
-<script language="javascript" type="text/javascript" src="js/tiny_mce/tiny_mce.js"></script>
-<script language="javascript" type="text/javascript" src="js/tiny_mce/jquery.tinymce.js"></script>
+<script language="javascript" type="text/javascript" src="{{app_abs}}/js/tiny_mce/tiny_mce.js"></script>
+<script language="javascript" type="text/javascript" src="{{app_abs}}/js/tiny_mce/jquery.tinymce.js"></script>
 <script type="text/javascript" src="{$p_js}"></script>
 EOF;
 
