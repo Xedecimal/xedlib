@@ -76,7 +76,7 @@ class HM
 			{
 				if (isset($val))
 				{
-					$ret .= HM::URLParse($key, $val, $start);
+					$ret .= HM::BuildURL($key, $val, $start);
 					$start = false;
 				}
 			}
@@ -98,7 +98,6 @@ class HM
 		return $ret;
 	}
 
-	#TODO: This does not parse a url idiot, it BUILDS ONE!
 	/**
 	 * Parses an object or array for serialization to a uri.
 	 *
@@ -107,7 +106,7 @@ class HM
 	 * @param bool $start Whether or not this is the first item being parsed.
 	 * @return string Rendered url string.
 	 */
-	static function URLParse($key, $val, $start = false)
+	static function BuildURL($key, $val, $start = false)
 	{
 		$ret = null;
 		if (is_array($val))
