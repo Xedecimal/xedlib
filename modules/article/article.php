@@ -121,6 +121,8 @@ class ModArticleAdmin extends Module
 	public $Name = 'news';
 	protected $ID = 'nws_id';
 
+	function Auth() { return ModUser::RequireAccess(1); }
+
 	function __construct()
 	{
 		require_once('xedlib/modules/editor_data/editor_data.php');
@@ -136,15 +138,12 @@ class ModArticleAdmin extends Module
 	{
 		global $_d, $me;
 
-		if (!ModUser::RequireAccess(2)) return;
 		$_d['nav.links']['News'] = '{{app_abs}}/'.$this->Name;
 	}
 
 	function Prepare()
 	{
 		global $_d;
-
-		if (!ModUser::RequireAccess(1)) return;
 
 		if (empty($this->_source->Description))
 			$this->_source->Description = 'Articles';
@@ -171,7 +170,6 @@ class ModArticleAdmin extends Module
 		global $_d;
 
 		if (!$this->Active) return;
-		if (!ModUser::RequireAccess(1)) return;
 
 		return $this->edNews->GetUI('edNews');
 	}
