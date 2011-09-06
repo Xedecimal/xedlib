@@ -1,8 +1,3 @@
 .editor-content {
 	border: 1px solid #F00;
 }
-
-.editor-content:before
-{
-	content: 'Click to edit';
-}

@@ -20,8 +20,15 @@ class EditorInline extends Module
 
 		if ($_d['q'][1] == 'save')
 		{
-			file_put_contents(Server::GetVar('file'), Server::GetVar('content'));
-			die(json_encode(array('msg' => 'Success')));
+			$file = Server::GetVar('file');
+			file_put_contents($file, Server::GetVar('content'));
+			die(json_encode(array('msg' => 'Success', 'file' => $file)));
+		}
+		if (@$_d['q'][1] == 'reset')
+		{
+			$file = Server::GetVar('file');
+			if (file_exists($file)) unlink($file);
+			die(json_encode(array('file' => $file)));
 		}
 	}
 
@@ -43,7 +50,8 @@ EOF;
 
 	function TagInlineEditor($t, $g, $a)
 	{
-		$data = file_get_contents($a['FILE']);
+		if (file_exists($a['FILE'])) $data = file_get_contents($a['FILE']);
+		else $data = $g;
 		if (ModUser::RequireAccess(1))
 		{
 			return '<div title="'.$a['FILE'].'" class="editor-content">'.$data.'</div>';
