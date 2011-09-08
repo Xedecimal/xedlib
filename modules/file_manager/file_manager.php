@@ -221,7 +221,7 @@ class FileManager extends Module
 			if (!empty($caps))
 			foreach ($caps as $file => $cap)
 			{
-				$fi = new FileInfo($this->Root.'/'.$this->cf.$file, $this->filters);
+				$fi = new FileInfo($this->Root.'/'.$this->cf.'/'.$file, $this->filters);
 				$fi->info['title'] = $cap;
 				$f = FileManager::GetFilter($fi, $this->Root, $this->filters);
 				$f->Updated($this, $fi, $fi->info);
