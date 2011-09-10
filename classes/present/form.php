@@ -348,14 +348,16 @@ class Form extends LayeredOutput
 			}
 		}
 
-		$searchable =
-			$attribs['TYPE'] != 'hidden' &&
-			$attribs['TYPE'] != 'radio' &&
-			$attribs['TYPE'] != 'checkbox' &&
-			$attribs['TYPE'] != 'submit';
+		$searchable = false;
 
 		if (!empty($attribs['TYPE']))
 		{
+			$searchable =
+				$attribs['TYPE'] != 'hidden' &&
+				$attribs['TYPE'] != 'radio' &&
+				$attribs['TYPE'] != 'checkbox' &&
+				$attribs['TYPE'] != 'submit';
+
 			$fi = new FormInput(null, @$attribs['TYPE'], @$attribs['NAME'],
 				@$attribs['VALUE'], $attribs);
 			if (get_class($t->GetCurrentObject()) == 'Form')
