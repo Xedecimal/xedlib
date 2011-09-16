@@ -33,6 +33,8 @@ class ModUser extends Module
 		)
 	);
 
+	public $NavLogout = 'Log Out';
+
 	function __construct()
 	{
 		$this->Behavior = new ModUserBehavior();
@@ -56,7 +58,7 @@ class ModUser extends Module
 			$url = http_build_query(array(
 				'user_action' => 'logout'
 			));
-			$_d['nav.links']['Log Out'] = "{$rw}?$url";
+			$_d['nav.links'][$this->NavLogout] = "{$rw}?$url";
 		}
 
 		$_d['template.rewrites']['access'] = array('ModUser', 'TagAccess');

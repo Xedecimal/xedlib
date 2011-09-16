@@ -104,6 +104,7 @@ class FormEmail extends Module
 		# Preg out and find all elements we're working with
 
 		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
+		$rows = array();
 		foreach ($this->_inputs as $i => $n)
 		//foreach ($this->_fields as $n => $f)
 		{

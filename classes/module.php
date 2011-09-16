@@ -266,9 +266,9 @@ class Module
 		}
 
 		# Absolute Override
-		# @TODO Multi-level templates end up turning / into // with this.
-		#$apath = "$dir/$path";
-		#if (file_exists($apath)) return "$abs/$path";
+		# @TODO We need this, next time it comes with an issue, keep and patch it.
+		$apath = "$dir/$path";
+		if (file_exists($apath)) return "$abs/$path";
 
 		# Module Path
 		$modpath = "$dir/modules/$path";
