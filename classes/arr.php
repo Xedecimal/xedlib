@@ -65,12 +65,11 @@ class Arr
 
 	static function MergeRecursive($arr1, $arr2)
 	{
-		foreach ($arr1 as $k => $v)
+		foreach ($arr2 as $k => $v)
 		{
-			if (is_array($v)) $arr1[$k] =
-				Arr::MergeRecursive($arr1[$k], $arr2[$k]);
-
-			if (isset($arr2[$k])) $arr1[$k] = $arr2[$k];
+			if(array_key_exists($k, $arr1) && is_array($v)) $arr1[$k] =
+				$arr1[$k] = Arr::MergeRecursive($arr1[$k], $arr2[$k]);
+			else $arr1[$k] = $arr2[$k];
 		}
 
 		return $arr1;
