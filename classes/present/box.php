@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../Utility.php');
+require_once(dirname(__FILE__).'/../utility.php');
 
 /**
  * A simple themed box.
@@ -77,7 +77,7 @@ class Box
 		$ret .= "<!-- End Box {$this->name} -->\n";
 		return $ret;
 	}
-	
+
 	/**
 	 * Quick macro to retreive a generated box.
 	 * @param string $name Name of the box (good for javascript calls to getElementById()).

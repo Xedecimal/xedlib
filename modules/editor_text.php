@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../classes/present/Form.php');
+require_once(dirname(__FILE__).'/../classes/present/form.php');
 
 class EditorText extends Module
 {

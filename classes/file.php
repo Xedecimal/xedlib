@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/Server.php');
+require_once(dirname(__FILE__).'/server.php');
 
 define('SCAN_FILES', 1);
 define('SCAN_DIRS', 2);

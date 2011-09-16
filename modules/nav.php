@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/../classes/TreeNode.php');
-require_once(dirname(__FILE__).'/../classes/HM.php');
+require_once(dirname(__FILE__).'/../classes/tree_node.php');
+require_once(dirname(__FILE__).'/../classes/hm.php');
 
 class ModNav extends Module
 {
@@ -101,11 +101,14 @@ class ModNav extends Module
 			$t->ReWrite('head', array($this, 'TagHead'));
 			$ret['nav'] = ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
 				!empty($_d['nav.class']) ? $_d['nav.class'] : 'nav');
-
-			$ret['crumb'] = $this->GetCrumb();
 		}
 
 		return $ret;
+	}
+
+	function TagCrumb($t, $g)
+	{
+		return $this->GetCrumb();
 	}
 
 	function GetCrumb()

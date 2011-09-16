@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/../HM.php');
+require_once(dirname(__FILE__).'/../hm.php');
 
 /**
  * A generic table class to manage a top level table, with children rows and cells.

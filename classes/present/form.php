@@ -1,9 +1,9 @@
 <?php
 
-require_once(dirname(__FILE__).'/../HM.php');
-require_once(dirname(__FILE__).'/../LayeredOutput.php');
-require_once(dirname(__FILE__).'/FormInput.php');
-require_once(dirname(__FILE__).'/Template.php');
+require_once(dirname(__FILE__).'/../hm.php');
+require_once(dirname(__FILE__).'/../layered_output.php');
+require_once(dirname(__FILE__).'/form_input.php');
+require_once(dirname(__FILE__).'/template.php');
 
 /**
  * A web page form, with functions for easy field creation and layout.

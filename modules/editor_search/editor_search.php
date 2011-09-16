@@ -62,7 +62,7 @@ class EditorSearch extends Module
 			}
 		}
 
-		//Collect search data
+		# Collect search data
 
 		if (@$this->_q[1] == $this->Name && @$this->_q[0] == 'search')
 		{
@@ -80,7 +80,7 @@ class EditorSearch extends Module
 					$query['cols'][$ms[2]] = "GROUP_CONCAT(DISTINCT {$col})";
 			}
 
-			// Collect the data.
+			# Collect the data.
 
 			if (!empty($this->ss))
 			{
@@ -366,6 +366,7 @@ class EditorSearch extends Module
 		$vp = new VarParser();
 		for ($ix = 0; $ix < $pages; $ix++)
 		{
+			$vars['name'] = $this->Name;
 			$vars['url'] = HM::URL($_d['app_abs'].'/'.$this->Name
 				.'/search', array_merge($_GET, $_POST));
 			$vars['num'] = $ix+1;

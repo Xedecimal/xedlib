@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../classes/present/Form.php');
-require_once(dirname(__FILE__).'/../../classes/present/FormInput.php');
+require_once(dirname(__FILE__).'/../../classes/present/form.php');
+require_once(dirname(__FILE__).'/../../classes/present/form_input.php');
 
 class FormEmail extends Module
 {
@@ -102,6 +102,7 @@ class FormEmail extends Module
 	function TagEmailField($t, $g)
 	{
 		# Preg out and find all elements we're working with
+
 		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
 		foreach ($this->_inputs as $i => $n)
 		//foreach ($this->_fields as $n => $f)
@@ -111,12 +112,9 @@ class FormEmail extends Module
 			$row['name'] = $this->_labels[$i];
 			$row['value'] = $this->_data[$m[1]];
 
-			//if (!$f->IsSignificant()) continue;
-
-			//$row['name'] = $n;
-			//$row['value'] = Server::GetVar($f->name);
 			$rows[] = $row;
 		}
+
 		return VarParser::Concat($g, $rows);
 	}
 }

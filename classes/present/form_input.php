@@ -1,9 +1,9 @@
 <?php
 
-require_once(dirname(__FILE__).'/../Utility.php');
-require_once(dirname(__FILE__).'/../Arr.php');
-require_once(dirname(__FILE__).'/../HM.php');
-require_once(dirname(__FILE__).'/FormOption.php');
+require_once(dirname(__FILE__).'/../utility.php');
+require_once(dirname(__FILE__).'/../arr.php');
+require_once(dirname(__FILE__).'/../hm.php');
+require_once(dirname(__FILE__).'/form_option.php');
 
 class FormInput
 {
@@ -157,7 +157,7 @@ class FormInput
 		}
 		if ($this->atrs['TYPE'] == 'boolean')
 		{
-			return GetInputBoolean($parent, $this->atrs,
+			return FormInput::GetBoolean($parent, $this->atrs,
 				!isset($this->valu) ? Server::GetVar(@$this->atrs['NAME'])
 					: $this->valu);
 		}
@@ -188,8 +188,8 @@ class FormInput
 		}
 		if ($this->atrs['TYPE'] == 'area')
 		{
-			if (empty($this->atrs['ROWS'])) $this->atrs['ROWS'] = 10;
-			if (empty($this->atrs['COLS'])) $this->atrs['COLS'] = 25;
+			if (empty($this->atrs['ROWS'])) $this->atrs['ROWS'] = '10';
+			if (empty($this->atrs['COLS'])) $this->atrs['COLS'] = '25';
 			if (empty($this->atrs['CLASS'])) $this->atrs['CLASS'] = 'input_area';
 			$natrs = $this->atrs;
 			unset($natrs['TYPE']);
@@ -531,7 +531,7 @@ class FormInput
 	 */
 	static function GetBoolean($parent, $attribs)
 	{
-		$id = CleanID((isset($parent) ? $parent.'_' : null).@$attribs['NAME']);
+		$id = HM::CleanID((isset($parent) ? $parent.'_' : null).@$attribs['NAME']);
 		if (!isset($attribs['ID'])) $attribs['ID'] = $id;
 		if (!isset($attribs['VALUE'])) $attribs['VALUE'] = 0;
 		if (!isset($attribs['TEXTNO'])) $attribs['TEXTNO'] = 'No';
