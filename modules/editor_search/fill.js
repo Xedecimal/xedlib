@@ -17,12 +17,15 @@ function fill(ix, element) {
 				if (row[col] == val) input.click();
 			});
 		}
-		else if (input.attr('type') == 'radio' || input.attr('type') == 'checkbox')
-		{
-			if (json[record][m[1]] == input.val()) input.click();
+		else if (input.attr('type') == 'radio') {
+			if (json[record][m[1]] == input.val()) input.replaceWith('(*)');
+			else input.replaceWith('(&nbsp;&nbsp;)');
 		}
-		else
-		{
+		else if (input.attr('type') == 'checkbox') {
+			if (json[record][m[1]] == input.val()) input.replaceWith('[X]');
+			else input.replaceWith('[&nbsp;&nbsp;]');
+		}
+		else {
 			// Contains '.'
 			if (m[1].match(/\.([^.]+)/))
 				// Everything after '.'
