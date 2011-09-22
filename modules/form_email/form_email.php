@@ -60,18 +60,18 @@ class FormEmail extends Module
 				$this->_inputs[(string)$in['id']] = (string)$in['name'];
 
 			$t->ReWrite('field', array(&$this, 'TagEmailField'));
-			$body = $t->ParseFile($this->_email_template);
+			$this->body = $t->ParseFile($this->_email_template);
 
 			if (!empty($this->debug))
 			{
 				var_dump("To: {$this->_to}");
 				var_dump("Subject: {$this->_subject}");
 				var_dump($headers);
-				echo "<pre>$body</pre>";
+				echo "<pre>$this->body</pre>";
 				die();
 			}
 
-			mail($this->_to, $this->_subject, $body, implode($headers, "\r\n"));
+			mail($this->_to, $this->_subject, $this->body, implode($headers, "\r\n"));
 		}
 	}
 
@@ -109,12 +109,37 @@ class FormEmail extends Module
 		//foreach ($this->_fields as $n => $f)
 		{
 			if (!preg_match($preg, $n, $m)) continue;
+			if (!isset($this->_labels[$i])) continue;
 
-			$row['name'] = $this->_labels[$i];
-			$row['value'] = $this->_data[$m[1]];
+			$row = array();
 
-			$rows[] = $row;
+			# Repeating Value
+			if (is_array($this->_data[$m[1]]))
+			{
+				$l = $this->_labels[$i];
+				foreach ($this->_data[$m[1]] as $ix => $val)
+					$arrs[$ix][$l] = $val;
+			}
+			else # Non-repeating value
+			{
+				$row['name'] = $this->_labels[$i];
+				$row['value'] = $this->_data[$m[1]];
+				$rows[] = $row;
+			}
 		}
+
+		foreach ($arrs as $ix => $val)
+			foreach ($val as $label => $value)
+				if (empty($value)) unset($arrs[$ix]);
+
+		# Process repeating fields.
+		foreach ($arrs as $ix => $val)
+			foreach ($val as $label => $value)
+			{
+				$row['name'] = $label.' '.($ix+1);
+				$row['value'] = $value;
+				$rows[] = $row;
+			}
 
 		return VarParser::Concat($g, $rows);
 	}
