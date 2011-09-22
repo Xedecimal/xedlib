@@ -78,7 +78,7 @@ class FormOption extends TreeNode
 		}
 		else
 		{
-			$valu = isset($this->valu) ? ' value="'.$this->valu.'"' : null;
+			$valu = !empty($this->valu) ? ' value="'.$this->valu.'"' : null;
 			return "<option{$valu}{$selected}>".htmlspecialchars($this->text).'</option>';
 		}
 	}
@@ -120,7 +120,7 @@ class FormOption extends TreeNode
 	 * @param string $none Text for unselected item (id of 0)
 	 * @return array SelOption array.
 	 */
-	static function FromData($result, $col_disp, $col_id, $default = 0, $none = null)
+	static function FromData($result, $disp, $id = null, $default = 0, $none = null)
 	{
 		$ret = null;
 		if (isset($none))
@@ -131,10 +131,12 @@ class FormOption extends TreeNode
 		}
 		foreach ($result as $res)
 		{
-			$sel = new FormOption($res[$col_disp],
-				strcmp($default, $res[$col_id]) == 0);
-			$sel->valu = $res[$col_id];
-			$ret[$res[$col_id]] = $sel;
+			$ptext = VarParser::Parse($disp, $res);
+			$pid = VarParser::Parse($id, $res);
+
+			$sel = new FormOption($ptext, strcmp($default, $pid) == 0);
+			if (!empty($pid)) $sel->valu = $pid;
+			$ret[$pid] = $sel;
 		}
 		return $ret;
 	}
