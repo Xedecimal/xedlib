@@ -119,8 +119,7 @@
 							name="{{fn_name}}_sels[]" value="{{fipath}}" />
 						</td>
 					</check>
-					<td class="folder-caption"><a href="{{url}}">{{name}}</a></td>
-					<td>{{caption}}</td>
+					<td class="folder-caption"><a href="{{url}}">{{name}}</a><br />{{caption}}</td>
 					<td>{{butup}}</td>
 					<td>{{butdown}}</td>
 				</tr>
