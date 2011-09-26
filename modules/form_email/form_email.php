@@ -128,19 +128,6 @@ class FormEmail extends Module
 			}
 		}
 
-		foreach ($arrs as $ix => $val)
-			foreach ($val as $label => $value)
-				if (empty($value)) unset($arrs[$ix]);
-
-		# Process repeating fields.
-		foreach ($arrs as $ix => $val)
-			foreach ($val as $label => $value)
-			{
-				$row['name'] = $label.' '.($ix+1);
-				$row['value'] = $value;
-				$rows[] = $row;
-			}
-
 		return VarParser::Concat($g, $rows);
 	}
 }
