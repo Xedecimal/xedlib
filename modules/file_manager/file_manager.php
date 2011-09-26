@@ -416,7 +416,7 @@ class FileManager extends Module
 		if (!empty($f->vars['icon'])) return $f->vars['icon'];
 		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
 		else return null;
-		return '<img src="'.$ret.'" alt="icon" />';
+		return '<img src="'.$ret.'" alt="icon" style="vertical-align: middle" />';
 	}
 
 	function TagPart($t, $guts, $attribs)
