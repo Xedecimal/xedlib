@@ -1234,7 +1234,7 @@ class FileManagerView
 	{
 		if (!empty($file->info['title']))
 			return stripslashes($file->info['title']);
-		else return $file->filename;
+		else return '';
 	}
 }
 
