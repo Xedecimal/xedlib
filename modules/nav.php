@@ -7,6 +7,29 @@ class ModNav extends Module
 {
 	public $Block = 'nav';
 
+	function Link()
+	{
+		global $_d;
+
+		$_d['template.rewrites']['crumb'] = array(&$this, 'TagCrumb');
+	}
+
+	function Get()
+	{
+		global $_d;
+
+		if (isset($_d['nav.links']))
+		{
+			$t = new Template();
+			$t->ReWrite('link', array($this, 'TagLink'));
+			$t->ReWrite('head', array($this, 'TagHead'));
+			$ret['nav'] = ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
+				!empty($_d['nav.class']) ? $_d['nav.class'] : 'nav');
+		}
+
+		return $ret;
+	}
+
 	/**
 	* @param TreeNode $link
 	* @param int $depth
@@ -90,22 +113,6 @@ class ModNav extends Module
 		return $r;
 	}
 
-	function Get()
-	{
-		global $_d;
-
-		if (isset($_d['nav.links']))
-		{
-			$t = new Template();
-			$t->ReWrite('link', array($this, 'TagLink'));
-			$t->ReWrite('head', array($this, 'TagHead'));
-			$ret['nav'] = ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
-				!empty($_d['nav.class']) ? $_d['nav.class'] : 'nav');
-		}
-
-		return $ret;
-	}
-
 	function TagCrumb($t, $g)
 	{
 		return $this->GetCrumb();
@@ -130,6 +137,7 @@ class ModNav extends Module
 	function cb_crumb($item)
 	{
 		global $rw;
+		if (is_array($item->data)) return;
 		if (substr($item->data, -strlen($rw)) == $rw) return true;
 	}
 }
