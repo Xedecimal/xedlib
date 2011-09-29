@@ -110,7 +110,10 @@ class HM
 		$ret = null;
 		if (is_array($val))
 			foreach ($val as $akey => $aval)
+			{
 				$ret .= HM::BuildURL($key.'['.$akey.']', $aval, $start);
+				$start = false;
+			}
 		else
 		{
 			//$nval = str_replace(' ', '%20', $val);

@@ -221,7 +221,7 @@ class FileManager extends Module
 			if (!empty($caps))
 			foreach ($caps as $file => $cap)
 			{
-				$fi = new FileInfo($this->Root.'/'.$this->cf.$file, $this->filters);
+				$fi = new FileInfo($this->Root.'/'.$this->cf.'/'.$file, $this->filters);
 				$fi->info['title'] = $cap;
 				$f = FileManager::GetFilter($fi, $this->Root, $this->filters);
 				$f->Updated($this, $fi, $fi->info);
@@ -267,7 +267,7 @@ class FileManager extends Module
 		else if ($act == 'Create')
 		{
 			if (!$this->Behavior->AllowCreateDir) return;
-			$p = $this->Root.$this->cf.'/'.Server::GetVar($this->Name.'_cname');
+			$p = $this->Root.'/'.$this->cf.'/'.Server::GetVar($this->Name.'_cname');
 			mkdir($p);
 			chmod($p, 0755);
 			FilterDefault::UpdateMTime($p);
@@ -416,7 +416,7 @@ class FileManager extends Module
 		if (!empty($f->vars['icon'])) return $f->vars['icon'];
 		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
 		else return null;
-		return '<img src="'.$ret.'" alt="icon" />';
+		return '<img src="'.$ret.'" alt="icon" style="vertical-align: middle" />';
 	}
 
 	function TagPart($t, $guts, $attribs)
@@ -612,8 +612,9 @@ class FileManager extends Module
 				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' => $this->cf.$f->filename));
 			else
-				$this->vars['url'] = htmlspecialchars($this->Root.$this->cf.$f->filename);
+				$this->vars['url'] = htmlspecialchars($this->Root.$this->cf.'/'.$f->filename);
 			$this->vars['filename'] = htmlspecialchars($f->filename);
+			$this->vars['caption'] = $this->View->GetCaption($f);
 			$this->vars['fipath'] = htmlspecialchars($f->path);
 			$this->vars['type'] = 'files';
 			$this->vars['index'] = $ix;
@@ -1013,7 +1014,7 @@ class FileManager extends Module
 	 */
 	function GetDirectory()
 	{
-		$dp = opendir($this->Root.$this->cf);
+		$dp = opendir($this->Root.'/'.$this->cf);
 		$ret['files'] = array();
 		$ret['folders'] = array();
 
@@ -1221,6 +1222,8 @@ class FileManagerView
 
 	public $RenameTitle = 'Rename File / Folder';
 
+	public $Captions = false;
+
 	/**
 	 * Returns the caption of a given thumbnail depending on caption display
 	 * configuration.
@@ -1231,7 +1234,7 @@ class FileManagerView
 	{
 		if (!empty($file->info['title']))
 			return stripslashes($file->info['title']);
-		else return $file->filename;
+		else return '';
 	}
 }
 
