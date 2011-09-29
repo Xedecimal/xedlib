@@ -8,6 +8,7 @@ require_once(dirname(__FILE__).'/box.php');
 
 /**
  * A template
+ * @TODO: Replace all hard coded tags with rewrites!
  */
 class Template extends LayeredOutput
 {
@@ -569,7 +570,7 @@ class Template extends LayeredOutput
 	{
 		$ds = $GLOBALS[$a['DS']];
 		if (!empty($ds[$a['NAME']]))
-			return U::RunCallbacks($ds[$a['NAME']], $t);
+			return U::RunCallbacks($ds[$a['NAME']], $t, $a);
 	}
 
 	static function TagNEmpty($t, $g, $a)
