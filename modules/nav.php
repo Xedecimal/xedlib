@@ -23,8 +23,8 @@ class ModNav extends Module
 			$t = new Template();
 			$t->ReWrite('link', array($this, 'TagLink'));
 			$t->ReWrite('head', array($this, 'TagHead'));
-			$ret['nav'] = ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
-				!empty($_d['nav.class']) ? $_d['nav.class'] : 'nav');
+			$tree = ModNav::LinkTree($_d['nav.links']);
+			$ret['nav'] = ModNav::GetLinks($tree, @$_d['nav.class']);
 		}
 
 		return $ret;
@@ -49,14 +49,22 @@ class ModNav extends Module
 			{
 				if ($ix++ > 0 && !empty($_d['nav.sep']) && $depth < 0)
 					$ret .= $_d['nav.sep'];
+
+				$liatrs = '';
+
 				if (is_string($c->data))
 					$link = '<a href="'.$c->data.'">'.$c->id.'</a>';
 				else if (isset($c->data['raw'])) $link = $c->data['raw'];
 				else if (is_array($c->data))
+				{
+					$liatrs = HM::GetAttribs(@$c->data['liatrs']);
+					if (!empty($c->data['liatrs'])) unset($c->data['liatrs']);
 					$link = '<a'.HM::GetAttribs($c->data).'>'.$c->id.'</a>';
+				}
 				else if (is_string($c)) $link = $c;
 				else $link = $c->id;
-				$ret .= '<li>'.$link;
+
+				$ret .= "<li$liatrs>$link";
 				$ret .= ModNav::GetLinks($c, $class, $depth+1);
 				$ret .= '</li>';
 			}
@@ -112,6 +120,8 @@ class ModNav extends Module
 
 		return $r;
 	}
+
+	# Breadcrumb Related
 
 	function TagCrumb($t, $g)
 	{
