@@ -24,7 +24,7 @@ class ModNav extends Module
 			$t->ReWrite('link', array($this, 'TagLink'));
 			$t->ReWrite('head', array($this, 'TagHead'));
 			$tree = ModNav::LinkTree($_d['nav.links']);
-			$ret['nav'] = ModNav::GetLinks($tree, @$_d['nav.class']);
+			$ret['nav'] = ModNav::GetLinks($tree, U::ifset(@$_d['nav.class'], 'nav'));
 		}
 
 		return $ret;
