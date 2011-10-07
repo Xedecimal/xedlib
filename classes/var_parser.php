@@ -15,6 +15,11 @@ class VarParser
 	 */
 	public $vars;
 
+	/**
+	 * Control the way this VarParser behaves.
+	 *
+	 *  @var VarParserBehavior
+	 */
 	public $Behavior;
 
 	function __construct()

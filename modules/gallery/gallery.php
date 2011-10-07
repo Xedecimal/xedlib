@@ -10,6 +10,7 @@ require_once(dirname(__FILE__).'/../file_manager/filter_gallery.php');
 define('CAPTION_NONE',  0);
 define('CAPTION_TITLE', 1);
 define('CAPTION_FILE',  2);
+define('CAPTION_TITLE_FILE', 3);
 
 class Gallery extends Module
 {
@@ -84,6 +85,7 @@ class Gallery extends Module
 	{
 		$out = '';
 		$vp = new VarParser();
+		$vp->Behavior->Bleed = false;
 
 		foreach ($this->files['files'] as $ix => $fi)
 		{
@@ -297,7 +299,7 @@ EOF;
 			return stripslashes($file->info['title']);
 		else if ($this->Display->Captions == CAPTION_FILE)
 			return str_replace('_', ' ', substr($file->filename, 0, strrpos($file->filename, '.')));
-		else
+		else if ($this->Display->Captions == CAPTION_TITLE_FILE)
 			return str_replace('_', ' ', $file->filename);
 	}
 }
@@ -309,7 +311,7 @@ class GalleryDisplay
 	 * CAPTION_FILE.
 	 * @var int
 	 */
-	public $Captions = CAPTION_TITLE;
+	public $Captions = CAPTION_TITLE_FILE;
 
 	/**
 	 * String to append on the left side of the caption, this also handles
