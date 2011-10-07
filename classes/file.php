@@ -132,14 +132,16 @@ class File
 	}
 
 	/**
-	 * Returns an array of all files located recursively in a given path, excluding
-	 * anything matching the regular expression of $exclude.
+	 * Returns an array of all files, folders or both located recursively in a
+	 * given path, excluding anything matching the regular expression of
+	 * $exclude.
 	 *
 	 * @param string $path Path to recurse.
 	 * @param string $exclude Passed to preg_match to blacklist files.
+	 * @param int $flags Bitmask of SCAN_FILE and SCAN_DIRS.
 	 * @return array Series of non-directories that were not excluded.
 	 */
-	static function Comb($path, $exclude, $flags = 3)
+	static function Comb($path, $exclude = null, $flags = 3)
 	{
 		if ($exclude != null && preg_match($exclude, $path)) return array();
 		// This is a file and unable to recurse.
