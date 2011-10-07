@@ -570,7 +570,7 @@ class Template extends LayeredOutput
 	{
 		$ds = $GLOBALS[$a['DS']];
 		if (!empty($ds[$a['NAME']]))
-			return U::RunCallbacks($ds[$a['NAME']], $t, $a);
+			return U::RunCallbacks($ds[$a['NAME']], $t, $g, $a);
 	}
 
 	static function TagNEmpty($t, $g, $a)
