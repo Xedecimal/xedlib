@@ -40,8 +40,8 @@ class EditorInline extends Module
 		$p_js = Module::P('editor_inline/editor_inline.js');
 		$ret['head'] = <<<EOF
 <link rel="stylesheet" type="text/css" href="{$p_css}" />
-<script language="javascript" type="text/javascript" src="{{app_abs}}/js/tiny_mce/tiny_mce.js"></script>
-<script language="javascript" type="text/javascript" src="{{app_abs}}/js/tiny_mce/jquery.tinymce.js"></script>
+<script type="text/javascript" src="{{app_abs}}/js/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="{{app_abs}}/js/tiny_mce/jquery.tinymce.js"></script>
 <script type="text/javascript" src="{$p_js}"></script>
 EOF;
 

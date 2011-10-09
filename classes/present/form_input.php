@@ -288,6 +288,9 @@ class FormInput
 		}
 
 		if (empty($this->atrs['TYPE'])) $this->atrs['TYPE'] = 'text';
+		if (isset($this->atrs['VALUE'])
+			&& is_object($this->atrs['VALUE']))
+				unset($this->atrs['VALUE']);
 		$atrs = HM::GetAttribs($this->atrs);
 		return "<input {$atrs} />";
 	}

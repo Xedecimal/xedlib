@@ -42,7 +42,7 @@ class Module
 	* @param string $name Class name of defined module class.
 	* @param array $deps Depended modules eg. array('ModName', 'ModName2')
 	*/
-	static function Register($name, $deps = null)
+	final static function Register($name, $deps = null)
 	{
 		global $_d;
 		if (!empty($_d['module.disable'][$name])) return;

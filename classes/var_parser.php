@@ -15,6 +15,11 @@ class VarParser
 	 */
 	public $vars;
 
+	/**
+	 * Control the way this VarParser behaves.
+	 *
+	 *  @var VarParserBehavior
+	 */
 	public $Behavior;
 
 	function __construct()
@@ -80,12 +85,7 @@ class VarParser
 		{
 			$tree = explode('.', $tvar);
 			$cv = $this->FindVar($tree[0]);
-			for ($ix = 1; $ix < count($tree); $ix++)
-			{
-				$cv = $cv[$tree[$ix]];
-				var_dump($cv);
-			}
-
+			for ($ix = 1; $ix < count($tree); $ix++) $cv = $cv[$tree[$ix]];
 			return $cv;
 		}
 		global $$tvar;

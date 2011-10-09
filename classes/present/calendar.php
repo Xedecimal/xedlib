@@ -158,9 +158,6 @@ class Calendar
 		$ret = null;
 		$tevent = new Template();
 		$key = $this->curday->Day.'-'.$this->month->Month.'-'.$this->month->Year;
-		#$key = mktime(0, 0, 0, $this->month->Month, $this->curday->Day,
-		#	$this->month->Year);
-		#echo "Checking for {$key}<br/>\n";
 		if (!empty($this->datesbyday[$key]))
 		foreach ($this->datesbyday[$key] as $k)
 		{

@@ -25,7 +25,10 @@ class HM
 		$ret = '';
 		if (is_array($attribs))
 		foreach ($attribs as $n => $v)
+		{
+			if (!is_string($v)) continue;
 			$ret .= ' '.strtolower($n).'="'.htmlspecialchars($v).'"';
+		}
 		else return ' '.$attribs;
 		return $ret;
 	}
@@ -110,7 +113,10 @@ class HM
 		$ret = null;
 		if (is_array($val))
 			foreach ($val as $akey => $aval)
+			{
 				$ret .= HM::BuildURL($key.'['.$akey.']', $aval, $start);
+				$start = false;
+			}
 		else
 		{
 			//$nval = str_replace(' ', '%20', $val);

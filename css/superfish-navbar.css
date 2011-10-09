@@ -33,29 +33,6 @@
 .sf-navbar a, .sf-navbar a:visited {
 	border:			none;
 }
-.sf-navbar li.current {
-	background:		#BDD2FF;
-}
-.sf-navbar li:hover,
-.sf-navbar li.sfHover,
-.sf-navbar li li.current,
-.sf-navbar a:focus, .sf-navbar a:hover, .sf-navbar a:active {
-	background:		#BDD2FF;
-}
-.sf-navbar ul li:hover,
-.sf-navbar ul li.sfHover,
-ul.sf-navbar ul li:hover li,
-ul.sf-navbar ul li.sfHover li,
-.sf-navbar ul a:focus, .sf-navbar ul a:hover, .sf-navbar ul a:active {
-	background:		#D1DFFF;
-}
-ul.sf-navbar li li li:hover,
-ul.sf-navbar li li li.sfHover,
-.sf-navbar li li.current li.current,
-.sf-navbar ul li li a:focus, .sf-navbar ul li li a:hover, .sf-navbar ul li li a:active {
-	background:		#E6EEFF;
-}
-ul.sf-navbar .current ul,
 ul.sf-navbar ul li:hover ul,
 ul.sf-navbar ul li.sfHover ul {
 	left:			0;
@@ -63,10 +40,6 @@ ul.sf-navbar ul li.sfHover ul {
 }
 ul.sf-navbar .current ul ul {
 	top: 			-999em;
-}
-
-.sf-navbar li li.current > a {
-	font-weight:	bold;
 }
 
 /*** point all arrows down ***/
