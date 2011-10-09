@@ -59,10 +59,12 @@ class FilterGallery extends FilterDefault
 		if (file_exists($abs)) $fi->icon =
 			'<img'.HM::GetAttribs($atrs).' />';
 
+		# Prepare custom folder icon
+
 		if (is_dir($fi->path))
 		{
 			$fs = glob($fi->path.'/.t_image.*');
-			if (!empty($fs)) $fi->vars['icon'] = $fs[0];
+			if (!empty($fs)) $fi->vars['icon'] = '<img src="'.$fs[0].'" alt="Icon" />';
 			else $fi->vars['icon'] = FileManager::GetIcon($fi);
 		}
 		return $fi;
