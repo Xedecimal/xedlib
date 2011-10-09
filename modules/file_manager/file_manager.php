@@ -528,7 +528,7 @@ class FileManager extends Module
 			else
 				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' =>
-					"{$this->cf}{$f->filename}"));
+					"{$this->cf}/{$f->filename}"));
 
 			$this->vars['name'] = $f;
 			$this->vars['caption'] = $this->View->GetCaption($f);
