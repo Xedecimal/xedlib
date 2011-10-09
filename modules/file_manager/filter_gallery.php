@@ -31,6 +31,8 @@ class FilterGallery extends FilterDefault
 			$dinfo = $this->GetInfo(new FileInfo($fi->dir))->info;
 		else $dinfo = $fi->info;
 
+		if (substr($fi->filename, 0, 2) == 't_') $fi->show = false;
+
 		if (!isset($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
 		if (!isset($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
 
