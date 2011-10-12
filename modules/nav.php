@@ -53,7 +53,7 @@ class ModNav extends Module
 				$liatrs = '';
 
 				if (is_string($c->data))
-					$link = '<a href="'.$c->data.'">'.$c->id.'</a>';
+					$link = '<a href="'.$c->data.'">'.str_replace('\\', '/', $c->id).'</a>';
 				else if (isset($c->data['raw'])) $link = $c->data['raw'];
 				else if (is_array($c->data))
 				{
