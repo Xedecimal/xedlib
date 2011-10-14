@@ -147,8 +147,11 @@ class ModNav extends Module
 	function cb_crumb($item)
 	{
 		global $rw;
-		if (is_array($item->data)) return;
-		if (substr($item->data, -strlen($rw)) == $rw) return true;
+		if (is_array($item->data) && !empty($item->data['HREF']))
+			$url = $item->data['HREF'];
+		else if (is_string($item->data)) $url = $item->data;
+		else return;
+		if (substr($url, -strlen($rw)) == $rw) return true;
 	}
 }
 
