@@ -104,7 +104,8 @@ class VarParser
 		$vp = new VarParser();
 		$vp->Behavior->Bleed = $bleed;
 		$ret = '';
-		foreach ($items as $i['vp-id'] => $i) $ret .= $vp->ParseVars($t, array_merge($i, $ext_data));
+		foreach ($items as $id => $i)
+			$ret .= $vp->ParseVars($t, $i);
 		return $ret;
 	}
 }
