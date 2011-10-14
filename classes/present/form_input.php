@@ -1,9 +1,9 @@
 <?php
 
-require_once(dirname(__FILE__).'/../Utility.php');
-require_once(dirname(__FILE__).'/../Arr.php');
-require_once(dirname(__FILE__).'/../HM.php');
-require_once(dirname(__FILE__).'/FormOption.php');
+require_once(dirname(__FILE__).'/../utility.php');
+require_once(dirname(__FILE__).'/../arr.php');
+require_once(dirname(__FILE__).'/../hm.php');
+require_once(dirname(__FILE__).'/form_option.php');
 
 class FormInput
 {
@@ -54,7 +54,7 @@ class FormInput
 		$this->name = $name;
 		$this->help = $help;
 
-		// Consume these attributes
+		# Consume these attributes
 
 		if (is_array($atrs))
 		{
@@ -62,20 +62,20 @@ class FormInput
 			$this->invalid = Arr::Yank($atrs, 'INVALID');
 		}
 
-		// Propegate these attributes
+		# Propegate these attributes
 
 		if (is_array($atrs))
 			foreach ($atrs as $k => $v)
 				$this->atrs[strtoupper($k)] = $v;
 		else $this->atrs = HM::ParseAttribs($atrs);
 
-		// Analyze these attributes
+		# Analyze these attributes
 
 		$this->atrs['TYPE'] = $type;
 		if ($name != null) $this->atrs['NAME'] = $name;
 		if ($valu != null) $this->atrs['VALUE'] = $valu;
 
-		// @TODO: I don't believe these should be in the constructor.
+		# @TODO: I don't believe these should be in the constructor.
 
 		switch ($type)
 		{
@@ -94,7 +94,7 @@ class FormInput
 	function attr($attr = null, $val = null)
 	{
 		if (!isset($attr)) return $this->atrs;
-		if (isset($val)) return $this->atrs[$attr] = $val;
+		if (isset($val)) return $this->atrs[strtoupper($attr)] = $val;
 		if (isset($this->atrs[$attr])) return $this->atrs[$attr];
 	}
 
@@ -157,7 +157,7 @@ class FormInput
 		}
 		if ($this->atrs['TYPE'] == 'boolean')
 		{
-			return GetInputBoolean($parent, $this->atrs,
+			return FormInput::GetBoolean($parent, $this->atrs,
 				!isset($this->valu) ? Server::GetVar(@$this->atrs['NAME'])
 					: $this->valu);
 		}
@@ -188,8 +188,8 @@ class FormInput
 		}
 		if ($this->atrs['TYPE'] == 'area')
 		{
-			if (empty($this->atrs['ROWS'])) $this->atrs['ROWS'] = 10;
-			if (empty($this->atrs['COLS'])) $this->atrs['COLS'] = 25;
+			if (empty($this->atrs['ROWS'])) $this->atrs['ROWS'] = '10';
+			if (empty($this->atrs['COLS'])) $this->atrs['COLS'] = '25';
 			if (empty($this->atrs['CLASS'])) $this->atrs['CLASS'] = 'input_area';
 			$natrs = $this->atrs;
 			unset($natrs['TYPE']);
@@ -237,8 +237,10 @@ class FormInput
 				$atrs['NAME'] .= '[]';
 				$atrs['TYPE'] = 'text';
 				$atrs['CLASS'] = 'date';
+				$atrs['VALUE'] = @$this->atrs['VALUE'][0];
 				$one = '<input '.HM::GetAttribs($atrs).' />';
 				if (isset($atrs['ID'])) $atrs['ID'] .= '2';
+				$atrs['VALUE'] = @$this->atrs['VALUE'][1];
 				$two = '<input '.HM::GetAttribs($atrs).' />';
 				return "$one to $two";
 			case 'time':
@@ -286,6 +288,9 @@ class FormInput
 		}
 
 		if (empty($this->atrs['TYPE'])) $this->atrs['TYPE'] = 'text';
+		if (isset($this->atrs['VALUE'])
+			&& is_object($this->atrs['VALUE']))
+				unset($this->atrs['VALUE']);
 		$atrs = HM::GetAttribs($this->atrs);
 		return "<input {$atrs} />";
 	}
@@ -529,7 +534,7 @@ class FormInput
 	 */
 	static function GetBoolean($parent, $attribs)
 	{
-		$id = CleanID((isset($parent) ? $parent.'_' : null).@$attribs['NAME']);
+		$id = HM::CleanID((isset($parent) ? $parent.'_' : null).@$attribs['NAME']);
 		if (!isset($attribs['ID'])) $attribs['ID'] = $id;
 		if (!isset($attribs['VALUE'])) $attribs['VALUE'] = 0;
 		if (!isset($attribs['TEXTNO'])) $attribs['TEXTNO'] = 'No';

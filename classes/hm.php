@@ -1,7 +1,8 @@
 <?php
 
 /**
- * (eXtensible|Hyper Text) (Markup|Transfer) (Protocol|Language)
+ * (eXtensible|Hyper Text) (Markup|Transfer) (Protocol|Language), or just
+ * HyperMarkup in this case.
  */
 
 class HM
@@ -24,7 +25,10 @@ class HM
 		$ret = '';
 		if (is_array($attribs))
 		foreach ($attribs as $n => $v)
+		{
+			if (!is_string($v)) continue;
 			$ret .= ' '.strtolower($n).'="'.htmlspecialchars($v).'"';
+		}
 		else return ' '.$attribs;
 		return $ret;
 	}
@@ -60,7 +64,7 @@ class HM
 	 */
 	static function URL($url, $uri = null)
 	{
-		$ret = $url; # This should be encoded elsewhere and not here.
+		$ret = $url;
 
 		global $PERSISTS;
 		$nuri = array();
@@ -74,7 +78,7 @@ class HM
 			{
 				if (isset($val))
 				{
-					$ret .= HM::URLParse($key, $val, $start);
+					$ret .= HM::BuildURL($key, $val, $start);
 					$start = false;
 				}
 			}
@@ -85,7 +89,8 @@ class HM
 	static function ParseURL($url)
 	{
 		$up = parse_url($url);
-		$ret['url'] = $up['path'];
+		if (!empty($up['path'])) $ret['url'] = $up['path'];
+		else $ret['url'] = '/';
 		if (!empty($up['query']))
 		foreach (preg_split('/&|\?/', $up['query']) as $parm)
 		{
@@ -95,7 +100,6 @@ class HM
 		return $ret;
 	}
 
-	#TODO: This does not parse a url idiot, it BUILDS ONE!
 	/**
 	 * Parses an object or array for serialization to a uri.
 	 *
@@ -104,12 +108,15 @@ class HM
 	 * @param bool $start Whether or not this is the first item being parsed.
 	 * @return string Rendered url string.
 	 */
-	static function URLParse($key, $val, $start = false)
+	static function BuildURL($key, $val, $start = false)
 	{
 		$ret = null;
 		if (is_array($val))
 			foreach ($val as $akey => $aval)
-				$ret .= HM::URLParse($key.'['.$akey.']', $aval, $start);
+			{
+				$ret .= HM::BuildURL($key.'['.$akey.']', $aval, $start);
+				$start = false;
+			}
 		else
 		{
 			//$nval = str_replace(' ', '%20', $val);

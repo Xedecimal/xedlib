@@ -10,6 +10,7 @@ require_once(dirname(__FILE__).'/../file_manager/filter_gallery.php');
 define('CAPTION_NONE',  0);
 define('CAPTION_TITLE', 1);
 define('CAPTION_FILE',  2);
+define('CAPTION_TITLE_FILE', 3);
 
 class Gallery extends Module
 {
@@ -41,6 +42,7 @@ class Gallery extends Module
 		$this->Display = new GalleryDisplay();
 		$this->Template = Module::L('gallery/gallery.xml');
 		$this->FileManager = new FileManager();
+		$this->CheckActive($this->Name);
 	}
 
 	function TagHeader($t, $guts)
@@ -83,6 +85,7 @@ class Gallery extends Module
 	{
 		$out = '';
 		$vp = new VarParser();
+		$vp->Behavior->Bleed = false;
 
 		foreach ($this->files['files'] as $ix => $fi)
 		{
@@ -181,10 +184,12 @@ EOF;
 	function Get()
 	{
 		global $me;
+
+		if (!$this->Active) return;
 		$this->f = new FilterGallery($this->FileManager);
 
 		require_once(dirname(__FILE__).'/../file_manager/file_manager.php');
-		require_once(dirname(__FILE__).'/../../classes/present/Template.php');
+		require_once(dirname(__FILE__).'/../../classes/present/template.php');
 
 		$path = Server::GetVar('galcf');
 
@@ -287,13 +292,14 @@ EOF;
 	 */
 	function GetCaption($file)
 	{
+		if ($this->Display->Captions == CAPTION_NONE) return '';
 		if ($this->InfoCaption
 			&& !empty($file->info['title'])
 			&& $this->Display->Captions == CAPTION_TITLE)
 			return stripslashes($file->info['title']);
 		else if ($this->Display->Captions == CAPTION_FILE)
 			return str_replace('_', ' ', substr($file->filename, 0, strrpos($file->filename, '.')));
-		else
+		else if ($this->Display->Captions == CAPTION_TITLE_FILE)
 			return str_replace('_', ' ', $file->filename);
 	}
 }
@@ -305,7 +311,7 @@ class GalleryDisplay
 	 * CAPTION_FILE.
 	 * @var int
 	 */
-	public $Captions = CAPTION_TITLE;
+	public $Captions = CAPTION_TITLE_FILE;
 
 	/**
 	 * String to append on the left side of the caption, this also handles

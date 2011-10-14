@@ -1,11 +1,34 @@
 <?php
 
-require_once(dirname(__FILE__).'/../classes/TreeNode.php');
-require_once(dirname(__FILE__).'/../classes/HM.php');
+require_once(dirname(__FILE__).'/../classes/tree_node.php');
+require_once(dirname(__FILE__).'/../classes/hm.php');
 
 class ModNav extends Module
 {
 	public $Block = 'nav';
+
+	function Link()
+	{
+		global $_d;
+
+		$_d['template.rewrites']['crumb'] = array(&$this, 'TagCrumb');
+	}
+
+	function Get()
+	{
+		global $_d;
+
+		if (isset($_d['nav.links']))
+		{
+			$t = new Template();
+			$t->ReWrite('link', array($this, 'TagLink'));
+			$t->ReWrite('head', array($this, 'TagHead'));
+			$tree = ModNav::LinkTree($_d['nav.links']);
+			$ret['nav'] = ModNav::GetLinks($tree, U::ifset(@$_d['nav.class'], 'nav'));
+		}
+
+		return $ret;
+	}
 
 	/**
 	* @param TreeNode $link
@@ -26,14 +49,22 @@ class ModNav extends Module
 			{
 				if ($ix++ > 0 && !empty($_d['nav.sep']) && $depth < 0)
 					$ret .= $_d['nav.sep'];
+
+				$liatrs = '';
+
 				if (is_string($c->data))
-					$link = '<a href="'.$c->data.'">'.$c->id.'</a>';
+					$link = '<a href="'.$c->data.'">'.str_replace('\\', '/', $c->id).'</a>';
 				else if (isset($c->data['raw'])) $link = $c->data['raw'];
 				else if (is_array($c->data))
+				{
+					$liatrs = HM::GetAttribs(@$c->data['liatrs']);
+					if (!empty($c->data['liatrs'])) unset($c->data['liatrs']);
 					$link = '<a'.HM::GetAttribs($c->data).'>'.$c->id.'</a>';
+				}
 				else if (is_string($c)) $link = $c;
 				else $link = $c->id;
-				$ret .= '<li>'.$link;
+
+				$ret .= "<li$liatrs>$link";
 				$ret .= ModNav::GetLinks($c, $class, $depth+1);
 				$ret .= '</li>';
 			}
@@ -43,6 +74,11 @@ class ModNav extends Module
 		return $ret;
 	}
 
+	/**
+	 *
+	 * @param type $nav
+	 * @return TreeNode
+	 */
 	static function LinkTree($nav)
 	{
 		$r = new TreeNode();
@@ -85,18 +121,37 @@ class ModNav extends Module
 		return $r;
 	}
 
-	function Get()
-	{
-		global $_d;
+	# Breadcrumb Related
 
-		if (isset($_d['nav.links']))
+	function TagCrumb($t, $g)
+	{
+		return $this->GetCrumb();
+	}
+
+	function GetCrumb()
+	{
+		global $rw, $_d;
+		$tree = ModNav::LinkTree($_d['nav.links']);
+		$walk = $tree->UFind(array(&$this, 'cb_crumb'));
+		$ret = '';
+		while (!empty($walk->id))
 		{
-			$t = new Template();
-			$t->ReWrite('link', array($this, 'TagLink'));
-			$t->ReWrite('head', array($this, 'TagHead'));
-			return ModNav::GetLinks(ModNav::LinkTree($_d['nav.links']),
-				!empty($_d['nav.class']) ? $_d['nav.class'] : 'nav');
+			if (!empty($ret)) $ret = ' » '.$ret;
+			$ret = '<a href="'.$walk->data.'">'.$walk->id.'</a>'.$ret;
+			$walk = $walk->parent;
 		}
+
+		return $ret;
+	}
+
+	function cb_crumb($item)
+	{
+		global $rw;
+		if (is_array($item->data) && !empty($item->data['HREF']))
+			$url = $item->data['HREF'];
+		else if (is_string($item->data)) $url = $item->data;
+		else return;
+		if (substr($url, -strlen($rw)) == $rw) return true;
 	}
 }
 

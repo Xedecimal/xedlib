@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/VarParser.php');
+require_once(dirname(__FILE__).'/var_parser.php');
 
 /**
  * A node holds children.
@@ -75,6 +75,22 @@ class TreeNode
 			else
 			{
 				$ret = $c->Find($id);
+				if (isset($ret)) return $ret;
+			}
+		}
+	}
+
+	function UFind($cb)
+	{
+		if (call_user_func($cb, $this)) return $this;
+
+		if (is_array($this->children))
+		foreach ($this->children as $c)
+		{
+			if (call_user_func($cb, $c)) return $c;
+			else
+			{
+				$ret = $c->UFind($cb);
 				if (isset($ret)) return $ret;
 			}
 		}

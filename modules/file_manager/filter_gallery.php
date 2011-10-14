@@ -31,11 +31,13 @@ class FilterGallery extends FilterDefault
 			$dinfo = $this->GetInfo(new FileInfo($fi->dir))->info;
 		else $dinfo = $fi->info;
 
-		if (empty($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
-		if (empty($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
+		if (substr($fi->filename, 0, 2) == 't_') $fi->show = false;
 
-		if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = $dinfo['thumb_width'];
-		if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = $dinfo['thumb_height'];
+		if (!isset($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
+		if (!isset($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
+
+		$fi->info['thumb_width'] = $dinfo['thumb_width'];
+		$fi->info['thumb_height'] = $dinfo['thumb_height'];
 
 		global $_d;
 
@@ -47,20 +49,22 @@ class FilterGallery extends FilterDefault
 
 		$atrs['SRC'] = Server::GetRelativePath($abs);
 
-		if ($this->Behavior->UseThumbs)
-		{
-			$atrs['WIDTH'] = $fi->info['thumb_width'];
-			$atrs['HEIGHT'] = $fi->info['thumb_height'];
-		}
+		//if ($this->Behavior->UseThumbs)
+		//{
+			//$atrs['WIDTH'] = $fi->info['thumb_width'];
+			//$atrs['HEIGHT'] = $fi->info['thumb_height'];
+		//}
 		$atrs['ALT'] = 'icon';
 
 		if (file_exists($abs)) $fi->icon =
 			'<img'.HM::GetAttribs($atrs).' />';
 
+		# Prepare custom folder icon
+
 		if (is_dir($fi->path))
 		{
 			$fs = glob($fi->path.'/.t_image.*');
-			if (!empty($fs)) $fi->vars['icon'] = $fs[0];
+			if (!empty($fs)) $fi->vars['icon'] = '<img src="'.$fs[0].'" alt="Icon" />';
 			else $fi->vars['icon'] = FileManager::GetIcon($fi);
 		}
 		return $fi;
@@ -141,7 +145,7 @@ class FilterGallery extends FilterDefault
 				$h = $info['thumb_height'];
 				$src = $fir->path;
 				$dst = $fir->dir.'/t_'.File::GetFile($fir->filename);
-				$this->ResizeFile($src, $dst, $w, $h, true);
+				$this->ResizeFile($src, $dst, $w, $h);
 			}
 		}
 	}
@@ -264,28 +268,9 @@ class FilterGallery extends FilterDefault
 	 */
 	static function ResizeFile($file, $dest, $nx, $ny, $literal = false)
 	{
-		$pinfo = pathinfo($file);
-		$dt = $dest.'.'.$pinfo['extension'];
-
-		switch (strtolower($pinfo['extension']))
-		{
-			case "jpg":
-			case "jpeg":
-				$img = imagecreatefromjpeg($file);
-				$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-				imagejpeg($img, $dt);
-			break;
-			case "png":
-				$img = imagecreatefrompng($file);
-				$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-				imagepng($img, $dt);
-			break;
-			case "gif":
-				$img = imagecreatefromgif($file);
-				$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-				imagegif($img, $dt);
-			break;
-		}
+		$img = imagecreatefromstring(file_get_contents($file));
+		$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
+		imagejpeg($img, $dest);
 	}
 
 	/**
@@ -307,7 +292,7 @@ class FilterGallery extends FilterDefault
 			$dx = $nx;
 			$dy = $ny;
 		}
-		else
+		else # Not literal, maintain aspect ratio
 		{
 			if ($sx < $sy)
 			{

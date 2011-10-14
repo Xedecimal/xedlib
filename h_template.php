@@ -6,8 +6,6 @@ require_once('h_utility.php');
  * @package Presentation
  */
 
-
-
 /**
  * Requires $file and creates a new $class of type DisplayObject to prepare and
  * present.

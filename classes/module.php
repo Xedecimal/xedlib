@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/present/Template.php');
+require_once(dirname(__FILE__).'/present/template.php');
 
 class Module
 {
@@ -42,7 +42,7 @@ class Module
 	* @param string $name Class name of defined module class.
 	* @param array $deps Depended modules eg. array('ModName', 'ModName2')
 	*/
-	static function Register($name, $deps = null)
+	final static function Register($name, $deps = null)
 	{
 		global $_d;
 		if (!empty($_d['module.disable'][$name])) return;
@@ -158,7 +158,7 @@ class Module
 	{
 		global $_d;
 
-		//No such table - Infest this database.
+		# No such table - Infest this database.
 		if ($errno == ER_NO_SUCH_TABLE)
 		{
 			global $mods;
@@ -250,14 +250,14 @@ class Module
 
 	static function P($path)
 	{
-		// Only translate finished paths.
+		# Only translate finished paths.
 		if (preg_match('/{{/', $path)) return $path;
 
 		global $_d;
 		$abs = $_d['app_abs'];
 		$dir = $_d['app_dir'];
 
-		// Overloaded Path
+		# Overloaded Path
 		$tmp = @$_d['settings']['site_template'];
 		if (!empty($tmp))
 		{
@@ -265,20 +265,21 @@ class Module
 			if (file_exists($opath)) return "$abs/$opath";
 		}
 
-		// Absolute Override
+		# Absolute Override
+		# @TODO We need this, next time it comes with an issue, keep and patch it.
 		$apath = "$dir/$path";
 		if (file_exists($apath)) return "$abs/$path";
 
-		// Module Path
+		# Module Path
 		$modpath = "$dir/modules/$path";
 		if (file_exists($modpath)) return "$abs/modules/$path";
 
-		// Xedlib Path
+		# Xedlib Path
 		$xedpath = dirname(__FILE__).'/'.$path;
 		if (file_exists($xedpath))
 			return Server::GetRelativePath(dirname(__FILE__)).'/'.$path;
 
-		// Xedlib Module
+		# Xedlib Module
 		$xedmpath = realpath(dirname(__FILE__)."/../modules/$path");
 		if (file_exists($xedmpath))
 			return Server::GetRelativePath(realpath(dirname(__FILE__)

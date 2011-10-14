@@ -2,8 +2,8 @@
 <input type="hidden" name="user_action" value="login" />
 <fieldset><legend>Login</legend>
 <ul>
-	<field><li><label for="{{name}}">{{text}}</label>
-		<input type="{{itype}}" name="{{name}}" id="{{name}}" /></li></field>
+	<field><li><input type="{{itype}}" name="{{name}}" id="{{name}}" />
+		<label for="{{name}}">{{text}}</label></li></field>
 
 	<li><input type="submit" class="submit" value="Login" /></li>
 </ul>

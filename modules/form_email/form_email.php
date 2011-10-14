@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/../../classes/present/Form.php');
-require_once(dirname(__FILE__).'/../../classes/present/FormInput.php');
+require_once(dirname(__FILE__).'/../../classes/present/form.php');
+require_once(dirname(__FILE__).'/../../classes/present/form_input.php');
 
 class FormEmail extends Module
 {
@@ -60,18 +60,18 @@ class FormEmail extends Module
 				$this->_inputs[(string)$in['id']] = (string)$in['name'];
 
 			$t->ReWrite('field', array(&$this, 'TagEmailField'));
-			$body = $t->ParseFile($this->_email_template);
+			$this->body = $t->ParseFile($this->_email_template);
 
 			if (!empty($this->debug))
 			{
 				var_dump("To: {$this->_to}");
 				var_dump("Subject: {$this->_subject}");
 				var_dump($headers);
-				echo "<pre>$body</pre>";
+				echo "<pre>$this->body</pre>";
 				die();
 			}
 
-			mail($this->_to, $this->_subject, $body, implode($headers, "\r\n"));
+			mail($this->_to, $this->_subject, $this->body, implode($headers, "\r\n"));
 		}
 	}
 
@@ -102,21 +102,32 @@ class FormEmail extends Module
 	function TagEmailField($t, $g)
 	{
 		# Preg out and find all elements we're working with
+
 		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
+		$rows = array();
 		foreach ($this->_inputs as $i => $n)
 		//foreach ($this->_fields as $n => $f)
 		{
 			if (!preg_match($preg, $n, $m)) continue;
+			if (!isset($this->_labels[$i])) continue;
 
-			$row['name'] = $this->_labels[$i];
-			$row['value'] = $this->_data[$m[1]];
+			$row = array();
 
-			//if (!$f->IsSignificant()) continue;
-
-			//$row['name'] = $n;
-			//$row['value'] = Server::GetVar($f->name);
-			$rows[] = $row;
+			# Repeating Value
+			if (is_array($this->_data[$m[1]]))
+			{
+				$l = $this->_labels[$i];
+				foreach ($this->_data[$m[1]] as $ix => $val)
+					$arrs[$ix][$l] = $val;
+			}
+			else # Non-repeating value
+			{
+				$row['name'] = $this->_labels[$i];
+				$row['value'] = $this->_data[$m[1]];
+				$rows[] = $row;
+			}
 		}
+
 		return VarParser::Concat($g, $rows);
 	}
 }

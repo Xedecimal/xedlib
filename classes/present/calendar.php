@@ -1,7 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__).'/../Server.php');
-require_once(dirname(__FILE__).'/Form.php');
+require_once(dirname(__FILE__).'/../server.php');
+require_once(dirname(__FILE__).'/form.php');
 
 /**
  * @package Calendar
@@ -158,9 +158,6 @@ class Calendar
 		$ret = null;
 		$tevent = new Template();
 		$key = $this->curday->Day.'-'.$this->month->Month.'-'.$this->month->Year;
-		#$key = mktime(0, 0, 0, $this->month->Month, $this->curday->Day,
-		#	$this->month->Year);
-		#echo "Checking for {$key}<br/>\n";
 		if (!empty($this->datesbyday[$key]))
 		foreach ($this->datesbyday[$key] as $k)
 		{
@@ -179,7 +176,7 @@ class Calendar
 	function Get($timestamp = null)
 	{
 		global $me;
-		require_once('Template.php');
+		require_once('template.php');
 
 		$vp = new VarParser();
 

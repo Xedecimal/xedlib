@@ -63,6 +63,18 @@ class Arr
 		return $ret;
 	}
 
+	static function MergeRecursive($arr1, $arr2)
+	{
+		foreach ($arr2 as $k => $v)
+		{
+			if(array_key_exists($k, $arr1) && is_array($v)) $arr1[$k] =
+				$arr1[$k] = Arr::MergeRecursive($arr1[$k], $arr2[$k]);
+			else $arr1[$k] = $arr2[$k];
+		}
+
+		return $arr1;
+	}
+
 	static function FromXML($xml)
 	{
 		return json_decode(json_encode((array)simplexml_load_string($xml)), 1);

@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).'/Utility.php');
+require_once(dirname(__FILE__).'/utility.php');
 
 /**
  * String manipulation.
@@ -17,8 +17,7 @@ class Str
 	{
 		if (strlen($str) < 1) return null;
 		if (substr($str, -1) == 'y') return substr($str, 0, -1).'ies';
-		if (substr($str, -1) != 's') return "{$str}s";
-		return $str;
+		else return "{$str}s";
 	}
 
 	/**
@@ -28,14 +27,14 @@ class Str
 	 * @param int $length Maximum length you're going for.
 	 * @return string Chomped text.
 	 */
-	function Chomp($text, $length)
+	static function Chomp($text, $length = 255)
 	{
 		if (strlen($text) > $length)
 		{
 			$ret = substr($text, 0, $length);
 			while ($ret[strlen($ret)-1] != ' ' && strlen($ret) > 1)
 				$ret = substr($ret, 0, count($ret)-2);
-			return $ret . "...";
+			return $ret.'...';
 		}
 		return $text;
 	}

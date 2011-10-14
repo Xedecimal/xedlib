@@ -1,23 +1,18 @@
 <?php
 
-class InlineEditor extends Module
+class EditorInline extends Module
 {
 	public $Name = 'editor_inline';
-
-	function __construct()
-	{
-		$this->CheckActive($this->Name);
-	}
 
 	function Link()
 	{
 		global $_d;
-
 		$_d['template.rewrites']['inline'] = array(&$this, 'TagInlineEditor');
 	}
 
 	function Prepare()
 	{
+		$this->CheckActive($this->Name);
 		if (!$this->Active) return;
 		if (!ModUser::RequireAccess(1)) return;
 
@@ -25,8 +20,15 @@ class InlineEditor extends Module
 
 		if ($_d['q'][1] == 'save')
 		{
-			file_put_contents(Server::GetVar('file'), Server::GetVar('content'));
-			die(json_encode(array('msg' => 'Success')));
+			$file = Server::GetVar('file');
+			file_put_contents($file, Server::GetVar('content'));
+			die(json_encode(array('msg' => 'Success', 'file' => $file)));
+		}
+		if (@$_d['q'][1] == 'reset')
+		{
+			$file = Server::GetVar('file');
+			if (file_exists($file)) unlink($file);
+			die(json_encode(array('file' => $file)));
 		}
 	}
 
@@ -38,8 +40,8 @@ class InlineEditor extends Module
 		$p_js = Module::P('editor_inline/editor_inline.js');
 		$ret['head'] = <<<EOF
 <link rel="stylesheet" type="text/css" href="{$p_css}" />
-<script language="javascript" type="text/javascript" src="js/tiny_mce/tiny_mce.js"></script>
-<script language="javascript" type="text/javascript" src="js/tiny_mce/jquery.tinymce.js"></script>
+<script type="text/javascript" src="{{app_abs}}/js/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="{{app_abs}}/js/tiny_mce/jquery.tinymce.js"></script>
 <script type="text/javascript" src="{$p_js}"></script>
 EOF;
 
@@ -48,7 +50,8 @@ EOF;
 
 	function TagInlineEditor($t, $g, $a)
 	{
-		$data = file_get_contents($a['FILE']);
+		if (file_exists($a['FILE'])) $data = file_get_contents($a['FILE']);
+		else $data = $g;
 		if (ModUser::RequireAccess(1))
 		{
 			return '<div title="'.$a['FILE'].'" class="editor-content">'.$data.'</div>';
@@ -57,6 +60,6 @@ EOF;
 	}
 }
 
-Module::Register('InlineEditor');
+Module::Register('EditorInline');
 
 ?>

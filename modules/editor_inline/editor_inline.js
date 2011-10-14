@@ -1,7 +1,13 @@
 $(function () {
-	$('.editor-content').live('click', function () {
-		$(this).attr('class', 'editor-editing');
-		$(this).tinymce({
+	$('.editor-content').each(function () {
+		$(this).before('<a href="'+$(this).attr('title')+'" class="inline-edit"">Edit</a>');
+		$(this).before(' <a href="'+$(this).attr('title')+'" class="inline-reset">Reset</a>');
+	});
+
+	$('.inline-edit').live('click', function () {
+		var target = $('.editor-content[title="'+$(this).attr('href')+'"]');
+		//target.replaceWith('<textarea>'+target.html()+'</textarea>');
+		target.tinymce({
 			// Location of TinyMCE script
 			script_url : 'js/tiny_mce/tiny_mce.js',
 
@@ -19,9 +25,6 @@ $(function () {
 			theme_advanced_statusbar_location : "bottom",
 			theme_advanced_resizing : true,
 
-			// Example content CSS (should be your site CSS)
-			content_css : "css/content.css",
-
 			// Drop lists for link/image/media/template dialogs
 			template_external_list_url : "lists/template_list.js",
 			external_link_list_url : "lists/link_list.js",
@@ -30,13 +33,27 @@ $(function () {
 
 			save_onsavecallback : "inline_mce_save"
 		});
+		return false;
+	});
+
+	$('.inline-reset').live('click', function () {
+		var target = $(this).attr('href');
+		$.post('editor_inline/reset', {file: target}, function (data) {
+			window.location.reload();
+		}, 'json');
+
+		return false;
 	});
 });
 
 function inline_mce_save(ed)
 {
-	$.post('editor_inline/save', {file: ed.getElement().getAttribute('title'),
+	var target = ed.getElement().getAttribute('title');
+	$.post('editor_inline/save', {file: target,
 		content: ed.getContent()}, function (data) {
-			alert('Result: '+data.msg);
+			if (data.msg == 'Success')
+			{
+				$('.editor-content[title="'+data.file+'"]').tinymce().hide();
+			}
 		}, 'json');
 }
