@@ -24,7 +24,7 @@ class ModNav extends Module
 			$t->ReWrite('link', array($this, 'TagLink'));
 			$t->ReWrite('head', array($this, 'TagHead'));
 			$tree = ModNav::LinkTree($_d['nav.links']);
-			$ret['nav'] = ModNav::GetLinks($tree, U::ifset(@$_d['nav.class'], 'nav'));
+			$ret['nav'] = ModNav::GetLinks($tree, @$_d['nav.class']);
 		}
 
 		return $ret;
@@ -34,16 +34,19 @@ class ModNav extends Module
 	* @param TreeNode $link
 	* @param int $depth
 	*/
-	static function GetLinks($link, $class = 'nav', $depth = -1)
+	static function GetLinks($link, $atrs = null, $depth = -1)
 	{
 		global $_d;
 
 		# Iterate Children, skip root node as it's just a container.
 
+		if ($depth < 0 && $atrs == null) $ratrs['CLASS'] = 'nav';
+		else $ratrs = $atrs;
+
 		$ret = null;
 		if (!empty($link->children))
 		{
-			$ret .= '<ul class="'.$class.'">';
+			$ret .= '<ul'.HM::GetAttribs($ratrs).'>';
 			$ix = 0;
 			foreach ($link->children as $c)
 			{
@@ -57,15 +60,17 @@ class ModNav extends Module
 				else if (isset($c->data['raw'])) $link = $c->data['raw'];
 				else if (is_array($c->data))
 				{
-					$liatrs = HM::GetAttribs(@$c->data['liatrs']);
 					if (!empty($c->data['liatrs'])) unset($c->data['liatrs']);
 					$link = '<a'.HM::GetAttribs($c->data).'>'.$c->id.'</a>';
 				}
 				else if (is_string($c)) $link = $c;
 				else $link = $c->id;
 
+				if (is_array($c->data))
+					$liatrs = HM::GetAttribs(@$c->data['liatrs']);
+
 				$ret .= "<li$liatrs>$link";
-				$ret .= ModNav::GetLinks($c, $class, $depth+1);
+				$ret .= ModNav::GetLinks($c, $atrs, $depth+1);
 				$ret .= '</li>';
 			}
 			$ret .= '</ul>';
