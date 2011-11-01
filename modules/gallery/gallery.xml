@@ -8,12 +8,14 @@
 }
 </style>
 
+<div class="folders">
 <folder>
 <div class="folder">
 <a href="{{url}}">{{icon}}</a>
 <div class="caption">{{name}}</div>
 </div> <!-- folder -->
 </folder>
+</div>
 
 <file>
 <div class="file{{class}}">

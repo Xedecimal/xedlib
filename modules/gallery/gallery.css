@@ -5,6 +5,7 @@ a img { border: 0; }
 	padding: 5px;
 	float: left;
 	vertical-align: top;
+	text-align: center;
 }
 
 .caption { text-align: center; }
