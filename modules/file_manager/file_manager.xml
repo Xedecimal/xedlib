@@ -147,16 +147,13 @@
 					</td>
 					</check>
 					<td><p><a href="{{url}}">{{filename}}</a><br />{{caption}}</p></td>
-					<quickcap><td><textarea cols="30" rows="2"
-					name="{{fn_name}}_titles[{{filename}}]">{{ftitle}}</textarea></td></quickcap>
+					<quickopt><td>{{opt}}</td></quickopt>
 					<td>{{butup}}</td>
 					<td>{{butdown}}</td>
 				</tr>
 				</file>
 			</table>
-			<QuickCapButton>
-				<input type="submit" name="{{fn_name}}_action" value="Update Captions" />
-			</QuickCapButton>
+			<QuickOptFinal />
 		</box>
 		</files>
 </directory>

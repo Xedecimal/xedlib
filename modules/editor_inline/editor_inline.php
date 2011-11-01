@@ -54,7 +54,7 @@ EOF;
 		else $data = $g;
 		if (ModUser::RequireAccess(1))
 		{
-			return '<div title="'.$a['FILE'].'" class="editor-content">'.$data.'</div>';
+			return '<div data-file="'.$a['FILE'].'" class="editor-content"'.HM::GetAttribs($a).'>'.$data.'</div>';
 		}
 		return $data;
 	}

@@ -84,9 +84,9 @@ class ModNav extends Module
 	static function LinkTree($nav)
 	{
 		$r = new TreeNode();
-		foreach ($nav as $p => $t)
+		foreach ($nav as $path => $t)
 		{
-			$ep = explode('/', $p);
+			$ep = explode('/', $path);
 			foreach ($ep as $ix => $d)
 			{
 				# Has Parent
@@ -95,8 +95,10 @@ class ModNav extends Module
 					# Find Parent
 					$tnp = $r->Find($ep[$ix - 1]);
 
-					# Find Child
+					# Find this item
 					$tn = $tnp->Find($d);
+
+					# This item does not exist.
 					if (empty($tn))
 					{
 						# Add Child
@@ -104,13 +106,16 @@ class ModNav extends Module
 						$tnp->AddChild($tn);
 					}
 				}
+
 				# Is Parent
 				else
 				{
 					$tnp = $r->Find($d);
+
+					# There is no parent for this item.
 					if (empty($tnp))
 					{
-						# Add Child
+						# Add this to root.
 						$tn = new TreeNode(null, $d);
 						$r->AddChild($tn);
 					}
@@ -139,7 +144,8 @@ class ModNav extends Module
 		while (!empty($walk->id))
 		{
 			if (!empty($ret)) $ret = ' » '.$ret;
-			$ret = '<a href="'.$walk->data.'">'.$walk->id.'</a>'.$ret;
+			$url = is_array($walk->data) ? $walk->data['HREF'] : $walk->data;
+			$ret = '<a href="'.$url.'">'.$walk->id.'</a>'.$ret;
 			$walk = $walk->parent;
 		}
 
@@ -153,7 +159,9 @@ class ModNav extends Module
 			$url = $item->data['HREF'];
 		else if (is_string($item->data)) $url = $item->data;
 		else return;
-		if (substr($url, -strlen($rw)) == $rw) return true;
+
+		$end = substr(strstr($url, '/'), 1);
+		if (strcmp($end, $rw) == 0) return true;
 	}
 }
 
