@@ -1,11 +1,12 @@
 $(function () {
 	$('.editor-content').each(function () {
-		$(this).before('<a href="'+$(this).attr('title')+'" class="inline-edit"">Edit</a>');
-		$(this).before(' <a href="'+$(this).attr('title')+'" class="inline-reset">Reset</a>');
+		$(this).before('<a href="'+$(this).data('file')+'" class="inline-edit"">Edit</a>');
+		if (!$(this).data('noreset'))
+			$(this).before(' <a href="'+$(this).data('file')+'" class="inline-reset">Reset</a>');
 	});
 
 	$('.inline-edit').live('click', function () {
-		var target = $('.editor-content[title="'+$(this).attr('href')+'"]');
+		var target = $('.editor-content[data-file="'+$(this).attr('href')+'"]');
 		//target.replaceWith('<textarea>'+target.html()+'</textarea>');
 		target.tinymce({
 			// Location of TinyMCE script
@@ -48,12 +49,12 @@ $(function () {
 
 function inline_mce_save(ed)
 {
-	var target = ed.getElement().getAttribute('title');
+	var target = $(ed.getElement()).data('file');
 	$.post('editor_inline/save', {file: target,
 		content: ed.getContent()}, function (data) {
 			if (data.msg == 'Success')
 			{
-				$('.editor-content[title="'+data.file+'"]').tinymce().hide();
+				$('.editor-content[data-file="'+data.file+'"]').tinymce().hide();
 			}
 		}, 'json');
 }
