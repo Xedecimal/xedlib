@@ -35,6 +35,7 @@ define('DB_MI', 1); # MySQLi
 define('DB_OD', 2); # ODBC
 define('DB_SL', 3); # SQLite
 define('DB_SL3', 4); # SQLite 3
+define('DB_MG', 5); # MongoDB
 
 define('ER_NO_SUCH_TABLE', 1146);
 define('ER_INVALID_LOGIN', 9999);
@@ -221,11 +222,17 @@ class Database
 				$this->link = new SQLite3($m['path']);
 				$this->type = DB_SL3;
 				break;
+			case 'mongodb':
+				$c = new Mongo($url);
+				$this->link = $c->{$this->name};
+				$this->type = DB_MG;
+				break;
 			default:
 				Server::Error("Invalid database type.");
 				break;
 		}
-		call_user_func($this->ErrorHandler, null, null);
+		if (!empty($this->ErrorHandler))
+			call_user_func($this->ErrorHandler, null, null);
 	}
 
 	/**
@@ -257,7 +264,9 @@ class Database
 			case DB_SL3:
 				$res = $this->link->query($query);
 		}
-		call_user_func($this->ErrorHandler, $query, $handler);
+		if (!empty($this->ErrorHandler))
+			call_user_func($this->ErrorHandler, $query, $handler);
+
 		return $res;
 	}
 
