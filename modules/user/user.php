@@ -31,6 +31,10 @@ class ModUser extends Module
 			'column' => 'usr_pass',
 			'text' => 'Password',
 			'type' => 'password'
+		),
+		'access' => array(
+			'column' => 'usr_access',
+			'default' => 1
 		)
 	);
 
@@ -75,7 +79,7 @@ class ModUser extends Module
 		{
 			foreach ($this->fields as $f['name'] => $f)
 			{
-				$add[$f['column']] = Server::GetVar($f['name'].'_create');
+				$add[$f['column']] = Server::GetVar($f['name'].'_create', @$f['default']);
 				if (@$f['type'] == 'password') $add[$f['column']] = md5($add[$f['column']]);
 			}
 			$this->dsUser->Add($add);
@@ -213,6 +217,8 @@ class ModUser extends Module
 		$ret = null;
 		foreach ($this->fields as $v['name'] => $v)
 		{
+			if (empty($v['text'])) continue;
+
 			$v['name'] .= '_create';
 
 			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
@@ -321,7 +327,7 @@ class ModUser extends Module
 			{
 				$query['match'] = array(
 					$ds[1] => $check_pass,
-					$ds[2] => Database::SqlAnd($check_user)
+					$ds[2] => $check_user
 				);
 
 				$item = $ds[0]->GetOne($query);
