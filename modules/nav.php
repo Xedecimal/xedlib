@@ -18,6 +18,8 @@ class ModNav extends Module
 	{
 		global $_d;
 
+		$ret = '';
+
 		if (isset($_d['nav.links']))
 		{
 			$t = new Template();
