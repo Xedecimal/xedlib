@@ -516,7 +516,7 @@ class DataSet
 	{
 		if ($this->database->type == DB_MG)
 		{
-			$this->table->save($columns);
+			$this->table->save($columns, array('safe' => 1));
 			return;
 		}
 		$query = 'INSERT';
