@@ -1,6 +1,6 @@
 $(function () {
 	$('.editor-content').each(function () {
-		$(this).before('<a href="'+$(this).data('file')+'" class="inline-edit"">Edit</a>');
+		$(this).before('<a href="'+$(this).data('file')+'" class="inline-edit">Edit</a>');
 		if (!$(this).data('noreset'))
 			$(this).before(' <a href="'+$(this).data('file')+'" class="inline-reset">Reset</a>');
 	});
