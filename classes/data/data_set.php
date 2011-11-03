@@ -609,9 +609,8 @@ class DataSet
 		# Mongo Database
 		if ($this->database->type == DB_MG)
 		{
-			return iterator_to_array(
-				$this->table->find(
-					$this->ConvertToMongo($opts['match'])));
+			$q = $this->ConvertToMongo($opts['match']);
+			return iterator_to_array($this->table->find($q));
 		}
 
 		$lq = $this->database->lq;
