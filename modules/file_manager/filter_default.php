@@ -13,6 +13,17 @@ class FilterDefault implements FileFilter
 	 */
 	public $Name = "Default";
 
+	static function UpdateMTime($filename)
+	{
+		$finfo = new FileInfo($filename);
+		$finfo->info['mtime'] = time();
+		$finfo->SaveInfo();
+	}
+
+	# FileFilter implementation
+
+	public function FFPrepare(&$fi) { }
+
 	/**
 	 * Places information into $fi for later use.
 	 *
@@ -119,17 +130,6 @@ class FilterDefault implements FileFilter
 	 * @param string $path Source path.
 	 */
 	public function FFCleanup($path) {}
-
-	static function UpdateMTime($filename)
-	{
-		$finfo = new FileInfo($filename);
-		$finfo->info['mtime'] = time();
-		$finfo->SaveInfo();
-	}
-
-	public function FFPrepare(&$fi) {
-
-	}
 }
 
 ?>

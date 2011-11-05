@@ -128,7 +128,9 @@ class FileManager extends Module
 
 		# TODO: Only declare $fi once!
 
-		$fi = new FileInfo($this->Root.'/'.$this->cf);
+		if (!file_exists($this->Root.'/'.$this->cf)) $fi = new FileInfo($this->Root);
+		else $fi = new FileInfo($this->Root.'/'.$this->cf);
+
 		$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 		$f->FFPrepare($fi);
 
@@ -176,7 +178,7 @@ class FileManager extends Module
 
 				if (!preg_match('#^\.\[[0-9]+\]_.*#', $name))
 				{
-					$filter->Upload($name, $fi);
+					$filter->FFUpload($name, $fi);
 					if (!empty($this->Behavior->Watchers))
 						U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
 							$target);
@@ -189,7 +191,7 @@ class FileManager extends Module
 			$info = new FileInfo($this->Root.'/'.$this->cf, $this->Filters);
 			$newinfo = Server::GetVar('info');
 			$f = FileManager::GetFilter($info, $this->Root, $this->Filters);
-			$f->Updated($this, $info, $newinfo);
+			$f->FFUpdated($this, $info, $newinfo);
 			$this->Behavior->Update($newinfo);
 
 			if (!empty($newinfo))
@@ -222,7 +224,7 @@ class FileManager extends Module
 				$fi = new FileInfo($this->Root.'/'.$this->cf.$file, $this->Filters);
 				$fi->info['title'] = $cap;
 				$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
-				$f->Updated($this, $fi, $fi->info);
+				$f->FFUpdated($this, $fi, $fi->info);
 				$fi->SaveInfo();
 			}
 		}
@@ -255,7 +257,7 @@ class FileManager extends Module
 				}
 				if (!$break)
 				{
-					$f->Delete($fi, $this->Behavior->Recycle);
+					$f->FFDelete($fi, $this->Behavior->Recycle);
 					$types = Server::GetVar($this->Name.'_type');
 					$this->files = $this->GetDirectory();
 					$ix = 0;
@@ -387,11 +389,11 @@ class FileManager extends Module
 		if (substr($this->Root, -1) != '/') $this->Root .= '/';
 
 		# Verify that this root exists.
-		if (!file_exists($this->Root.$this->cf))
+		/*if (!file_exists($this->Root.$this->cf))
 		{
 			Server::Error('Directory does not exist:'.$this->Root.$this->cf);
 			$this->cf = '';
-		}
+		}*/
 
 		if (is_dir($this->Root.$this->cf)) $this->files = $this->GetDirectory();
 	}
@@ -685,7 +687,7 @@ class FileManager extends Module
 	function TagQuickOptFinal($t, $guts)
 	{
 		if (isset($this->curfilter))
-			return $this->curfilter->FFGetQuickOptFinal($this->curfile);
+			return $this->curfilter->FFGetQuickOptFinal(@$this->curfile);
 	}
 
 	function TagOptions($t, $guts)
@@ -775,7 +777,7 @@ class FileManager extends Module
 		if (!$this->Active) return;
 
 		if (!file_exists($this->Root.$this->cf))
-			return "FileManager::Get(): File doesn't exist ({$this->Root}{$this->cf}).<br/>\n";
+			$this->cf = '';
 
 		$relpath = Server::GetRelativePath(dirname(__FILE__));
 
