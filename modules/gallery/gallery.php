@@ -66,7 +66,7 @@ class Gallery extends Module
 			if (!is_dir($p)) continue;
 
 			$fi = new FileInfo($this->Root.$this->path.'/'.$file);
-			$this->f->GetInfo($fi);
+			$this->f->FFGetInfo($fi);
 
 			$du['editor'] = Server::GetVar('editor');
 			$du['galcf'] = Server::GetVar('galcf', '').'/'.$file;
@@ -89,7 +89,7 @@ class Gallery extends Module
 
 		foreach ($this->files['files'] as $ix => $fi)
 		{
-			$this->f->GetInfo($fi);
+			$this->f->FFGetInfo($fi);
 			if (!$fi->show || empty($fi->icon)) continue;
 
 			if ($ix >= count($this->files['files'])-1) $d['class'] = ' last';
@@ -194,7 +194,7 @@ EOF;
 		$path = Server::GetVar('galcf');
 
 		$this->FileManager->Name = $this->Name;
-		$this->FileManager->Filters = array('Gallery');
+		$this->FileManager->Filters = array('FilterGallery');
 		$this->FileManager->Root = $this->Root.$path;
 		$this->FileManager->Behavior->ShowAllFiles = true;
 		$this->FileManager->View->Sort = $this->Display->Sort;
@@ -267,7 +267,7 @@ EOF;
 
 		//Gallery settings
 		$fig = new FileInfo($this->Root);
-		$this->FileManager->GetFilter($fig, $this->Root, array('Gallery'));
+		$this->FileManager->GetFilter($fig, $this->Root, array('FilterGallery'));
 		$t->Set('file_thumb_width', $fig->info['thumb_width']+20);
 		$t->Set('file_thumb_height', $fig->info['thumb_height']+50);
 

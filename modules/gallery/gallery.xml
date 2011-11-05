@@ -13,16 +13,18 @@
 <div class="folder">
 <a href="{{url}}">{{icon}}</a>
 <div class="caption">{{name}}</div>
-</div> <!-- folder -->
+</div> <!-- .folder -->
 </folder>
 </div>
 
+<div class="files">
 <file>
 <div class="file{{class}}">
 <a href="{{fullname}}" class="gal">{{icon}}</a>
 <div class="caption">{{name}}</div>
 </div> <!-- file -->
 </file>
+</div> <!-- .files -->
 
 <div class="clear">&nbsp;</div>
 
