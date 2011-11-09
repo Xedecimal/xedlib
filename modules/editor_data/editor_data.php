@@ -1374,17 +1374,6 @@ class EditorData extends Module
 		if ($this->Behavior->Search) return $g;
 	}
 
-	/**
-	 * Gets a standard user interface for a single editor's Get() method.
-	 *
-	 * @param string Name of state variable to pass around via GPC.
-	 * @return string Rendered html of associated objects.
-	 */
-	function GetUI($target = 'editor')
-	{
-
-	}
-
 	function Reset()
 	{
 		if (isset($_SESSION[$this->Name.'_action']))
