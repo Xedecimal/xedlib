@@ -262,15 +262,6 @@ class CodeReader
 		}
 	}
 
-	/**
-	 * TODO: Describe.
-	 *
-	 * @param array      $data   Context data.
-	 * @param array      $names  Current nametable.
-	 * @param CodeObject $member Current member we are iterating.
-	 *
-	 * @return null
-	 */
 	function ValidateRecurse($data, $names, $member)
 	{
 		if ($member->type == T_FUNCTION)
