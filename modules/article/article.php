@@ -155,7 +155,8 @@ class ModArticleAdmin extends Module
 			$this->_source->FieldInputs = array(
 				'nws_date' => new FormInput('Date', 'date'),
 				'nws_title' => new FormInput('Title'),
-				'nws_body' => new FormInput('Body', 'area', null, null, array('rows="10" width="100%"'))
+				'nws_body' => new FormInput('Body', 'area', null, null,
+					array('rows' => 10, 'width' => "100%"))
 			);
 
 		global $me;
@@ -171,7 +172,7 @@ class ModArticleAdmin extends Module
 
 		if (!$this->Active) return;
 
-		return $this->edNews->GetUI('edNews');
+		return $this->edNews->Get();
 	}
 }
 
