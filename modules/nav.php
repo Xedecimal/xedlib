@@ -26,7 +26,7 @@ class ModNav extends Module
 			$t->ReWrite('link', array($this, 'TagLink'));
 			$t->ReWrite('head', array($this, 'TagHead'));
 			$tree = ModNav::LinkTree($_d['nav.links']);
-			$ret['nav'] = ModNav::GetLinks($tree, @$_d['nav.class']);
+			$ret['nav'] = ModNav::GetLinks($tree, array('CLASS' => @$_d['nav.class']));
 		}
 
 		return $ret;
@@ -61,10 +61,7 @@ class ModNav extends Module
 					$link = '<a href="'.$c->data.'">'.str_replace('\\', '/', $c->id).'</a>';
 				else if (isset($c->data['raw'])) $link = $c->data['raw'];
 				else if (is_array($c->data))
-				{
-					if (!empty($c->data['liatrs'])) unset($c->data['liatrs']);
 					$link = '<a'.HM::GetAttribs($c->data).'>'.$c->id.'</a>';
-				}
 				else if (is_string($c)) $link = $c;
 				else $link = $c->id;
 
