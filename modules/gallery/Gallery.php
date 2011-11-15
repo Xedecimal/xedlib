@@ -57,22 +57,16 @@ class Gallery extends Module
 
 		$out = '';
 		$vp = new VarParser();
-		$dp = opendir($this->Root.$this->path);
-		while ($file = readdir($dp))
+
+		foreach ($this->files['folders'] as $fi)
 		{
-			if ($file[0] == '.') continue;
-
-			$p = $this->Root.$this->path.'/'.$file;
-			if (!is_dir($p)) continue;
-
-			$fi = new FileInfo($this->Root.$this->path.'/'.$file);
 			$this->f->GetInfo($fi);
 
 			$du['editor'] = Server::GetVar('editor');
-			$du['galcf'] = Server::GetVar('galcf', '').'/'.$file;
+			$du['galcf'] = Server::GetVar('galcf', '').'/'.$fi->path;
 			$d['url'] = HM::URL($me, $du);
 
-			$d['name'] = $file;
+			$d['name'] = $fi->filename;
 			$d['icon'] = $fi->vars['icon'];
 			$d['editor'] = Server::GetVar('editor');
 
@@ -197,7 +191,7 @@ EOF;
 		$this->FileManager->Filters = array('Gallery');
 		$this->FileManager->Root = $this->Root.$path;
 		$this->FileManager->Behavior->ShowAllFiles = true;
-		$this->FileManager->View->Sort = $this->Display->Sort;
+		$this->FileManager->Behavior->Sort = $this->Display->Sort;
 		$this->files = $this->FileManager->GetDirectory();
 
 		$t = new Template();
@@ -328,7 +322,7 @@ class GalleryDisplay
 	public $CaptionRight = '';
 
 	/**
-	 * Method of sorting this gallery, can be SORT_MANUAL or SORT_NONE.
+	 * Method of sorting this gallery, can be FM_SORT_MANUAL or FM_SORT_NONE.
 	 * @var int
 	 */
 	public $Sort;
