@@ -63,7 +63,7 @@ class Gallery extends Module
 			$this->f->GetInfo($fi);
 
 			$du['editor'] = Server::GetVar('editor');
-			$du['galcf'] = Server::GetVar('galcf', '').'/'.$fi->path;
+			$du['galcf'] = Server::GetVar('galcf', '').'/'.$fi->filename;
 			$d['url'] = HM::URL($me, $du);
 
 			$d['name'] = $fi->filename;
