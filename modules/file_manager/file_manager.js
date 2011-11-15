@@ -1,12 +1,14 @@
 $(function () {
 	$('.div-mass-options').hide();
 	$('.in-sel-folders').click(function () {
-		$('.check_folder').attr('checked', $(this).attr('checked'));
+		$('.check_folder').attr('checked',
+			$(this).attr('checked') ? 'checked' : false);
 		$('.check_folder').change();
 	});
 
 	$('.in-sel-files').click(function () {
-		$('.check_file').attr('checked', $(this).attr('checked'));
+		$('.check_file').attr('checked',
+			$(this).attr('checked') ? 'checked' : false);
 		$('.check_folder').change();
 	});
 
