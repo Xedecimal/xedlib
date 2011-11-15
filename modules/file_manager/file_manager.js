@@ -23,6 +23,21 @@ $(function () {
 	$('.delete').click(function () {
 		return confirm('Are you sure you wish to delete selected items?');
 	});
+
+	$('.table-listing tbody').sortable({
+		handle: '.icon',
+		stop: function (event, ui) {
+			var indices = [];
+			ui.item.parent().find('.tr-entry').each(function (ix) {
+				indices.push($(this).data('path'));
+			});
+			var target = ui.item.closest('form').attr('action');
+			var args = {}
+			args[target+'_action'] = 'sort';
+			args['indices'] = indices;
+			$.get(target, args);
+		}
+	});
 });
 
 function checkChanged()
