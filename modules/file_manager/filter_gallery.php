@@ -313,16 +313,12 @@ class FilterGallery extends FilterDefault
 		}
 		else # Not literal, maintain aspect ratio
 		{
-			if ($sx < $sy)
-			{
-				$dx = $nx * $sx / $sy;
-				$dy = $ny;
-			}
-			else
-			{
-				$dx = $nx;
-				$dy = $ny * $sy / $sx;
-			}
+			# Get a scale factor
+			if ($nx < $ny) $sf = ($nx / $sx);
+			else $sf = ($ny / $sy);
+
+			$dx = $sx * $sf;
+			$dy = $sy * $sf;
 		}
 		$dimg = imagecreatetruecolor($dx, $dy);
 		ImageCopyResampled($dimg, $img, 0, 0, 0, 0, $dx, $dy, $sx, $sy);
