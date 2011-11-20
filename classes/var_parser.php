@@ -85,7 +85,7 @@ class VarParser
 		{
 			$tree = explode('.', $tvar);
 			$cv = $this->FindVar($tree[0]);
-			for ($ix = 1; $ix < count($tree); $ix++) $cv = $cv[$tree[$ix]];
+			for ($ix = 1; $ix < count($tree); $ix++) $cv = @$cv[$tree[$ix]];
 			return $cv;
 		}
 		global $$tvar;
