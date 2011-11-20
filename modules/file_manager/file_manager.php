@@ -108,8 +108,8 @@ class FileManager extends Module
 	function __construct()
 	{
 		$this->Behavior = new FileManagerBehavior();
+		$this->Behavior->Target = $this->Name;
 		$this->View = new FileManagerView();
-		$this->QuickOpts = array();
 		$this->Template = dirname(__FILE__).'/file_manager.xml';
 		$this->CheckActive($this->Name);
 	}
@@ -275,27 +275,15 @@ class FileManager extends Module
 			if (!empty($this->Behavior->Watchers))
 				U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_CREATE, $p);
 		}
-		else if ($act == 'swap')
+		else if ($act == 'sort')
 		{
-			$this->files = $this->GetDirectory();
-			$index = Server::GetVar('index');
-			$types = Server::GetVar('type');
-			$cd = Server::GetVar('cd');
-
-			$dpos = $cd == 'up' ? $index-1 : $index+1;
-
-			$sfile = $this->files[$types][$index];
-			$this->files[$types][$index] = $this->files[$types][$dpos];
-			$this->files[$types][$dpos] = $sfile;
-
-			foreach ($this->files[$types] as $ix => $file)
+			foreach ($_GET['indices'] as $ix => $path)
 			{
-				$file->info['index'] = $ix;
-				$file->SaveInfo();
+				$fi = new FileInfo($path);
+				$fi->info['index'] = $ix;
+				$fi->SaveInfo();
 			}
-			if (!empty($this->Behavior->Watchers))
-				U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_REORDER,
-					$sfile->path . ' ' . ($cd == 'up' ? 'up' : 'down'));
+			die();
 		}
 		else if ($act == 'Move To')
 		{
@@ -539,29 +527,6 @@ class FileManager extends Module
 			$this->vars['icon'] = $this->GetIcon($f);
 
 			$common = "?cf={$this->cf}&amp;editor={$this->Name}&amp;type=folders";
-
-			//Move Up
-
-			if ($this->Behavior->AllowSort && $this->Behavior->Sort == FM_SORT_MANUAL && $ix > 0)
-			{
-				$uriUp = $common."&amp;{$this->Name}_action=swap&amp;cd=up&amp;index={$ix}";
-				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/up.png';
-				$this->vars['butup'] = "<a href=\"$uriUp\"><img src=\"{$img}\" ".
-				"alt=\"Move Up\" title=\"Move Up\" /></a>";
-			}
-			else $this->vars['butup'] = '';
-
-			//Move Down
-
-			if ($this->Behavior->AllowSort && $this->Behavior->Sort == FM_SORT_MANUAL
-				&& $ix < count($this->files['folders'])-1)
-			{
-				$uriDown = $common."&amp;{$this->Name}_action=swap&amp;cd=down&amp;index={$ix}";
-				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/down.png';
-				$this->vars['butdown'] = "<a href=\"$uriDown\"><img src=\"{$img}\" ".
-				"alt=\"Move Down\" title=\"Move Down\" /></a>";
-			}
-			else $this->vars['butdown'] = '';
 
 			$tfile = new Template($this->vars);
 			$ret .= $tfile->GetString($g);
