@@ -64,10 +64,9 @@ class FormEmail extends Module
 
 			if (!empty($this->debug))
 			{
-				var_dump("To: {$this->_to}");
-				var_dump("Subject: {$this->_subject}");
 				var_dump($headers);
-				echo "<pre>$this->body</pre>";
+				var_dump("Subject: {$this->_subject}");
+				echo "Body: <pre>$this->body</pre>";
 				die();
 			}
 
@@ -106,7 +105,6 @@ class FormEmail extends Module
 		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
 		$rows = array();
 		foreach ($this->_inputs as $i => $n)
-		//foreach ($this->_fields as $n => $f)
 		{
 			if (!preg_match($preg, $n, $m)) continue;
 			if (!isset($this->_labels[$i])) continue;
