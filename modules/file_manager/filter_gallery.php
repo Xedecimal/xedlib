@@ -48,15 +48,10 @@ class FilterGallery extends FilterDefault
 		else $abs = "$dir/{$fi->filename}";
 
 		$relpath = Server::GetRelativePath($abs);
-		$path = dirname($relpath).'/'.urlencode(basename($relpath));
+		$path = str_replace('%2F', '/', rawurlencode($relpath));
 
 		$atrs['SRC'] = $path;
 
-		//if ($this->Behavior->UseThumbs)
-		//{
-			//$atrs['WIDTH'] = $fi->info['thumb_width'];
-			//$atrs['HEIGHT'] = $fi->info['thumb_height'];
-		//}
 		$atrs['ALT'] = 'icon';
 
 		if (file_exists($abs)) $fi->icon =
