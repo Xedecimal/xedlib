@@ -10,6 +10,7 @@ class ModPage extends Module
 
 		if ($name == 'part') $name = $_d['q'][1];
 		$file = "content/{$name}.xml";
+		if (!file_exists($file)) $file = "content/{$name}/{$name}.xml";
 
 		if (@$_d['page.opts'][$name] == 'xml')
 		{
