@@ -129,9 +129,9 @@
 							<input type="checkbox" class="check_folder"
 							id="{{fn_name}}_sel_{{type}}_{{index}}"
 							name="{{fn_name}}_sels[]" value="{{fipath}}" />
-					</check>
+					</check></td>
 					<td><a href="{{url}}">{{name}}</a></td>
-				</tr>
+					</tr>
 				</folder>
 			</table>
 		</box>
