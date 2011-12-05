@@ -131,6 +131,7 @@
 							name="{{fn_name}}_sels[]" value="{{fipath}}" />
 					</check></td>
 					<td><a href="{{url}}">{{name}}</a></td>
+					<quickopt><td>{{opt}}</td></quickopt>
 					</tr>
 				</folder>
 			</table>
@@ -161,8 +162,9 @@
 				</tr>
 				</file>
 			</table>
-			<QuickOptFinal />
 		</files>
+
+		<QuickOptFinal />
 </directory>
 
 <details>

@@ -222,7 +222,7 @@ class FileManager extends Module
 			if (!empty($caps))
 			foreach ($caps as $file => $cap)
 			{
-				$fi = new FileInfo($this->Root.'/'.$this->cf.$file, $this->Filters);
+				$fi = new FileInfo($this->Root.'/'.$this->cf.'/'.$file, $this->Filters);
 				$fi->info['title'] = $cap;
 				$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 				$f->FFUpdated($this, $fi, $fi->info);
@@ -494,12 +494,19 @@ class FileManager extends Module
 		$ret = '';
 		$ix = 0;
 
+		#@TODO Move this to a higher level so both TagFolder and TagFile can benfit from it.
+		$fi = new FileInfo($this->Root.$this->cf);
+		$this->curfilter = $filter = Filemanager::GetFilter($fi, $this->Root,
+			$this->Filters);
+
 		if (!empty($this->files['folders']))
 		foreach ($this->files['folders'] as $f)
 		{
 			FileManager::GetFilter($f, $this->Root, $this->Filters, $f->dir);
 			if (!$f->show) continue;
 			if (!$this->GetVisible($f)) continue;
+
+			$this->curfile = $f;
 
 			global $me;
 			if (isset($this->Behavior->FolderCallback))
@@ -530,6 +537,7 @@ class FileManager extends Module
 			$common = "?cf={$this->cf}&amp;editor={$this->Name}&amp;type=folders";
 
 			$tfile = new Template($this->vars);
+			$tfile->ReWrite('quickopt', array(&$this, 'TagQuickOpt'));
 			$ret .= $tfile->GetString($g);
 
 			$ix++;
@@ -626,7 +634,21 @@ class FileManager extends Module
 
 	function TagQuickOpt($t, $guts)
 	{
-		return $this->curfilter->FFGetQuickOpts($this->curfile, $guts);
+		$file = $this->curfile;
+
+		$d['opt'] = '';
+
+		if ($this->Behavior->QuickCaptions)
+		{
+			$d['opt'] .= '<textarea name="'.$this->Name.'_titles['.$file->filename.
+				']" rows="2" cols="30">'.
+				@htmlspecialchars(stripslashes($file->info['title'])).
+				'</textarea>';
+		}
+
+		$d['opt'] .= $this->curfilter->FFGetQuickOpts($file, $guts);
+
+		return VarParser::Parse($guts, $d);
 	}
 
 	function TagDetails($t, $g, $a)
@@ -652,8 +674,17 @@ class FileManager extends Module
 
 	function TagQuickOptFinal($t, $guts)
 	{
+		$ret = '';
+
+		if ($this->Behavior->AllowEdit && $this->Behavior->QuickCaptions)
+		{
+			$ret .= '<input type="submit" name="'.$this->Name.'_action" value="Update Captions" />';
+		}
+
 		if (isset($this->curfilter))
-			return $this->curfilter->FFGetQuickOptFinal(@$this->curfile);
+			$ret .= $this->curfilter->FFGetQuickOptFinal(@$this->curfile);
+
+		return $ret;
 	}
 
 	function TagOptions($t, $guts)
@@ -889,10 +920,6 @@ class FileManager extends Module
 				$ret .= "<input id=\"butSelAll{$type}\" type=\"button\"
 					onclick=\"docmanSelAll('{$type}');\"
 					value=\"Select all {$type}\" />";
-			if ($this->Behavior->AllowEdit && $this->Behavior->QuickCaptions)
-			{
-				$ret .= '<input type="submit" name="ca" value="Update Captions" />';
-			}
 		}
 		return $ret;
 	}
@@ -960,14 +987,6 @@ class FileManager extends Module
 			"alt=\"Move Down\" title=\"Move Down\" /></a>";
 		}
 		else $d['butdown'] = '';
-
-		if ($this->Behavior->QuickCaptions)
-		{
-			$d['caption'] = '<textarea name="titles['.$file->filename.
-				']" rows="2" cols="30">'.
-				@htmlspecialchars(stripslashes($file->info['title'])).
-				'</textarea>';
-		}
 
 		return $d;
 	}
