@@ -26,8 +26,6 @@
 </file>
 </div> <!-- .files -->
 
-<div class="clear">&nbsp;</div>
-
 <image>
 	{{butBack}}
 	<b>Picture {{current}} of {{total}}</b>

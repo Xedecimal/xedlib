@@ -48,7 +48,7 @@ class FilterGallery extends FilterDefault
 		else $abs = "$dir/{$fi->filename}";
 
 		$relpath = Server::GetRelativePath($abs);
-		$path = dirname($relpath).'/'.urlencode(basename($relpath));
+		$path = HM::urlencode_path(dirname($relpath).'/'.basename($relpath));
 
 		$atrs['SRC'] = $path;
 
