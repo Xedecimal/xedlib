@@ -130,7 +130,7 @@
 							id="{{fn_name}}_sel_{{type}}_{{index}}"
 							name="{{fn_name}}_sels[]" value="{{fipath}}" />
 					</check>
-					<td><a href="{{url}}">{{name}}</a></td>
+					<td class="folder-caption"><a href="{{url}}">{{name}}</a><br />{{caption}}</td>
 				</tr>
 				</folder>
 			</table>
