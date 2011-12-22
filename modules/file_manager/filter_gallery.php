@@ -291,7 +291,7 @@ class FilterGallery extends FilterDefault
 		else # Not literal, maintain aspect ratio
 		{
 			# Get a scale factor
-			if ($nx < $ny) $sf = ($nx / $sx);
+			if ($sx > $sy) $sf = ($nx / $sx);
 			else $sf = ($ny / $sy);
 
 			$dx = $sx * $sf;
