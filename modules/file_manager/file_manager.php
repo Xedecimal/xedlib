@@ -294,8 +294,8 @@ class FileManager extends Module
 			foreach ($sels as $file)
 			{
 				$fi = new FileInfo($file, $this->Filters);
-				$f = FileInfo::GetFilter($fi, $this->Root, $this->Filters);
-				$f->Rename($fi, "$ct/{$fi->filename}");
+				$f = $this->GetFilter($fi, $this->Root, $this->Filters);
+				$f->FFRename($fi, "$ct/{$fi->filename}");
 
 				if (!empty($this->Behavior->Watchers))
 					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_MOVE,

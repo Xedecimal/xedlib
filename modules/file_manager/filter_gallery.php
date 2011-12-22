@@ -130,7 +130,7 @@ class FilterGallery extends FilterDefault
 	 */
 	function FFRename(&$fi, $newname)
 	{
-		parent::Rename($fi, $newname);
+		parent::FFRename($fi, $newname);
 		$thumb = $fi->dir.'/t_'.basename($fi->filename);
 		$ttarget = dirname($newname).'/t_'.basename($newname);
 		if (file_exists($thumb)) rename($thumb, $ttarget);
