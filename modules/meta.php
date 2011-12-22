@@ -2,6 +2,13 @@
 
 class Meta extends Module
 {
+	function Link()
+	{
+		global $_d;
+
+		$_d['template.rewrites']['title'] = array(&$this, 'TagTitle');
+	}
+
 	function Get()
 	{
 		global $_d;
@@ -18,8 +25,16 @@ class Meta extends Module
 			return $ret;
 		}
 	}
+
+	function TagTitle($t, $g)
+	{
+		global $_d;
+
+		$meta = @$_d['config']['meta'][$_d['q'][0]];
+		if (!empty($meta['title'])) $t = $meta['title'];
+		else $t = $g;
+		return '<title>'.$t.'</title>';
+	}
 }
 
 Module::Register('Meta');
-
-?>

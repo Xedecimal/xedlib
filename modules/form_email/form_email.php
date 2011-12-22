@@ -39,6 +39,9 @@ class FormEmail extends Module
 			$t = new Template();
 			$t->use_getvar = true;
 
+			if (strpos($this->_from, '@') == false)
+				$this->_from = $this->_data[$this->_from];
+
 			$headers[] = 'From: '.$this->_from;
 			$headers[] = 'Reply-To: '.$this->_from;
 
