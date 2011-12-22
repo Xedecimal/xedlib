@@ -52,11 +52,6 @@ class FilterGallery extends FilterDefault
 
 		$atrs['SRC'] = $path;
 
-		//if ($this->Behavior->UseThumbs)
-		//{
-			//$atrs['WIDTH'] = $fi->info['thumb_width'];
-			//$atrs['HEIGHT'] = $fi->info['thumb_height'];
-		//}
 		$atrs['ALT'] = 'icon';
 
 		if (file_exists($abs)) $fi->icon =
