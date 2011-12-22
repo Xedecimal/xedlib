@@ -161,8 +161,9 @@
 				</tr>
 				</file>
 			</table>
-			<QuickOptFinal />
 		</files>
+
+		<QuickOptFinal />
 </directory>
 
 <details>

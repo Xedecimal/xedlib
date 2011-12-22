@@ -46,6 +46,10 @@ class ModUser extends Module
 		$this->CheckActive($this->Name);
 
 		global $_d;
+
+		if ($this->Active) $_d['user.login'] = true;
+
+		global $_d;
 		$_d['user.session.user'] = 'user_sessuser';
 		$_d['user.session.pass'] = 'user_sesspass';
 		if (!isset($_d['user.cols.access']))
