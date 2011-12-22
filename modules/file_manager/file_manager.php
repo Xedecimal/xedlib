@@ -110,7 +110,6 @@ class FileManager extends Module
 		$this->Behavior = new FileManagerBehavior();
 		$this->Behavior->Target = $this->Name;
 		$this->View = new FileManagerView();
-		$this->QuickOpts = array();
 		$this->Template = dirname(__FILE__).'/file_manager.xml';
 		$this->CheckActive($this->Name);
 	}
