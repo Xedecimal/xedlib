@@ -95,10 +95,8 @@ class ModNav extends Module
 			if (strcmp($end, $rw) == 0)
 			{
 				$els = explode('/', $t);
-				$t = '';
 				foreach ($els as $ix => $e)
 				{
-					$t .= ($ix > 0 ? '/' : '').$e;
 					$l = $_d['nav.links'][$t];
 					if (!is_array($l)) $l = array('HREF' => $l);
 					$l['liatrs']['CLASS'] = 'current';
