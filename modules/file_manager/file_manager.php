@@ -62,13 +62,6 @@ class FileManager extends Module
 	public $Root;
 
 	/**
-	 * Array of filters that are available for this object.
-	 *
-	 * @var array
-	 */
-	private $filters;
-
-	/**
 	 * Current File
 	 *
 	 * @var string
@@ -103,20 +96,19 @@ class FileManager extends Module
 	*/
 	public $uid;
 
-	public $Filters = array('Default');
+	/**
+	 * Array of filters that are available for this object.
+	 *
+	 * @var array
+	 */
+	public $Filters = array('FilterDefault');
 
 	public $FilterConfig = array();
 
-	/**
-	 * Enter description here...
-	 *
-	 * @param string $name Name of this instance.
-	 * @param string $root Highlest folder level allowed.
-	 * @param array $filters Directory filters allowed.
-	 */
 	function __construct()
 	{
 		$this->Behavior = new FileManagerBehavior();
+		$this->Behavior->Target = $this->Name;
 		$this->View = new FileManagerView();
 		$this->Template = dirname(__FILE__).'/file_manager.xml';
 		$this->CheckActive($this->Name);
@@ -133,6 +125,14 @@ class FileManager extends Module
 
 		$act = Server::GetVar($this->Name.'_action');
 		$this->cf = Server::GetVar($this->Name.'_cf');
+
+		# TODO: Only declare $fi once!
+
+		if (!file_exists($this->Root.'/'.$this->cf)) $fi = new FileInfo($this->Root);
+		else $fi = new FileInfo($this->Root.'/'.$this->cf);
+
+		$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
+		$f->FFPrepare($fi);
 
 		//Don't allow renaming the root or the file manager will throw errors
 		//ever after.
@@ -178,7 +178,7 @@ class FileManager extends Module
 
 				if (!preg_match('#^\.\[[0-9]+\]_.*#', $name))
 				{
-					$filter->Upload($name, $fi);
+					$filter->FFUpload($name, $fi);
 					if (!empty($this->Behavior->Watchers))
 						U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
 							$target);
@@ -191,7 +191,7 @@ class FileManager extends Module
 			$info = new FileInfo($this->Root.'/'.$this->cf, $this->Filters);
 			$newinfo = Server::GetVar('info');
 			$f = FileManager::GetFilter($info, $this->Root, $this->Filters);
-			$f->Updated($this, $info, $newinfo);
+			$f->FFUpdated($this, $info, $newinfo);
 			$this->Behavior->Update($newinfo);
 
 			if (!empty($newinfo))
@@ -221,19 +221,19 @@ class FileManager extends Module
 			if (!empty($caps))
 			foreach ($caps as $file => $cap)
 			{
-				$fi = new FileInfo($this->Root.'/'.$this->cf.'/'.$file, $this->filters);
+				$fi = new FileInfo($this->Root.'/'.$this->cf.'/'.$file, $this->Filters);
 				$fi->info['title'] = $cap;
-				$f = FileManager::GetFilter($fi, $this->Root, $this->filters);
-				$f->Updated($this, $fi, $fi->info);
+				$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
+				$f->FFUpdated($this, $fi, $fi->info);
 				$fi->SaveInfo();
 			}
 		}
 		else if ($act == 'Rename')
 		{
 			if (!$this->Behavior->AllowRename) return;
-			$fi = new FileInfo($this->Root.'/'.$this->cf, $this->filters);
+			$fi = new FileInfo($this->Root.'/'.$this->cf, $this->Filters);
 			$name = Server::GetVar($this->Name.'_rname');
-			$f = FileManager::GetFilter($fi, $this->Root, $this->filters);
+			$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 			$f->Rename($fi, $name);
 			$this->cf = substr($fi->path, strlen($this->Root)).'/';
 			if (!empty($this->Behavior->Watchers))
@@ -247,7 +247,7 @@ class FileManager extends Module
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
-				$fi = new FileInfo(stripslashes($file), $this->filters);
+				$fi = new FileInfo(stripslashes($file), $this->Filters);
 				$f = Filemanager::GetFilter($fi, $this->Root, $this->Filters);
 				$break = false;
 				if (!empty($this->Behavior->Watchers))
@@ -257,7 +257,7 @@ class FileManager extends Module
 				}
 				if (!$break)
 				{
-					$f->Delete($fi, $this->Behavior->Recycle);
+					$f->FFDelete($fi, $this->Behavior->Recycle);
 					$types = Server::GetVar($this->Name.'_type');
 					$this->files = $this->GetDirectory();
 					$ix = 0;
@@ -275,27 +275,15 @@ class FileManager extends Module
 			if (!empty($this->Behavior->Watchers))
 				U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_CREATE, $p);
 		}
-		else if ($act == 'swap')
+		else if ($act == 'sort')
 		{
-			$this->files = $this->GetDirectory();
-			$index = Server::GetVar('index');
-			$types = Server::GetVar('type');
-			$cd = Server::GetVar('cd');
-
-			$dpos = $cd == 'up' ? $index-1 : $index+1;
-
-			$sfile = $this->files[$types][$index];
-			$this->files[$types][$index] = $this->files[$types][$dpos];
-			$this->files[$types][$dpos] = $sfile;
-
-			foreach ($this->files[$types] as $ix => $file)
+			foreach ($_GET['indices'] as $ix => $path)
 			{
-				$file->info['index'] = $ix;
-				$file->SaveInfo();
+				$fi = new FileInfo($path);
+				$fi->info['index'] = $ix;
+				$fi->SaveInfo();
 			}
-			if (!empty($this->Behavior->Watchers))
-				U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_REORDER,
-					$sfile->path . ' ' . ($cd == 'up' ? 'up' : 'down'));
+			die();
 		}
 		else if ($act == 'Move To')
 		{
@@ -304,9 +292,9 @@ class FileManager extends Module
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
-				$fi = new FileInfo($file, $this->filters);
-				$f = FileInfo::GetFilter($fi, $this->Root, $this->filters);
-				$f->Rename($fi, "$ct/{$fi->filename}");
+				$fi = new FileInfo($file, $this->Filters);
+				$f = $this->GetFilter($fi, $this->Root, $this->Filters);
+				$f->FFRename($fi, "$ct/{$fi->filename}");
 
 				if (!empty($this->Behavior->Watchers))
 					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_MOVE,
@@ -320,8 +308,8 @@ class FileManager extends Module
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
-				$fi = new FileInfo($file, $this->filters);
-				$f = FileInfo::GetFilter($fi, $this->Root, $this->filters);
+				$fi = new FileInfo($file, $this->Filters);
+				$f = FileInfo::GetFilter($fi, $this->Root, $this->Filters);
 				$f->Copy($fi, $ct.$fi->filename);
 
 				if (!empty($this->Behavior->Watchers))
@@ -336,7 +324,7 @@ class FileManager extends Module
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
-				$fi = new FileInfo($file, $this->filters);
+				$fi = new FileInfo($file, $this->Filters);
 				`ln -s "{$fi->path}" "{$ct}"`;
 			}
 		}
@@ -389,11 +377,11 @@ class FileManager extends Module
 		if (substr($this->Root, -1) != '/') $this->Root .= '/';
 
 		# Verify that this root exists.
-		if (!file_exists($this->Root.$this->cf))
+		/*if (!file_exists($this->Root.$this->cf))
 		{
 			Server::Error('Directory does not exist:'.$this->Root.$this->cf);
 			$this->cf = '';
-		}
+		}*/
 
 		if (is_dir($this->Root.$this->cf)) $this->files = $this->GetDirectory();
 	}
@@ -583,12 +571,19 @@ class FileManager extends Module
 		$ret = '';
 		$ix = 0;
 
+		#@TODO Move this to a higher level so both TagFolder and TagFile can benfit from it.
+		$fi = new FileInfo($this->Root.$this->cf);
+		$this->curfilter = $filter = Filemanager::GetFilter($fi, $this->Root,
+			$this->Filters);
+
 		if (!empty($this->files['folders']))
 		foreach ($this->files['folders'] as $f)
 		{
 			FileManager::GetFilter($f, $this->Root, $this->Filters, $f->dir);
 			if (!$f->show) continue;
 			if (!$this->GetVisible($f)) continue;
+
+			$this->curfile = $f;
 
 			global $me;
 			if (isset($this->Behavior->FolderCallback))
@@ -606,7 +601,7 @@ class FileManager extends Module
 			else
 				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' =>
-					"{$this->cf}{$f->filename}"));
+					"{$this->cf}/{$f->filename}"));
 
 			$this->vars['name'] = $f;
 			$this->vars['caption'] = $this->View->GetCaption($f);
@@ -618,30 +613,8 @@ class FileManager extends Module
 
 			$common = "?cf={$this->cf}&amp;editor={$this->Name}&amp;type=folders";
 
-			//Move Up
-
-			if ($this->Behavior->AllowSort && $this->Behavior->Sort == FM_SORT_MANUAL && $ix > 0)
-			{
-				$uriUp = $common."&amp;{$this->Name}_action=swap&amp;cd=up&amp;index={$ix}";
-				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/up.png';
-				$this->vars['butup'] = "<a href=\"$uriUp\"><img src=\"{$img}\" ".
-				"alt=\"Move Up\" title=\"Move Up\" /></a>";
-			}
-			else $this->vars['butup'] = '';
-
-			//Move Down
-
-			if ($this->Behavior->AllowSort && $this->Behavior->Sort == FM_SORT_MANUAL
-				&& $ix < count($this->files['folders'])-1)
-			{
-				$uriDown = $common."&amp;{$this->Name}_action=swap&amp;cd=down&amp;index={$ix}";
-				$img = Server::GetRelativePath(dirname(__FILE__)).'/images/down.png';
-				$this->vars['butdown'] = "<a href=\"$uriDown\"><img src=\"{$img}\" ".
-				"alt=\"Move Down\" title=\"Move Down\" /></a>";
-			}
-			else $this->vars['butdown'] = '';
-
 			$tfile = new Template($this->vars);
+			$tfile->ReWrite('quickopt', array(&$this, 'TagQuickOpt'));
 			$ret .= $tfile->GetString($g);
 
 			$ix++;
@@ -663,12 +636,13 @@ class FileManager extends Module
 		$ix = 0;
 
 		$fi = new FileInfo($this->Root.$this->cf);
-		$filter = Filemanager::GetFilter($fi, $this->Root, $this->Filters);
+		$this->curfilter = $filter = Filemanager::GetFilter($fi, $this->Root,
+			$this->Filters);
 
 		if (!empty($this->files['files']))
 		foreach ($this->files['files'] as $f)
 		{
-			$filter->GetInfo($f);
+			$filter->FFGetInfo($f);
 			if (!$f->show) continue;
 
 			$this->curfile = $f;
@@ -727,7 +701,7 @@ class FileManager extends Module
 			else $this->vars['butdown'] = '';
 
 			$tfile = new Template($this->vars);
-			$tfile->ReWrite('quickcap', array(&$this, 'TagQuickCap'));
+			$tfile->ReWrite('quickopt', array(&$this, 'TagQuickOpt'));
 			$ret .= $tfile->GetString($g);
 
 			$ix++;
@@ -735,10 +709,23 @@ class FileManager extends Module
 		return $ret;
 	}
 
-	function TagQuickCap($t, $guts)
+	function TagQuickOpt($t, $guts)
 	{
-		if (!$this->Behavior->QuickCaptions) return;
-		return $guts;
+		$file = $this->curfile;
+
+		$d['opt'] = '';
+
+		if ($this->Behavior->QuickCaptions)
+		{
+			$d['opt'] .= '<textarea name="'.$this->Name.'_titles['.$file->filename.
+				']" rows="2" cols="30">'.
+				@htmlspecialchars(stripslashes($file->info['title'])).
+				'</textarea>';
+		}
+
+		$d['opt'] .= $this->curfilter->FFGetQuickOpts($file, $guts);
+
+		return VarParser::Parse($guts, $d);
 	}
 
 	function TagDetails($t, $g, $a)
@@ -762,11 +749,19 @@ class FileManager extends Module
 		if ($this->mass_avail) return $guts;
 	}
 
-	function TagQuickCapButton($t, $guts)
+	function TagQuickOptFinal($t, $guts)
 	{
-		if (!$this->Behavior->QuickCaptions || empty($this->files['files']))
-			return null;
-		return $guts;
+		$ret = '';
+
+		if ($this->Behavior->AllowEdit && $this->Behavior->QuickCaptions)
+		{
+			$ret .= '<input type="submit" name="'.$this->Name.'_action" value="Update Captions" />';
+		}
+
+		if (isset($this->curfilter))
+			$ret .= $this->curfilter->FFGetQuickOptFinal(@$this->curfile);
+
+		return $ret;
 	}
 
 	function TagOptions($t, $guts)
@@ -793,17 +788,17 @@ class FileManager extends Module
 
 		$f = FileManager::GetFilter($fi, $this->Root, $this->Filters, $fi->info);
 
-		if ($this->Behavior->AllowSetType && count($this->filters) > 1 && is_dir($fi->path))
+		if ($this->Behavior->AllowSetType && count($this->Filters) > 1 && is_dir($fi->path))
 		{
 			$in = new FormInput('Change Type', 'select',
-				'info[type]', FormOption::FromArray($this->filters, $f->Name,
+				'info[type]', FormOption::FromArray($this->Filters, $f->Name,
 				false));
 			$this->vars['text'] = $in->text;
 			$this->vars['field'] = $in->Get($this->Name);
 			$ret .= $vp->ParseVars($guts, $this->vars);
 		}
 
-		$options = $f->GetOptions($this, $fi, $def);
+		$options = $f->FFGetOptions($this, $fi, $def);
 		$options = array_merge($options, $this->Behavior->GetOptions($fi));
 
 		if (!empty($options))
@@ -900,7 +895,7 @@ class FileManager extends Module
 		if (!empty($this->files[$type]))
 		{
 			$cfi = new FileInfo($this->Root.$this->cf);
-			$f = FileInfo::GetFilter($cfi, $this->Root, $this->filters);
+			$f = FileInfo::GetFilter($cfi, $this->Root, $this->Filters);
 			$ret .= '<table class="tableFiles">';
 			$end = false;
 			if (count($this->files[$type]) > 1
@@ -915,7 +910,7 @@ class FileManager extends Module
 			$ix = 0;
 			foreach($this->files[$type] as $file)
 			{
-				$f->GetInfo($file);
+				$f->FFGetInfo($file);
 				if (!$file->show) continue;
 				if (!$this->Behavior->ShowAllFiles)
 					if (!$this->GetVisible($file)) continue;
@@ -926,10 +921,6 @@ class FileManager extends Module
 				$ret .= "<input id=\"butSelAll{$type}\" type=\"button\"
 					onclick=\"docmanSelAll('{$type}');\"
 					value=\"Select all {$type}\" />";
-			if ($this->Behavior->AllowEdit && $this->Behavior->QuickCaptions)
-			{
-				$ret .= '<input type="submit" name="ca" value="Update Captions" />';
-			}
 		}
 		return $ret;
 	}
@@ -998,14 +989,6 @@ class FileManager extends Module
 		}
 		else $d['butdown'] = '';
 
-		if ($this->Behavior->QuickCaptions)
-		{
-			$d['caption'] = '<textarea name="titles['.$file->filename.
-				']" rows="2" cols="30">'.
-				@htmlspecialchars(stripslashes($file->info['title'])).
-				'</textarea>';
-		}
-
 		return $d;
 	}
 
@@ -1026,7 +1009,7 @@ class FileManager extends Module
 		{
 			if ($file[0] == '.') continue;
 
-			$newfi = new FileInfo($this->Root.$this->cf.'/'.$file, $this->Filters);
+			$newfi = new FileInfo("{$this->Root}/{$this->cf}/{$file}", $this->Filters);
 			if (!$newfi->show) continue;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
 			{
@@ -1139,11 +1122,11 @@ class FileManager extends Module
 			else
 			{
 				if (isset($defaults[0]))
-					$fname = 'Filter'.$defaults[0];
+					$fname = $defaults[0];
 				else
 					$fname = 'FilterDefault';
 				$f = new $fname($this);
-				$f->GetInfo($fi);
+				$f->FFGetInfo($fi);
 				return $f;
 			}
 		}
@@ -1153,7 +1136,7 @@ class FileManager extends Module
 		else $fname = 'Filter'.$defaults[0];
 
 		$f = new $fname();
-		$f->GetInfo($fi);
+		$f->FFGetInfo($fi);
 		return $f;
 	}
 }
@@ -1463,6 +1446,24 @@ class FileManagerBehavior
 			$info['access'] = $na;
 		}
 	}
+}
+
+interface FileFilter
+{
+	function FFPrepare(&$fi);
+	function FFGetInfo(&$fi);
+	/**
+	 * @returns array
+	 */
+	function FFGetOptions(&$fm, &$fi, $default);
+	function FFGetQuickOpts(&$fi, $g);
+	function FFGetQuickOptFinal($g);
+	function FFUpload($file, $target);
+	function FFRename(&$fi, $newname);
+	function FFUpdated(&$fm, &$fi, &$newinfo);
+	function FFDelete($fi, $save);
+	function FFInstall($path);
+	function FFCleanup($path);
 }
 
 ?>

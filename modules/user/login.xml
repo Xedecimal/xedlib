@@ -1,6 +1,6 @@
 <form action="{{app_abs}}/{{rw}}" method="post" class="form-login">
 <input type="hidden" name="user_action" value="login" />
-<fieldset>
+<fieldset><legend>Login</legend>
 <ul>
 	<field><li><input type="{{itype}}" name="{{name}}" id="{{name}}" />
 		<label for="{{name}}">{{text}}</label></li></field>

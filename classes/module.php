@@ -144,7 +144,7 @@ class Module
 	static function TagBlock($t, $g, $a)
 	{
 		global $_d;
-		return $_d['blocks'][$a['NAME']];
+		return @$_d['blocks'][$a['NAME']];
 	}
 
 	public $Block = 'default';

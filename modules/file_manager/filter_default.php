@@ -5,13 +5,24 @@ require_once(dirname(__FILE__).'/../../classes/present/form_input.php');
 /**
  * The generic file handler.
  */
-class FilterDefault
+class FilterDefault implements FileFilter
 {
 	/**
 	 * Name of this filter for identification purposes.
 	 * @var string
 	 */
 	public $Name = "Default";
+
+	static function UpdateMTime($filename)
+	{
+		$finfo = new FileInfo($filename);
+		$finfo->info['mtime'] = time();
+		$finfo->SaveInfo();
+	}
+
+	# FileFilter implementation
+
+	public function FFPrepare(&$fi) { }
 
 	/**
 	 * Places information into $fi for later use.
@@ -20,7 +31,7 @@ class FilterDefault
 	 * @return FileInfo
 	 * @todo Replace this with ApplyInfo as reference with no return.
 	 */
-	function GetInfo(&$fi)
+	public function FFGetInfo(&$fi)
 	{
 		if (is_dir($fi->path)) $fi->type = 'folder';
 		else $fi->type = File::ext($fi->filename);
@@ -34,7 +45,7 @@ class FilterDefault
 	 * @param string $default Default option set.
 	 * @return array
 	 */
-	function GetOptions(&$fm, &$fi, $default)
+	public function FFGetOptions(&$fm, &$fi, $default)
 	{
 		$more = array(
 			new FormInput('Description', 'text', 'info[title]',
@@ -45,13 +56,17 @@ class FilterDefault
 		else return $more;
 	}
 
+	public function FFGetQuickOpts(&$fi, $g) { }
+
+	public function FFGetQuickOptFinal($g) {}
+
 	/**
 	 * Called when a file is requested to upload.
 	 *
 	 * @param array $file Upload form's file field.
 	 * @param string $target Destination folder.
 	 */
-	function Upload($file, $target)
+	public function FFUpload($file, $target)
 	{
 		$this->UpdateMTime($target->path.'/'.$file);
 	}
@@ -63,7 +78,7 @@ class FilterDefault
 	 * @param FileInfo $fi Source file information.
 	 * @param FileInfo $newname Destination file information.
 	 */
-	function Rename(&$fi, $newname)
+	public function FFRename(&$fi, $newname)
 	{
 		$pinfo = pathinfo($newname);
 		$finfo = "{$fi->dir}/.{$fi->filename}";
@@ -80,7 +95,7 @@ class FilterDefault
 	 * When options are updated, this will be fired.
 	 * @param FileInfo $fi Associated file information.
 	 */
-	function Updated(&$fm, &$fi, &$newinfo)
+	public function FFUpdated(&$fm, &$fi, &$newinfo)
 	{
 	}
 
@@ -90,7 +105,7 @@ class FilterDefault
 	* @param FileInfo $fi Associated file information.
 	* @param bool $save Whether or not to back up the file getting deleted.
 	*/
-	function Delete($fi, $save)
+	public function FFDelete($fi, $save)
 	{
 		$finfo = "{$fi->dir}/.{$fi->filename}";
 		if (file_exists($finfo)) unlink($finfo);
@@ -108,20 +123,13 @@ class FilterDefault
 	 * Called when a filter is set to this one.
 	 * @param string $path Source path.
 	 */
-	function Install($path) {}
+	public function FFInstall($path) {}
 
 	/**
 	 * Called when a filter is no longer set to this one.
 	 * @param string $path Source path.
 	 */
-	function Cleanup($path) {}
-
-	static function UpdateMTime($filename)
-	{
-		$finfo = new FileInfo($filename);
-		$finfo->info['mtime'] = time();
-		$finfo->SaveInfo();
-	}
+	public function FFCleanup($path) {}
 }
 
 ?>

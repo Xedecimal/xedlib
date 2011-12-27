@@ -133,6 +133,8 @@ class DataSet
 				$this->func_fetch = 'odbc_fetch_array';
 				$this->func_rows = 'odbc_num_rows';
 				break;
+			case DB_MG:
+				$table = $db->link->$table;
 		}
 		$this->database = $db;
 		$this->table = $table;
@@ -608,6 +610,13 @@ class DataSet
 			construction.");
 		}
 
+		# Mongo Database
+		if ($this->database->type == DB_MG)
+		{
+			$q = $this->ConvertToMongo($opts['match']);
+			return iterator_to_array($this->table->find($q));
+		}
+
 		$lq = $this->database->lq;
 		$rq = $this->database->rq;
 
@@ -664,7 +673,7 @@ class DataSet
 	function GetOne($opts)
 	{
 		$data = $this->Get($opts);
-		if (!empty($data)) return $data[0];
+		if (!empty($data)) return array_pop($data);
 		return $data;
 	}
 
@@ -1047,6 +1056,18 @@ class DataSet
 	function func_fetch_sqlite3($res, $args)
 	{
 		return $res->fetchArray($args);
+	}
+
+	function ConvertToMongo($arr)
+	{
+		foreach ($arr as $col => $val)
+		{
+			if (is_array($val))
+			{
+				var_dump($val);
+			}
+		}
+		return $arr;
 	}
 }
 

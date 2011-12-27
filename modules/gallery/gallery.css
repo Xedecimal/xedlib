@@ -1,10 +1,13 @@
 a img { border: 0; }
 
+.files,.folders { overflow: hidden; }
+
 .folder,.file
 {
 	padding: 5px;
 	float: left;
 	vertical-align: top;
+	text-align: center;
 }
 
 .caption { text-align: center; }

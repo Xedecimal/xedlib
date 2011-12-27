@@ -1,6 +1,7 @@
 <?php
 
 require_once(dirname(__FILE__).'/../../classes/str.php');
+require_once(dirname(__FILE__).'/../nav.php');
 
 $_d['user.session.user'] = 'sess_user';
 $_d['user.session.pass'] = 'sess_pass';
@@ -30,6 +31,10 @@ class User extends Module
 			'column' => 'usr_pass',
 			'text' => 'Password',
 			'type' => 'password'
+		),
+		'access' => array(
+			'column' => 'usr_access',
+			'default' => 1
 		)
 	);
 
@@ -39,6 +44,10 @@ class User extends Module
 	{
 		$this->Behavior = new ModUserBehavior();
 		$this->CheckActive($this->Name);
+
+		global $_d;
+
+		if ($this->Active) $_d['user.login'] = true;
 
 		global $_d;
 		$_d['user.session.user'] = 'user_sessuser';
@@ -74,7 +83,7 @@ class User extends Module
 		{
 			foreach ($this->fields as $f['name'] => $f)
 			{
-				$add[$f['column']] = Server::GetVar($f['name'].'_create');
+				$add[$f['column']] = Server::GetVar($f['name'].'_create', @$f['default']);
 				if (@$f['type'] == 'password') $add[$f['column']] = md5($add[$f['column']]);
 			}
 			$this->dsUser->Add($add);
@@ -177,9 +186,9 @@ class User extends Module
 	function TagLinks()
 	{
 		if ($this->Behavior->CreateAccount)
-			$nav['Create an account'] = '{{app_abs}}/user/create';
+			$nav['Create an account'] = "{{app_abs}}/{$this->Name}/create";
 		if ($this->Behavior->ForgotPassword)
-			$nav['Forgot your password?'] = '{{app_abs}}/user/forgot-password';
+			$nav['Forgot your password?'] = "{{app_abs}}/{$this->Name}/forgot-password";
 		if (!empty($nav))
 			return ModNav::GetLinks(ModNav::LinkTree($nav));
 	}
@@ -211,6 +220,8 @@ class User extends Module
 		$ret = null;
 		foreach ($this->fields as $v['name'] => $v)
 		{
+			if (empty($v['text'])) continue;
+
 			$v['name'] .= '_create';
 
 			if (@is_array($v['type'])) { $cmp = 'in_array'; $v['itype'] = 'text'; }
@@ -319,7 +330,7 @@ class User extends Module
 			{
 				$query['match'] = array(
 					$ds[1] => $check_pass,
-					$ds[2] => Database::SqlAnd($check_user)
+					$ds[2] => $check_user
 				);
 
 				$item = $ds[0]->GetOne($query);

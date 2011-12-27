@@ -8,21 +8,23 @@
 }
 </style>
 
+<div class="folders">
 <folder>
 <div class="folder">
-<a href="{{url}}">{{icon}}</a>
-<div class="caption">{{name}}</div>
-</div> <!-- folder -->
+<a href="{{url}}">{{icon}}
+<div class="caption">{{name}}</div></a>
+</div> <!-- .folder -->
 </folder>
+</div>
 
+<div class="files">
 <file>
 <div class="file{{class}}">
-<a href="{{fullname}}" class="gal">{{icon}}</a>
-<div class="caption">{{name}}</div>
+<a href="{{fullname}}" class="gal">{{icon}}
+<div class="caption">{{name}}</div></a>
 </div> <!-- file -->
 </file>
-
-<div class="clear">&nbsp;</div>
+</div> <!-- .files -->
 
 <image>
 	{{butBack}}
