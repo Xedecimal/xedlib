@@ -512,7 +512,11 @@ class DataSet
 	 */
 	function Add($columns, $update_existing = false, $multi = false)
 	{
-		$query = 'INSERT';
+		if ($update_existing && (
+			$this->database->type == DB_SL || $this->database->type == DB_SL3
+		)) $query = 'REPLACE';
+		else $query = 'INSERT';
+
 		$query .= ' INTO '.$this->QuoteTable($this->table).' (';
 		$ix = 0;
 		foreach (array_keys($columns) as $key)
@@ -532,7 +536,9 @@ class DataSet
 			$ix++;
 		}
 		$query .= ")";
-		if ($update_existing)
+		if ($update_existing
+			&& $this->database->type != DB_SL
+			&& $this->database->type != DB_SL3)
 		{
 			$query .= ' ON DUPLICATE KEY UPDATE ';
 			$nc = $columns;
@@ -546,6 +552,9 @@ class DataSet
 		# otherwise.
 		if ($update_existing)
 		{
+			if ($this->database->type == DB_SL || $this->database->type == DB_SL3)
+				return $this->database->link->lastInsertRowID();
+
 			$q['limit'] = 1;
 			$q['columns']['id'] = Database::SqlUnquote('LAST_INSERT_ID()');
 			$res = $this->Get($q);

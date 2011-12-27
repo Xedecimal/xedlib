@@ -218,7 +218,7 @@ class Database
 			case 'sqlite3':
 				$this->ErrorHandler = array(&$this, 'CheckSQLite3Error');
 				$this->func_aff = 'sqlite3_num_rows';
-				$this->link = new SQLite3($m['path']);
+				$this->link = new SQLite3('.'.$m['path']);
 				$this->type = DB_SL3;
 				break;
 			default:
