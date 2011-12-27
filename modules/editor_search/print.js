@@ -16,6 +16,6 @@ $(function () {
 		$(this).replaceWith('<span class="input">'+$(this).val()+'</span>');
 	});
 
-	$('#tabs').tabs('destroy');
+	//$('#tabs').tabs('destroy');
 });
 </null>

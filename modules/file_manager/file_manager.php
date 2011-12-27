@@ -398,6 +398,84 @@ class FileManager extends Module
 		if (is_dir($this->Root.$this->cf)) $this->files = $this->GetDirectory();
 	}
 
+	/**
+	* Return the display.
+	*
+	* @param string $target Target script.
+	* @param string $action Current action, usually stored in Server::GetVar('ca').
+	* @return string Output.
+	*/
+	function Get()
+	{
+		if (!$this->Active) return;
+
+		if (!file_exists($this->Root.$this->cf))
+			return "FileManager::Get(): File doesn't exist ({$this->Root}{$this->cf}).<br/>\n";
+
+		$relpath = Server::GetRelativePath(dirname(__FILE__));
+
+		$this->mass_avail = $this->Behavior->MassAvailable();
+
+		//TODO: Get rid of this.
+		$fi = new FileInfo($this->Root.$this->cf);
+
+		global $me;
+		$this->vars['target'] = $this->Behavior->Target;
+
+		$ex = HM::ParseURL($this->Behavior->Target);
+		$ex['args'][$this->Name.'_action'] = 'upload';
+		$ex['args']['PHPSESSID'] = Server::GetVar('PHPSESSID');
+		$this->vars['java_target'] = HM::URL($ex['url'], $ex['args']);
+
+		$this->vars['root'] = $this->Root;
+		$this->vars['cf'] = $this->cf;
+
+		$this->vars['filename'] = $fi->filename;
+		$this->vars['path'] = $this->Root.$this->cf;
+		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
+		$this->vars['relpath'] = $relpath;
+		$this->vars['host'] = Server::GetVar('HTTP_HOST');
+		$this->vars['sid'] = Server::GetVar('PHPSESSID');
+		$this->vars['behavior'] = $this->Behavior;
+
+		$this->vars['folders'] = count($this->files['folders']);
+		$this->vars['files'] = count($this->files['files']);
+
+		$t = new Template();
+		$t->Set($this->vars);
+
+		#$t->ReWrite('form', array('Form', 'TagForm'));
+		$t->ReWrite('header', array(&$this, 'TagHeader'));
+		$t->ReWrite('path', array(&$this, 'TagPath'));
+		$t->ReWrite('download', array(&$this, 'TagDownload'));
+		$t->ReWrite('search', array(&$this, 'TagSearch'));
+
+		$t->ReWrite('behavior', array(&$this, 'TagBehavior'));
+
+		$t->ReWrite('details', array(&$this, 'TagDetails'));
+		$t->ReWrite('directory', array(&$this, 'TagDirectory'));
+		$t->ReWrite('folders', array(&$this, 'TagFolders'));
+		$t->ReWrite('folder', array(&$this, 'TagFolder'));
+		$t->ReWrite('files', array(&$this, 'TagFiles'));
+		$t->ReWrite('file', array(&$this, 'TagFile'));
+		$t->ReWrite('check', array(&$this, 'TagCheck'));
+		$t->ReWrite('quickcapbutton', array(&$this, 'TagQuickCapButton'));
+
+		$t->ReWrite('options', array(&$this, 'TagOptions'));
+		$t->ReWrite('addopts', array(&$this, 'TagAddOpts'));
+
+		$fi = new FileInfo($this->Root.$this->cf);
+
+		$t->Set('fn_name', $this->Name);
+		$t->Set($this->View);
+
+		$ret['head'] = '<script type="text/javascript"
+				src="{{xl_abs}}/modules/filemanager/FileManager.js"></script>';
+		$ret['default'] = $t->ParseFile($this->Template);
+
+		return $ret;
+	}
+
 	static function GetIcon($f)
 	{
 		$icons = array(
@@ -766,83 +844,7 @@ class FileManager extends Module
 		return $ret.'</table>';
 	}
 
-	/**
-	* Return the display.
-	*
-	* @param string $target Target script.
-	* @param string $action Current action, usually stored in Server::GetVar('ca').
-	* @return string Output.
-	*/
-	function Get()
-	{
-		if (!$this->Active) return;
 
-		if (!file_exists($this->Root.$this->cf))
-			return "FileManager::Get(): File doesn't exist ({$this->Root}{$this->cf}).<br/>\n";
-
-		$relpath = Server::GetRelativePath(dirname(__FILE__));
-
-		$this->mass_avail = $this->Behavior->MassAvailable();
-
-		//TODO: Get rid of this.
-		$fi = new FileInfo($this->Root.$this->cf);
-
-		global $me;
-		$this->vars['target'] = $this->Behavior->Target;
-
-		$ex = HM::ParseURL($this->Behavior->Target);
-		$ex['args'][$this->Name.'_action'] = 'upload';
-		$ex['args']['PHPSESSID'] = Server::GetVar('PHPSESSID');
-		$this->vars['java_target'] = HM::URL($ex['url'], $ex['args']);
-
-		$this->vars['root'] = $this->Root;
-		$this->vars['cf'] = $this->cf;
-
-		$this->vars['filename'] = $fi->filename;
-		$this->vars['path'] = $this->Root.$this->cf;
-		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
-		$this->vars['relpath'] = $relpath;
-		$this->vars['host'] = Server::GetVar('HTTP_HOST');
-		$this->vars['sid'] = Server::GetVar('PHPSESSID');
-		$this->vars['behavior'] = $this->Behavior;
-
-		$this->vars['folders'] = count($this->files['folders']);
-		$this->vars['files'] = count($this->files['files']);
-
-		$t = new Template();
-		$t->Set($this->vars);
-
-		#$t->ReWrite('form', array('Form', 'TagForm'));
-		$t->ReWrite('header', array(&$this, 'TagHeader'));
-		$t->ReWrite('path', array(&$this, 'TagPath'));
-		$t->ReWrite('download', array(&$this, 'TagDownload'));
-		$t->ReWrite('search', array(&$this, 'TagSearch'));
-
-		$t->ReWrite('behavior', array(&$this, 'TagBehavior'));
-
-		$t->ReWrite('details', array(&$this, 'TagDetails'));
-		$t->ReWrite('directory', array(&$this, 'TagDirectory'));
-		$t->ReWrite('folders', array(&$this, 'TagFolders'));
-		$t->ReWrite('folder', array(&$this, 'TagFolder'));
-		$t->ReWrite('files', array(&$this, 'TagFiles'));
-		$t->ReWrite('file', array(&$this, 'TagFile'));
-		$t->ReWrite('check', array(&$this, 'TagCheck'));
-		$t->ReWrite('quickcapbutton', array(&$this, 'TagQuickCapButton'));
-
-		$t->ReWrite('options', array(&$this, 'TagOptions'));
-		$t->ReWrite('addopts', array(&$this, 'TagAddOpts'));
-
-		$fi = new FileInfo($this->Root.$this->cf);
-
-		$t->Set('fn_name', $this->Name);
-		$t->Set($this->View);
-
-		$ret['head'] = '<script type="text/javascript"
-				src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
-		$ret['default'] = $t->ParseFile($this->Template);
-
-		return $ret;
-	}
 
 	/**
 	 * Returns a tree selection of a directory mostly used for moving files.

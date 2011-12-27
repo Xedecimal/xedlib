@@ -13,12 +13,10 @@ class EditorSearch extends Module
 	 */
 	public $Form;
 	/** @var DataSet */
-	private $_ds;
+	protected $_ds;
 
-	function __construct($name, &$ds)
+	function __construct()
 	{
-		$this->Name = $name;
-		$this->_ds = $ds;
 		$this->Behavior = new EditorSearchBehavior();
 		$this->Behavior->Buttons['View'] = array(
 			'href' => "{{app_abs}}/{$name}/view/{{id}}",
@@ -30,14 +28,17 @@ class EditorSearch extends Module
 		);
 		$this->Behavior->Buttons['Delete'] = array(
 			'class' => 'delResult',
-			'href' => "{{app_abs}}/{$name}/delete/{{id}}"
+			'href' => "{{app_abs}}/{$this->Name}/delete/{{id}}"
 		);
+
+		$this->CheckActive($this->Name);
 	}
 
 	function Prepare()
 	{
 		global $_d;
 
+		if (!$this->Active) return;
 		$this->_q = array_reverse($_d['q']);
 
 		if (@$this->_q[3] == $this->Name)
@@ -123,6 +124,8 @@ class EditorSearch extends Module
 	{
 		global $_d;
 
+		if (!$this->Active) return;
+
 		$qc = $_d['q'];
 		$ci = array_pop($qc);
 		$act = array_pop($qc);
@@ -136,11 +139,12 @@ class EditorSearch extends Module
 		{
 			$t->ReWrite('loop', 'TagLoop');
 			$t->ReWrite('input', array('Form', 'TagInput'));
-			$ret = '<script type="text/javascript" src="../js/fill/'
-				.$ci.'"></script>';
-			$ret .= '<script type="text/javascript" src="../js/print/'
-				.$ci.'"></script>';
-			return $ret.$t->ParseFile($this->Form);
+			$ret =<<<EOF
+<script type="text/javascript" src="../../xedlib/js/jquery.js"></script>
+<script type="text/javascript" src="../js/fill/{$ci}"></script>
+<script type="text/javascript" src="../js/print/{$ci}"></script>
+EOF;
+			die($ret.$t->ParseFile($this->Form));
 		}
 		if ($target == $this->Name && $act == 'edit'
 			&& $this->Behavior->AllowEdit)
