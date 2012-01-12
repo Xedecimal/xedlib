@@ -133,9 +133,9 @@ class U
 		else $nstart = $start;
 		$ret = U::DateRangeToString($nstart);
 		if ($start < 0) return 'in '.$ret;
-		else return $ret.' ago';		
+		else return $ret;
 	}
-	
+
 	static function DateRangeToString($secs)
 	{
 		$ss = $secs;
@@ -177,7 +177,7 @@ if (!function_exists('http_build_url'))
 	 * Build an URL
 	 * The parts of the second URL will be merged into the first according to
 	 * the flags argument.
-	 * 
+	 *
 	 * @param mixed $url (Part(s) of) an URL in form of a string or associative
 	 * array like parse_url() returns
 	 * @param mixed $parts Same as the first argument
