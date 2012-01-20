@@ -157,6 +157,124 @@ class U
 		else $ret = $ss.' second'.($ss > 1 ? 's' : null);
 		return $ret;
 	}
+
+	public static function MailWithAttachment($args)
+	{
+		$TextMessage = strip_tags(nl2br($args['body']), '<br>');
+		$HTMLMessage = nl2br($args['body']);
+
+		$boundary1   =rand(0,9)."-"
+			.rand(10000000000,9999999999)."-"
+			.rand(10000000000,9999999999)."=:"
+			.rand(10000,99999);
+
+		$boundary2   =rand(0,9)."-".rand(10000000000,9999999999)."-"
+			.rand(10000000000,9999999999)."=:"
+			.rand(10000,99999);
+
+		foreach ($args['files'] as $name => $file)
+		{
+			$attach = true;
+			$end = '';
+
+			$attachment[] = chunk_split(base64_encode(file_get_contents(
+				$file['tmp_name'])));
+			$ftype[] = $file['type'];
+			$fname[] = $file['name'];
+		}
+
+		/***************************************************************
+		 Creating Email: Headers, BODY
+		 1- HTML Email WIthout Attachment!! <<-------- H T M L ---------
+		 ***************************************************************/
+		#---->Headers Part
+		$Headers     =<<<AKAM
+From: {$args['from-name']} <{$args['from-email']}>
+Reply-To: {$args['from-email']}
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+    boundary="$boundary1"
+AKAM;
+
+		#---->BODY Part
+		$Body        =<<<AKAM
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+    boundary="$boundary1"
+
+This is a multi-part message in MIME format.
+
+--$boundary1
+Content-Type: text/plain;
+    charset="windows-1256"
+Content-Transfer-Encoding: quoted-printable
+
+$TextMessage
+--$boundary1
+Content-Type: text/html;
+    charset="windows-1256"
+Content-Transfer-Encoding: quoted-printable
+
+$HTMLMessage
+
+--$boundary1--
+AKAM;
+
+		if ($attach=='yes')
+		{
+			$attachments = '';
+			$Headers = <<<AKAM
+From: {$args['from-name']} <{$args['from-email']}>
+Reply-To: {$args['from-email']}
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+    boundary="$boundary1"
+AKAM;
+
+			for ($j = 0; $j < count($ftype); $j++)
+			{
+				$attachments.=<<<ATTA
+--$boundary1
+Content-Type: $ftype[$j];
+    name="$fname[$j]"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+    filename="$fname[$j]"
+
+$attachment[$j]
+
+ATTA;
+			}
+
+			$Body = <<<AKAM
+This is a multi-part message in MIME format.
+
+--$boundary1
+Content-Type: multipart/alternative;
+    boundary="$boundary2"
+
+--$boundary2
+Content-Type: text/plain;
+    charset="windows-1256"
+Content-Transfer-Encoding: quoted-printable
+
+$TextMessage
+--$boundary2
+Content-Type: text/html;
+    charset="windows-1256"
+Content-Transfer-Encoding: quoted-printable
+
+$HTMLMessage
+
+--$boundary2--
+
+$attachments
+--$boundary1--
+AKAM;
+		}
+
+		return mail($args['to'], $args['subject'], $Body, $Headers);
+    }
 }
 
 if (!function_exists('http_build_url'))
@@ -266,8 +384,7 @@ if (!function_exists('http_build_url'))
 			.((isset($parse_url['port'])) ? ':' . $parse_url['port'] : '')
 			.((isset($parse_url['path'])) ? $parse_url['path'] : '')
 			.((isset($parse_url['query'])) ? '?' . $parse_url['query'] : '')
-			.((isset($parse_url['fragment'])) ? '#' . $parse_url['fragment'] : '')
-		;
+			.((isset($parse_url['fragment'])) ? '#' . $parse_url['fragment'] : '');
 	}
 }
 
