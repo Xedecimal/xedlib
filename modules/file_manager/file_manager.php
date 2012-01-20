@@ -447,7 +447,6 @@ class FileManager extends Module
 		$t->ReWrite('files', array(&$this, 'TagFiles'));
 		$t->ReWrite('file', array(&$this, 'TagFile'));
 		$t->ReWrite('check', array(&$this, 'TagCheck'));
-		$t->ReWrite('quickcapbutton', array(&$this, 'TagQuickCapButton'));
 
 		$t->ReWrite('options', array(&$this, 'TagOptions'));
 		$t->ReWrite('addopts', array(&$this, 'TagAddOpts'));
@@ -670,6 +669,7 @@ class FileManager extends Module
 			$this->vars['fipath'] = htmlspecialchars($f->path);
 			$this->vars['type'] = 'files';
 			$this->vars['index'] = $ix;
+			$this->vars['info'] = $f->info;
 			if (!empty($f->icon)) $this->vars['icon'] = $f->icon;
 			else $this->vars['icon'] = '';
 			$this->vars['ftitle'] = isset($f->info['title']) ?
