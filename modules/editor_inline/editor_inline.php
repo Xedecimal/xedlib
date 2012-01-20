@@ -14,7 +14,7 @@ class EditorInline extends Module
 	{
 		$this->CheckActive($this->Name);
 		if (!$this->Active) return;
-		if (!ModUser::RequireAccess(1)) return;
+		if (!User::RequireAccess(1)) return;
 
 		global $_d;
 
@@ -34,7 +34,7 @@ class EditorInline extends Module
 
 	function Get()
 	{
-		if (!ModUser::RequireAccess(1)) return;
+		if (!User::RequireAccess(1)) return;
 
 		$p_css = Module::P('editor_inline/editor_inline.css');
 		$p_js = Module::P('editor_inline/editor_inline.js');
@@ -52,7 +52,7 @@ EOF;
 	{
 		if (file_exists($a['FILE'])) $data = file_get_contents($a['FILE']);
 		else $data = $g;
-		if (ModUser::RequireAccess(1))
+		if (User::RequireAccess(1))
 		{
 			return '<div data-file="'.$a['FILE'].'" class="editor-content"'.HM::GetAttribs($a).'>'.$data.'</div>';
 		}

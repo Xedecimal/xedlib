@@ -70,7 +70,7 @@ class User extends Module
 			$_d['nav.links'][$this->NavLogout] = "{$rw}?$url";
 		}
 
-		$_d['template.rewrites']['access'] = array('ModUser', 'TagAccess');
+		$_d['template.rewrites']['access'] = array('User', 'TagAccess');
 	}
 
 	function Prepare()
@@ -309,7 +309,7 @@ class User extends Module
 		{
 			if (!isset($ds[0]))
 				Error("<br />What: Dataset is not set.
-				<br />Who: ModUser::Prepare()
+				<br />Who: User::Prepare()
 				<br />Why: You may have set an incorrect dataset in the
 				creation of this LoginManager.");
 
@@ -368,13 +368,13 @@ class ModUserAdmin extends Module
 			$_d['user.levels'] = array(0 => 'Guest', 1 => 'User', 2 => 'Admin');
 	}
 
-	function Auth() { return ModUser::RequireAccess(2); }
+	function Auth() { return User::RequireAccess(2); }
 
 	function Link()
 	{
 		global $_d;
 
-		if (ModUser::RequireAccess(2))
+		if (User::RequireAccess(2))
 			$_d['nav.links']['Users'] = '{{app_abs}}/user';
 	}
 
@@ -385,7 +385,7 @@ class ModUserAdmin extends Module
 		if (@$_d['q'][0] != 'user') return;
 
 		global $mods;
-		$modUser = $mods['ModUser'];
+		$modUser = $mods['User'];
 
 		$modUser->_ds[0][0]->Description = 'User';
 		$modUser->_ds[0][0]->DisplayColumns = array(
@@ -399,7 +399,7 @@ class ModUserAdmin extends Module
 				ArrayToSelOptions($_d['user.levels']))
 		);
 
-		$this->edUser = new EditorData('user', $mods['ModUser']->_ds[0][0]);
+		$this->edUser = new EditorData('user', $mods['User']->_ds[0][0]);
 		$this->edUser->Behavior->Search = false;
 		$this->edUser->Behavior->Target = $_d['app_abs'].'/user';
 		$this->edUser->Prepare();
@@ -410,7 +410,7 @@ class ModUserAdmin extends Module
 		global $_d;
 
 		if (@$_d['q'][0] != 'user') return;
-		if (ModUser::RequireAccess(2)) return $this->edUser->GetUI();
+		if (User::RequireAccess(2)) return $this->edUser->GetUI();
 	}
 }
 
