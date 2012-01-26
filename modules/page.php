@@ -18,7 +18,7 @@ class ModPage extends Module
 		}
 		else $content = @file_get_contents($file);
 		if ($_d['q'][0] == 'part') die(VarParser::Parse($content, $_d));
-		return '<div class="page_content">'.$content.'</div>';
+		return '<div class="page_content">'.stripslashes($content).'</div>';
 	}
 }
 
