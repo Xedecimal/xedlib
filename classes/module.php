@@ -151,7 +151,6 @@ class Module
 	/** @var boolean */
 	public $Active;
 
-	# Do not make this static. Only allows one of each module per page.
 	public $Name = 'module';
 
 	function DataError($errno)

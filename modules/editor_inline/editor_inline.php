@@ -20,15 +20,38 @@ class EditorInline extends Module
 
 		if ($_d['q'][1] == 'save')
 		{
-			$file = Server::GetVar('file');
-			file_put_contents($file, Server::GetVar('content'));
-			die(json_encode(array('msg' => 'Success', 'file' => $file)));
+			$type = Server::GetVar('type');
+			$target = Server::GetVar('target');
+			$content = Server::GetVar('content');
+
+			if (empty($type) || $type == 'file')
+			{
+				file_put_contents($target, $content);
+			}
+			else if (!empty($type))
+			{
+				$h = new $type;
+				var_dump($h);
+				$h->Save($target, $content);
+			}
+
+			die(json_encode(array('msg' => 'Success', 'target' => $target)));
 		}
 		if (@$_d['q'][1] == 'reset')
 		{
 			$file = Server::GetVar('file');
 			if (file_exists($file)) unlink($file);
 			die(json_encode(array('file' => $file)));
+		}
+
+		if (@$_d['q'][1] == 'window')
+		{
+			$t = new Template();
+			$t->Set('target', Server::GetVar('target'));
+			$t->Set('handler', Server::GetVar('handler', ''));
+			$t->Set('file', Server::GetVar('file', ''));
+			$t->Set($_d);
+			die($t->ParseFile(Module::L('editor_inline/window.xml')));
 		}
 	}
 
@@ -40,7 +63,6 @@ class EditorInline extends Module
 		$p_js = Module::P('editor_inline/editor_inline.js');
 		$ret['head'] = <<<EOF
 <link rel="stylesheet" type="text/css" href="{$p_css}" />
-<script type="text/javascript" src="{{app_abs}}/js/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="{{app_abs}}/js/tiny_mce/jquery.tinymce.js"></script>
 <script type="text/javascript" src="{$p_js}"></script>
 EOF;
@@ -50,11 +72,26 @@ EOF;
 
 	function TagInlineEditor($t, $g, $a)
 	{
-		if (file_exists($a['FILE'])) $data = file_get_contents($a['FILE']);
-		else $data = $g;
+		$data = $g;
+
+		$a['ID'] = $a['HANDLER'].'-'.$a['TARGET'];
+		if (isset($a['TARGET']))
+		{
+			if (file_exists($a['TARGET'])) $data = file_get_contents($a['TARGET']);
+		}
+		if (isset($a['HANDLER']))
+		{
+			$a['DATA-HANDLER'] = $a['HANDLER'];
+			unset($a['HANDLER']);
+		}
+
+		$a['CLASS'] = 'editor-content';
+		$a['DATA-TARGET'] = $a['TARGET'];
+		unset($a['TARGET']);
+
 		if (ModUser::RequireAccess(1))
 		{
-			return '<div data-file="'.$a['FILE'].'" class="editor-content"'.HM::GetAttribs($a).'>'.$data.'</div>';
+			return '<div'.HM::GetAttribs($a).'>'.$data.'</div>';
 		}
 		return $data;
 	}
