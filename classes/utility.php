@@ -172,6 +172,7 @@ class U
 			.rand(10000000000,9999999999)."=:"
 			.rand(10000,99999);
 
+		if (!empty($args['files']))
 		foreach ($args['files'] as $name => $file)
 		{
 			$attach = true;
@@ -220,7 +221,7 @@ $HTMLMessage
 --$boundary1--
 AKAM;
 
-		if ($attach=='yes')
+		if (!empty($attach))
 		{
 			$attachments = '';
 			$Headers = <<<AKAM
@@ -259,10 +260,9 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: quoted-printable
 
 $TextMessage
+
 --$boundary2
-Content-Type: text/html;
-    charset="windows-1256"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=ISO-8859-1
 
 $HTMLMessage
 
