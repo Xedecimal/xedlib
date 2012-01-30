@@ -74,7 +74,7 @@ EOF;
 	{
 		$data = $g;
 
-		$a['ID'] = $a['HANDLER'].'-'.$a['TARGET'];
+		$a['ID'] = @$a['HANDLER'].'-'.$a['TARGET'];
 		if (isset($a['TARGET']))
 		{
 			if (file_exists($a['TARGET'])) $data = file_get_contents($a['TARGET']);
