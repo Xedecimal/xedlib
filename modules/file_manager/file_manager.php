@@ -418,6 +418,7 @@ class FileManager extends Module
 		$this->vars['root'] = $this->Root;
 		$this->vars['cf'] = $this->cf;
 
+		$this->vars['fmname'] = $this->Name;
 		$this->vars['filename'] = $fi->filename;
 		$this->vars['path'] = $this->Root.$this->cf;
 		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
