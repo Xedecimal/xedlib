@@ -650,7 +650,7 @@ class FileManager extends Module
 			if (isset($this->Behavior->FileCallback))
 			{
 				$cb = $this->Behavior->FileCallback;
-				$vars = $cb($f, $this->cf.$f->filename);
+				$vars = call_user_func_array($cb, array($f, $this->cf.$f->filename));
 				if (!empty($vars))
 				foreach ($vars as $k => $v)
 				{
