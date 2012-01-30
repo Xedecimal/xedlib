@@ -458,7 +458,7 @@ class FileManager extends Module
 		$t->Set($this->View);
 
 		$ret['head'] = '<script type="text/javascript"
-				src="{{xl_abs}}/modules/filemanager/FileManager.js"></script>';
+				src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
 		$ret['default'] = $t->ParseFile($this->Template);
 
 		return $ret;
