@@ -268,7 +268,10 @@ class User extends Module
 	static function TagAccess($t, $g, $a)
 	{
 		global $_d;
-		if (@$_d['user'][$_d['user.cols.access']] >= @$a['REQUIRE']) return $g;
+		if (!empty($a['REQUIRE']))
+			if (@$_d['user'][$_d['user.cols.access']] >= $a['REQUIRE']) return $g;
+		if (isset($a['EXACT']))
+			if ($_d['user'][$_d['user.cols.access']] == $a['EXACT']) return $g;
 	}
 
 	static function AddUserDataSet($ds, $passcol, $usercol)
