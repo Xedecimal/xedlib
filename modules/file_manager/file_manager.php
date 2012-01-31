@@ -840,8 +840,6 @@ class FileManager extends Module
 		return $ret.'</table>';
 	}
 
-
-
 	/**
 	 * Returns a tree selection of a directory mostly used for moving files.
 	 *
@@ -1010,7 +1008,7 @@ class FileManager extends Module
 		{
 			if ($file[0] == '.') continue;
 
-			$newfi = new FileInfo("{$this->Root}/{$this->cf}/{$file}", $this->Filters);
+			$newfi = new FileInfo("{$this->Root}{$this->cf}/{$file}", $this->Filters);
 			if (!$newfi->show) continue;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
 			{
