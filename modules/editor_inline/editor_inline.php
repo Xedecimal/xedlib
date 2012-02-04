@@ -43,16 +43,6 @@ class EditorInline extends Module
 			if (file_exists($file)) unlink($file);
 			die(json_encode(array('file' => $file)));
 		}
-
-		if (@$_d['q'][1] == 'window')
-		{
-			$t = new Template();
-			$t->Set('target', Server::GetVar('target'));
-			$t->Set('handler', Server::GetVar('handler', ''));
-			$t->Set('file', Server::GetVar('file', ''));
-			$t->Set($_d);
-			die($t->ParseFile(Module::L('editor_inline/window.xml')));
-		}
 	}
 
 	function Get()
