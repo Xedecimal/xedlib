@@ -19,11 +19,11 @@ class EditorSearch extends Module
 	{
 		$this->Behavior = new EditorSearchBehavior();
 		$this->Behavior->Buttons['View'] = array(
-			'href' => "{{app_abs}}/{$name}/view/{{id}}",
+			'href' => "{{app_abs}}/{$this->Name}/view/{{id}}",
 			'target' => '_blank'
 		);
 		$this->Behavior->Buttons['Edit'] = array(
-			'href' => "{{app_abs}}/{$name}/edit/{{id}}",
+			'href' => "{{app_abs}}/{$this->Name}/edit/{{id}}",
 			'target' => '_blank'
 		);
 		$this->Behavior->Buttons['Delete'] = array(
@@ -39,6 +39,7 @@ class EditorSearch extends Module
 		global $_d;
 
 		if (!$this->Active) return;
+
 		$this->_q = array_reverse($_d['q']);
 
 		if (@$this->_q[3] == $this->Name)
