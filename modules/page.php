@@ -2,6 +2,13 @@
 
 class ModPage extends Module
 {
+	function __construct()
+	{
+		global $_d;
+
+		if (!isset($_d['default'])) $_d['default'] = 'index';
+	}
+
 	function Get()
 	{
 		global $_d;
