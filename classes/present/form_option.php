@@ -36,11 +36,13 @@ class FormOption extends TreeNode
 	 * @param bool $group
 	 * @param bool $selected
 	 */
-	function __construct($text, $selected = false)
+	function __construct($text, $selected = false, $group = false)
 	{
 		$this->text = $text;
 		$this->selected = $selected;
+		$this->group = $group;
 		$this->disabled = false;
+		$this->children = array();
 	}
 
 	function __tostring() { return $this->text; }
@@ -48,7 +50,7 @@ class FormOption extends TreeNode
 	function RenderCheck($atrs)
 	{
 		if ($this->selected) $atrs['CHECKED'] = 'checked';
-		if (!empty($this->children))
+		if (!empty($this->children) || $this->group)
 		{
 			$ret = '<p><b><i>'.$this->text.'</i></b><br />';
 			foreach ($this->children as $c) $ret .= $c->RenderCheck($atrs);
