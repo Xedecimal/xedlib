@@ -80,7 +80,7 @@ class FormOption extends TreeNode
 		}
 		else
 		{
-			$valu = !empty($this->valu) ? ' value="'.$this->valu.'"' : null;
+			$valu = isset($this->valu) ? ' value="'.$this->valu.'"' : null;
 			return "<option{$valu}{$selected}>".htmlspecialchars($this->text).'</option>';
 		}
 	}
