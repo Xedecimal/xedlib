@@ -15,4 +15,4 @@ fieldset td label { display: block; text-align: right; padding: 5px; }
 fieldset td input[type=text] { width: 100%; }
 .tright { text-align: right; }
 
-select { padding: 2px; border: 1px; }
+select { padding: 2px; }
