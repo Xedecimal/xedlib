@@ -123,7 +123,7 @@ class Module
 		if (array_key_exists($block, $_d['blocks']))
 			$_d['blocks'][$block] .= $data;
 		else
-			$_d['blocks']['default'] .= $data;
+			@$_d['blocks']['default'] .= $data;
 	}
 
 	static function cmp_mod($x, $y)
