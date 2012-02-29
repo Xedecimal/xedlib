@@ -28,7 +28,7 @@
 <legend>Select fields to search</legend>
 <table>
 <searchfield><tr><td class="field_text">
-	<label>{{checkbox}} {{text}}</label></td>
+	<label>{{text}} {{checkbox}}</label></td>
 	<td class="hidden ds_field" id="hidden_{{id}}">{{field}}</td>
 </tr></searchfield>
 </table>
