@@ -263,7 +263,7 @@ class FormInput
 			case 'mask':
 				$this->mask_walk = 0;
 				return preg_replace_callback('/t([0-9]+)/',
-					array($this, 'mask_callback'), @$this->mask);
+					array($this, 'mask_callback'), @$this->atrs['DATA-MASK']);
 
 			case 'select':
 			case 'selects':
