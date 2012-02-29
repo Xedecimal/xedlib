@@ -32,6 +32,7 @@ class EditorSearch extends Module
 		);
 
 		$this->CheckActive($this->Name);
+		$this->_template = Module::L('editor_search/t.xml');
 	}
 
 	function Prepare()
@@ -73,13 +74,16 @@ class EditorSearch extends Module
 
 			$query['group'] = $this->_ds->id;
 
+			$query['columns'] = array(Database::SqlUnquote('SQL_CALC_FOUND_ROWS *'));
+
 			foreach (array_keys($this->_ds->DisplayColumns) as $col)
 			{
 				if (!isset($this->_ds->FieldInputs[$col])) continue;
 
 				$fi = $this->_ds->FieldInputs[$col];
 				if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
-					$query['cols'][$ms[2]] = "GROUP_CONCAT(DISTINCT {$col})";
+					$query['columns'][$ms[2]] =
+						Database::SqlUnquote("GROUP_CONCAT(DISTINCT {$col})");
 			}
 
 			# Collect the data.
@@ -88,12 +92,11 @@ class EditorSearch extends Module
 			{
 				foreach (array_keys($this->ss) as $col)
 				{
-					$val = Server::GetVar("{$col}");
+					$val = Server::GetVar($col);
 					if (!isset($val)) return;
 					$this->AddToQuery($query, $col, $val);
 				}
 
-				$query['cols'] = array(Database::SqlUnquote('SQL_CALC_FOUND_ROWS *'));
 				$this->items = $this->_ds->Get($query);
 
 				if (Server::GetVar('butSubmit') == 'Save Results as CSV')
@@ -145,7 +148,7 @@ class EditorSearch extends Module
 <script type="text/javascript" src="../js/fill/{$ci}"></script>
 <script type="text/javascript" src="../js/print/{$ci}"></script>
 EOF;
-			die($ret.$t->ParseFile($this->Form));
+			return $ret.$t->ParseFile($this->Form);
 		}
 		if ($target == $this->Name && $act == 'edit'
 			&& $this->Behavior->AllowEdit)
@@ -162,7 +165,7 @@ EOF;
 		{
 			$t->ReWrite('search', array($this, 'TagSearch'));
 			$t->ReWrite('results', array($this, 'TagResults'));
-			return $t->Parsefile(Module::L('editor_search/t.xml'));
+			return $t->Parsefile($this->_template);
 		}
 	}
 
@@ -294,7 +297,7 @@ EOF;
 				$this->item = $i;
 
 				$t->Set('res_links', U::RunCallbacks(@$_d['datasearch.cb.head_res'], $this, $i));
-				$t->Set('name', $i[$this->FieldName]);
+				#$t->Set('name', $i[$this->FieldName]);
 				$t->Set('id', $i[$this->_ds->id]);
 				$t->Set($i);
 				$ret .= $t->GetString($g);
@@ -347,7 +350,9 @@ EOF;
 						if ($bold) $vars['val'] .= '<span class="result">';
 					}
 					if (!empty($val))
-						$vars['val'] .= $this->ds->FieldInputs[$f]->valu[$val]->text;
+					{
+						$vars['val'] .= $this->_ds->FieldInputs[$f]->atrs['VALUE'][$val]->text;
+					}
 					if (!empty($this->fs[$f]) && $bold) $vars['val'] .= '</span>';
 				}
 			}

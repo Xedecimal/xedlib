@@ -27,9 +27,9 @@ function fill(ix, element) {
 		}
 		else {
 			// Contains '.'
-			if (m[1].match(/\.([^.]+)/))
+			if (m[1].match(/\.([^.]+)/)) return;
 				// Everything after '.'
-				m[1] = m[1].match(/\.([^.]+)/)[1];
+				//m[1] = m[1].match(/\.([^.]+)/)[1];
 			input.val(json[record][m[1]]);
 		}
 	}
