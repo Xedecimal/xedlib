@@ -103,7 +103,6 @@ class FormInput
 		switch ($this->atrs['TYPE'])
 		{
 			case 'select':
-				var_dump($newval);
 				if (isset($this->atrs['VALUE'][$newval]))
 					$this->atrs['VALUE'][$newval]->selected = true;
 				return @$this->atrs['VALUE'][$newval]->value;
