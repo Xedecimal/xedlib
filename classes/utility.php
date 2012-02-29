@@ -21,8 +21,7 @@ class U
 			'SD' => 'South Dakota', 'TN' => 'Tennessee', 'TX' => 'Texas',
 			'UT' => 'Utah', 'VT' => 'Vermont', 'VA' => 'Virginia',
 			'WA' => 'Washington', 'WV' => 'West Virginia', 'WI' => 'Wisconsin',
-			'WY' => 'Wyoming', 'DC' => 'District of Columbia', 'CN' => 'Canada',
-			'AE' => 'Armed Forces Africa / Canada / Europe / Middle East');
+			'WY' => 'Wyoming', 'DC' => 'District of Columbia');
 	}
 
 	static function DOut($text)
