@@ -70,7 +70,7 @@ class ModNav extends Module
 					$liatrs = HM::GetAttribs(@$c->data['liatrs']);
 
 				$ret .= "<li$liatrs>$link";
-				$ret .= ModNav::GetLinks($c, $atrs, $depth+1);
+				$ret .= ModNav::GetLinks($c, null, $depth+1);
 				$ret .= '</li>';
 			}
 			$ret .= '</ul>';
