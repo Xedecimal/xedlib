@@ -21,8 +21,7 @@ class U
 			'SD' => 'South Dakota', 'TN' => 'Tennessee', 'TX' => 'Texas',
 			'UT' => 'Utah', 'VT' => 'Vermont', 'VA' => 'Virginia',
 			'WA' => 'Washington', 'WV' => 'West Virginia', 'WI' => 'Wisconsin',
-			'WY' => 'Wyoming', 'DC' => 'District of Columbia', 'CN' => 'Canada',
-			'AE' => 'Armed Forces Africa / Canada / Europe / Middle East');
+			'WY' => 'Wyoming', 'DC' => 'District of Columbia');
 	}
 
 	static function DOut($text)
@@ -133,9 +132,9 @@ class U
 		else $nstart = $start;
 		$ret = U::DateRangeToString($nstart);
 		if ($start < 0) return 'in '.$ret;
-		else return $ret.' ago';		
+		else return $ret;
 	}
-	
+
 	static function DateRangeToString($secs)
 	{
 		$ss = $secs;
@@ -157,6 +156,124 @@ class U
 		else $ret = $ss.' second'.($ss > 1 ? 's' : null);
 		return $ret;
 	}
+
+	public static function MailWithAttachment($args)
+	{
+		$TextMessage = strip_tags(nl2br($args['body']), '<br>');
+		$HTMLMessage = nl2br($args['body']);
+
+		$boundary1   =rand(0,9)."-"
+			.rand(10000000000,9999999999)."-"
+			.rand(10000000000,9999999999)."=:"
+			.rand(10000,99999);
+
+		$boundary2   =rand(0,9)."-".rand(10000000000,9999999999)."-"
+			.rand(10000000000,9999999999)."=:"
+			.rand(10000,99999);
+
+		if (!empty($args['files']))
+		foreach ($args['files'] as $name => $file)
+		{
+			$attach = true;
+			$end = '';
+
+			$attachment[] = chunk_split(base64_encode(file_get_contents(
+				$file['tmp_name'])));
+			$ftype[] = $file['type'];
+			$fname[] = $file['name'];
+		}
+
+		/***************************************************************
+		 Creating Email: Headers, BODY
+		 1- HTML Email WIthout Attachment!! <<-------- H T M L ---------
+		 ***************************************************************/
+		#---->Headers Part
+		$Headers     =<<<AKAM
+From: {$args['from-name']} <{$args['from-email']}>
+Reply-To: {$args['from-email']}
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+    boundary="$boundary1"
+AKAM;
+
+		#---->BODY Part
+		$Body        =<<<AKAM
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+    boundary="$boundary1"
+
+This is a multi-part message in MIME format.
+
+--$boundary1
+Content-Type: text/plain;
+    charset="windows-1256"
+Content-Transfer-Encoding: quoted-printable
+
+$TextMessage
+--$boundary1
+Content-Type: text/html;
+    charset="windows-1256"
+Content-Transfer-Encoding: quoted-printable
+
+$HTMLMessage
+
+--$boundary1--
+AKAM;
+
+		if (!empty($attach))
+		{
+			$attachments = '';
+			$Headers = <<<AKAM
+From: {$args['from-name']} <{$args['from-email']}>
+Reply-To: {$args['from-email']}
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+    boundary="$boundary1"
+AKAM;
+
+			for ($j = 0; $j < count($ftype); $j++)
+			{
+				$attachments.=<<<ATTA
+--$boundary1
+Content-Type: $ftype[$j];
+    name="$fname[$j]"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+    filename="$fname[$j]"
+
+$attachment[$j]
+
+ATTA;
+			}
+
+			$Body = <<<AKAM
+This is a multi-part message in MIME format.
+
+--$boundary1
+Content-Type: multipart/alternative;
+    boundary="$boundary2"
+
+--$boundary2
+Content-Type: text/plain;
+    charset="windows-1256"
+Content-Transfer-Encoding: quoted-printable
+
+$TextMessage
+
+--$boundary2
+Content-Type: text/html; charset=ISO-8859-1
+
+$HTMLMessage
+
+--$boundary2--
+
+$attachments
+--$boundary1--
+AKAM;
+		}
+
+		return mail($args['to'], $args['subject'], $Body, $Headers);
+    }
 }
 
 if (!function_exists('http_build_url'))
@@ -177,7 +294,7 @@ if (!function_exists('http_build_url'))
 	 * Build an URL
 	 * The parts of the second URL will be merged into the first according to
 	 * the flags argument.
-	 * 
+	 *
 	 * @param mixed $url (Part(s) of) an URL in form of a string or associative
 	 * array like parse_url() returns
 	 * @param mixed $parts Same as the first argument
@@ -266,8 +383,7 @@ if (!function_exists('http_build_url'))
 			.((isset($parse_url['port'])) ? ':' . $parse_url['port'] : '')
 			.((isset($parse_url['path'])) ? $parse_url['path'] : '')
 			.((isset($parse_url['query'])) ? '?' . $parse_url['query'] : '')
-			.((isset($parse_url['fragment'])) ? '#' . $parse_url['fragment'] : '')
-		;
+			.((isset($parse_url['fragment'])) ? '#' . $parse_url['fragment'] : '');
 	}
 }
 

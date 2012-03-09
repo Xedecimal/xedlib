@@ -55,6 +55,14 @@ class Str
 		return $ret;
 	}
 
+	static function MakeUTF8($string)
+	{
+		$encodes = array('CP850', 'CP1252', 'ASCII', 'UTF-8', 'ISO-8859-1');
+		$enc = mb_detect_encoding($string, $encodes);
+		if ($enc == 'UTF-8') return $string;
+		if ($enc == 'ISO-8859-1') $enc = 'CP1252';
+		return mb_convert_encoding($string, 'UTF-8', $enc);
+	}
 }
 
 function strmatch($str1, $str2)

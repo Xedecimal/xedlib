@@ -7,7 +7,7 @@ $_d['user.session.user'] = 'sess_user';
 $_d['user.session.pass'] = 'sess_pass';
 $_d['user.cols.access'] = 'usr_access';
 
-class ModUser extends Module
+class User extends Module
 {
 	/**
 	 * @var LoginManager Associated login manager.
@@ -46,6 +46,10 @@ class ModUser extends Module
 		$this->CheckActive($this->Name);
 
 		global $_d;
+
+		if ($this->Active) $_d['user.login'] = true;
+
+		global $_d;
 		$_d['user.session.user'] = 'user_sessuser';
 		$_d['user.session.pass'] = 'user_sesspass';
 		if (!isset($_d['user.cols.access']))
@@ -66,7 +70,7 @@ class ModUser extends Module
 			$_d['nav.links'][$this->NavLogout] = "{$rw}?$url";
 		}
 
-		$_d['template.rewrites']['access'] = array('ModUser', 'TagAccess');
+		$_d['template.rewrites']['access'] = array('User', 'TagAccess');
 	}
 
 	function Prepare()
@@ -100,8 +104,7 @@ class ModUser extends Module
 				$body = "Your new password is: $pass";
 				$this->dsUser->Update(array('usr_email' => $em),
 					array('usr_pass' => md5($pass)));
-				U::VarInfo($body);
-				#mail($em, 'Forgotten Password', $body);
+				mail($em, 'Forgotten Password', $body);
 			}
 		}
 	}
@@ -265,7 +268,10 @@ class ModUser extends Module
 	static function TagAccess($t, $g, $a)
 	{
 		global $_d;
-		if (@$_d['user'][$_d['user.cols.access']] >= @$a['REQUIRE']) return $g;
+		if (!empty($a['REQUIRE']))
+			if (@$_d['user'][$_d['user.cols.access']] >= $a['REQUIRE']) return $g;
+		if (isset($a['EXACT']))
+			if ($_d['user'][$_d['user.cols.access']] == $a['EXACT']) return $g;
 	}
 
 	static function AddUserDataSet($ds, $passcol, $usercol)
@@ -306,7 +312,7 @@ class ModUser extends Module
 		{
 			if (!isset($ds[0]))
 				Error("<br />What: Dataset is not set.
-				<br />Who: ModUser::Prepare()
+				<br />Who: User::Prepare()
 				<br />Why: You may have set an incorrect dataset in the
 				creation of this LoginManager.");
 
@@ -365,13 +371,13 @@ class ModUserAdmin extends Module
 			$_d['user.levels'] = array(0 => 'Guest', 1 => 'User', 2 => 'Admin');
 	}
 
-	function Auth() { return ModUser::RequireAccess(2); }
+	function Auth() { return User::RequireAccess(2); }
 
 	function Link()
 	{
 		global $_d;
 
-		if (ModUser::RequireAccess(2))
+		if (User::RequireAccess(2))
 			$_d['nav.links']['Users'] = '{{app_abs}}/user';
 	}
 
@@ -382,7 +388,7 @@ class ModUserAdmin extends Module
 		if (@$_d['q'][0] != 'user') return;
 
 		global $mods;
-		$modUser = $mods['ModUser'];
+		$modUser = $mods['User'];
 
 		$modUser->_ds[0][0]->Description = 'User';
 		$modUser->_ds[0][0]->DisplayColumns = array(
@@ -396,7 +402,7 @@ class ModUserAdmin extends Module
 				ArrayToSelOptions($_d['user.levels']))
 		);
 
-		$this->edUser = new EditorData('user', $mods['ModUser']->_ds[0][0]);
+		$this->edUser = new EditorData('user', $mods['User']->_ds[0][0]);
 		$this->edUser->Behavior->Search = false;
 		$this->edUser->Behavior->Target = $_d['app_abs'].'/user';
 		$this->edUser->Prepare();
@@ -407,7 +413,7 @@ class ModUserAdmin extends Module
 		global $_d;
 
 		if (@$_d['q'][0] != 'user') return;
-		if (ModUser::RequireAccess(2)) return $this->edUser->GetUI();
+		if (User::RequireAccess(2)) return $this->edUser->GetUI();
 	}
 }
 

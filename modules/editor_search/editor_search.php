@@ -13,30 +13,33 @@ class EditorSearch extends Module
 	 */
 	public $Form;
 	/** @var DataSet */
-	private $_ds;
+	protected $_ds;
 
-	function __construct($name, &$ds)
+	function __construct()
 	{
-		$this->Name = $name;
-		$this->_ds = $ds;
 		$this->Behavior = new EditorSearchBehavior();
 		$this->Behavior->Buttons['View'] = array(
-			'href' => "{{app_abs}}/{$name}/view/{{id}}",
+			'href' => "{{app_abs}}/{$this->Name}/view/{{id}}",
 			'target' => '_blank'
 		);
 		$this->Behavior->Buttons['Edit'] = array(
-			'href' => "{{app_abs}}/{$name}/edit/{{id}}",
+			'href' => "{{app_abs}}/{$this->Name}/edit/{{id}}",
 			'target' => '_blank'
 		);
 		$this->Behavior->Buttons['Delete'] = array(
 			'class' => 'delResult',
-			'href' => "{{app_abs}}/{$name}/delete/{{id}}"
+			'href' => "{{app_abs}}/{$this->Name}/delete/{{id}}"
 		);
+
+		$this->CheckActive($this->Name);
+		$this->_template = Module::L('editor_search/t.xml');
 	}
 
 	function Prepare()
 	{
 		global $_d;
+
+		if (!$this->Active) return;
 
 		$this->_q = array_reverse($_d['q']);
 
@@ -71,13 +74,16 @@ class EditorSearch extends Module
 
 			$query['group'] = $this->_ds->id;
 
+			$query['columns'] = array(Database::SqlUnquote('SQL_CALC_FOUND_ROWS *'));
+
 			foreach (array_keys($this->_ds->DisplayColumns) as $col)
 			{
 				if (!isset($this->_ds->FieldInputs[$col])) continue;
 
 				$fi = $this->_ds->FieldInputs[$col];
 				if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
-					$query['cols'][$ms[2]] = "GROUP_CONCAT(DISTINCT {$col})";
+					$query['columns'][$ms[2]] =
+						Database::SqlUnquote("GROUP_CONCAT(DISTINCT {$col})");
 			}
 
 			# Collect the data.
@@ -86,12 +92,11 @@ class EditorSearch extends Module
 			{
 				foreach (array_keys($this->ss) as $col)
 				{
-					$val = Server::GetVar("{$col}");
+					$val = Server::GetVar($col);
 					if (!isset($val)) return;
 					$this->AddToQuery($query, $col, $val);
 				}
 
-				$query['cols'] = array(Database::SqlUnquote('SQL_CALC_FOUND_ROWS *'));
 				$this->items = $this->_ds->Get($query);
 
 				if (Server::GetVar('butSubmit') == 'Save Results as CSV')
@@ -123,6 +128,8 @@ class EditorSearch extends Module
 	{
 		global $_d;
 
+		if (!$this->Active) return;
+
 		$qc = $_d['q'];
 		$ci = array_pop($qc);
 		$act = array_pop($qc);
@@ -136,10 +143,11 @@ class EditorSearch extends Module
 		{
 			$t->ReWrite('loop', 'TagLoop');
 			$t->ReWrite('input', array('Form', 'TagInput'));
-			$ret = '<script type="text/javascript" src="../js/fill/'
-				.$ci.'"></script>';
-			$ret .= '<script type="text/javascript" src="../js/print/'
-				.$ci.'"></script>';
+			$ret =<<<EOF
+<script type="text/javascript" src="../../xedlib/js/jquery.js"></script>
+<script type="text/javascript" src="../js/fill/{$ci}"></script>
+<script type="text/javascript" src="../js/print/{$ci}"></script>
+EOF;
 			return $ret.$t->ParseFile($this->Form);
 		}
 		if ($target == $this->Name && $act == 'edit'
@@ -157,7 +165,7 @@ class EditorSearch extends Module
 		{
 			$t->ReWrite('search', array($this, 'TagSearch'));
 			$t->ReWrite('results', array($this, 'TagResults'));
-			return $t->Parsefile(Module::L('editor_search/t.xml'));
+			return $t->Parsefile($this->_template);
 		}
 	}
 
@@ -289,7 +297,7 @@ class EditorSearch extends Module
 				$this->item = $i;
 
 				$t->Set('res_links', U::RunCallbacks(@$_d['datasearch.cb.head_res'], $this, $i));
-				$t->Set('name', $i[$this->FieldName]);
+				#$t->Set('name', $i[$this->FieldName]);
 				$t->Set('id', $i[$this->_ds->id]);
 				$t->Set($i);
 				$ret .= $t->GetString($g);
@@ -342,7 +350,9 @@ class EditorSearch extends Module
 						if ($bold) $vars['val'] .= '<span class="result">';
 					}
 					if (!empty($val))
-						$vars['val'] .= $this->ds->FieldInputs[$f]->valu[$val]->text;
+					{
+						$vars['val'] .= $this->_ds->FieldInputs[$f]->atrs['VALUE'][$val]->text;
+					}
 					if (!empty($this->fs[$f]) && $bold) $vars['val'] .= '</span>';
 				}
 			}

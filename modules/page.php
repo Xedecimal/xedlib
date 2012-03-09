@@ -2,6 +2,13 @@
 
 class ModPage extends Module
 {
+	function __construct()
+	{
+		global $_d;
+
+		if (!isset($_d['default'])) $_d['default'] = 'index';
+	}
+
 	function Get()
 	{
 		global $_d;
@@ -19,7 +26,7 @@ class ModPage extends Module
 		}
 		else $content = @file_get_contents($file);
 		if ($_d['q'][0] == 'part') die(VarParser::Parse($content, $_d));
-		return '<div class="page_content">'.$content.'</div>';
+		return '<div class="page_content">'.stripslashes($content).'</div>';
 	}
 }
 

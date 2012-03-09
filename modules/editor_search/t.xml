@@ -1,21 +1,17 @@
 <div class="data-search">
-
-<style type="text/css">
-fieldset .actions a { padding: 5px; }
-</style>
-
+<style type="text/css">@import url('{{app_abs}}/xedlib/modules/editor_search/css.css')</style>
 <results>
 <div>
 <result>
 	<fieldset id="result-{{id}}"><legend>{{name}}</legend>
-	<div class="actions">
-		<result_button><a>{{text}}</a></result_button>
-	</div>
 	<ul>
 	<result_field>
 		<li><label>{{text}}</label>{{val}}</li>
 	</result_field>
 	</ul>
+	<div class="actions">
+		<result_button><a>{{text}}</a></result_button>
+	</div>
 	</fieldset>
 </result>
 «
@@ -25,20 +21,22 @@ fieldset .actions a { padding: 5px; }
 </results>
 
 <search>
-<form id="data_search_{{name}}" action="{{app_abs}}/{{name}}/search" method="post">
+<!-- Begin Form: {{form_name}} -->
+<form method="post" action="{{app_abs}}/{{name}}/search" id="data_search_{{name}}">
 <script type="text/javascript" src="editor_search/js.js"></script>
 <fieldset>
 <legend>Select fields to search</legend>
 <table>
-<searchfield><tr><td>
-	<label>{{checkbox}} {{text}}</label></td><td
-	class="hidden ds_field" id="hidden_{{id}}">{{field}}</td></tr>
-</searchfield>
+<searchfield><tr><td class="field_text">
+	<label>{{checkbox}} {{text}}</label></td>
+	<td class="hidden ds_field" id="hidden_{{id}}">{{field}}</td>
+</tr></searchfield>
 </table>
 </fieldset>
 <input type="submit" name="butSubmit" value="Search" />
 <input type="submit" name="butSubmit" value="Save Results as CSV" />
 </form>
+<!-- End Form: {{form_name}} -->
 </search>
 
 </div>

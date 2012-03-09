@@ -438,7 +438,7 @@ class EditorData extends Module
 					$value = Server::GetVar($this->Name.'_'.$col);
 					if ($in->attr('TYPE') == 'date')
 					{
-						$insert[$col] = Database::TimestampToMySql(strtotime($value));
+						$insert[$col] = date('Y-m-d', strtotime($value));
 					}
 					else if($in->attr('TYPE') == 'datetime')
 					{
@@ -548,7 +548,7 @@ class EditorData extends Module
 					$value = Server::GetVar($this->Name.'_'.$col);
 
 					if ($in->attr('TYPE') == 'date')
-						$update[$col] = $value[2].'-'.$value[0].'-'.$value[1];
+						$update[$col] = date('Y-m-d', strtotime($value));
 					else if ($in->attr('TYPE') == 'datetime')
 					{
 						if ($value[5][0] == 1)

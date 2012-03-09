@@ -22,6 +22,8 @@ class ModNav extends Module
 
 		if (isset($_d['nav.links']))
 		{
+			$this->MarkCurrent();
+
 			$t = new Template();
 			$t->ReWrite('link', array($this, 'TagLink'));
 			$t->ReWrite('head', array($this, 'TagHead'));
@@ -77,6 +79,31 @@ class ModNav extends Module
 		}
 
 		return $ret;
+	}
+
+	function MarkCurrent()
+	{
+		global $_d, $rw;
+
+		foreach ($_d['nav.links'] as $t => $u)
+		{
+			if (is_string($u)) $url = $u;
+			else continue;
+
+			$end = substr(strstr($url, '/'), 1);
+
+			if (strcmp($end, $rw) == 0)
+			{
+				$els = explode('/', $t);
+				foreach ($els as $ix => $e)
+				{
+					$l = $_d['nav.links'][$t];
+					if (!is_array($l)) $l = array('HREF' => $l);
+					$l['liatrs']['CLASS'] = 'current';
+					$_d['nav.links'][$t] = $l;
+				}
+			}
+		}
 	}
 
 	/**

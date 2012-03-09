@@ -221,7 +221,7 @@ class FileManager extends Module
 			if (!empty($caps))
 			foreach ($caps as $file => $cap)
 			{
-				$fi = new FileInfo($this->Root.'/'.$this->cf.$file, $this->Filters);
+				$fi = new FileInfo($this->Root.'/'.$this->cf.'/'.$file, $this->Filters);
 				$fi->info['title'] = $cap;
 				$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 				$f->FFUpdated($this, $fi, $fi->info);
@@ -293,8 +293,8 @@ class FileManager extends Module
 			foreach ($sels as $file)
 			{
 				$fi = new FileInfo($file, $this->Filters);
-				$f = FileInfo::GetFilter($fi, $this->Root, $this->Filters);
-				$f->Rename($fi, "$ct/{$fi->filename}");
+				$f = $this->GetFilter($fi, $this->Root, $this->Filters);
+				$f->FFRename($fi, "$ct/{$fi->filename}");
 
 				if (!empty($this->Behavior->Watchers))
 					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_MOVE,
@@ -384,6 +384,84 @@ class FileManager extends Module
 		}*/
 
 		if (is_dir($this->Root.$this->cf)) $this->files = $this->GetDirectory();
+	}
+
+	/**
+	* Return the display.
+	*
+	* @param string $target Target script.
+	* @param string $action Current action, usually stored in Server::GetVar('ca').
+	* @return string Output.
+	*/
+	function Get()
+	{
+		if (!$this->Active) return;
+
+		if (!file_exists($this->Root.$this->cf))
+			return "FileManager::Get(): File doesn't exist ({$this->Root}{$this->cf}).<br/>\n";
+
+		$relpath = Server::GetRelativePath(dirname(__FILE__));
+
+		$this->mass_avail = $this->Behavior->MassAvailable();
+
+		//TODO: Get rid of this.
+		$fi = new FileInfo($this->Root.$this->cf);
+
+		global $me;
+		$this->vars['target'] = $this->Behavior->Target;
+
+		$ex = HM::ParseURL($this->Behavior->Target);
+		$ex['args'][$this->Name.'_action'] = 'upload';
+		$ex['args']['PHPSESSID'] = Server::GetVar('PHPSESSID');
+		$this->vars['java_target'] = HM::URL($ex['url'], $ex['args']);
+
+		$this->vars['root'] = $this->Root;
+		$this->vars['cf'] = $this->cf;
+
+		$this->vars['fmname'] = $this->Name;
+		$this->vars['filename'] = $fi->filename;
+		$this->vars['path'] = $this->Root.$this->cf;
+		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
+		$this->vars['relpath'] = $relpath;
+		$this->vars['host'] = Server::GetVar('HTTP_HOST');
+		$this->vars['sid'] = Server::GetVar('PHPSESSID');
+		$this->vars['behavior'] = $this->Behavior;
+
+		$this->vars['folders'] = count($this->files['folders']);
+		$this->vars['files'] = count($this->files['files']);
+
+		$t = new Template();
+		$t->Set($this->vars);
+
+		#$t->ReWrite('form', array('Form', 'TagForm'));
+		$t->ReWrite('header', array(&$this, 'TagHeader'));
+		$t->ReWrite('path', array(&$this, 'TagPath'));
+		$t->ReWrite('download', array(&$this, 'TagDownload'));
+		$t->ReWrite('search', array(&$this, 'TagSearch'));
+
+		$t->ReWrite('behavior', array(&$this, 'TagBehavior'));
+
+		$t->ReWrite('details', array(&$this, 'TagDetails'));
+		$t->ReWrite('directory', array(&$this, 'TagDirectory'));
+		$t->ReWrite('folders', array(&$this, 'TagFolders'));
+		$t->ReWrite('folder', array(&$this, 'TagFolder'));
+		$t->ReWrite('files', array(&$this, 'TagFiles'));
+		$t->ReWrite('file', array(&$this, 'TagFile'));
+		$t->ReWrite('check', array(&$this, 'TagCheck'));
+
+		$t->ReWrite('options', array(&$this, 'TagOptions'));
+		$t->ReWrite('addopts', array(&$this, 'TagAddOpts'));
+
+		$fi = new FileInfo($this->Root.$this->cf);
+
+		$t->Set('fn_name', $this->Name);
+		$t->Set($this->View);
+
+		$ret['head'] = '<script type="text/javascript"
+				src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
+		$ret['default'] = $t->ParseFile($this->Template);
+
+		return $ret;
 	}
 
 	static function GetIcon($f)
@@ -493,12 +571,19 @@ class FileManager extends Module
 		$ret = '';
 		$ix = 0;
 
+		#@TODO Move this to a higher level so both TagFolder and TagFile can benfit from it.
+		$fi = new FileInfo($this->Root.$this->cf);
+		$this->curfilter = $filter = Filemanager::GetFilter($fi, $this->Root,
+			$this->Filters);
+
 		if (!empty($this->files['folders']))
 		foreach ($this->files['folders'] as $f)
 		{
 			FileManager::GetFilter($f, $this->Root, $this->Filters, $f->dir);
 			if (!$f->show) continue;
 			if (!$this->GetVisible($f)) continue;
+
+			$this->curfile = $f;
 
 			global $me;
 			if (isset($this->Behavior->FolderCallback))
@@ -529,6 +614,7 @@ class FileManager extends Module
 			$common = "?cf={$this->cf}&amp;editor={$this->Name}&amp;type=folders";
 
 			$tfile = new Template($this->vars);
+			$tfile->ReWrite('quickopt', array(&$this, 'TagQuickOpt'));
 			$ret .= $tfile->GetString($g);
 
 			$ix++;
@@ -564,7 +650,7 @@ class FileManager extends Module
 			if (isset($this->Behavior->FileCallback))
 			{
 				$cb = $this->Behavior->FileCallback;
-				$vars = $cb($f, $this->cf.$f->filename);
+				$vars = call_user_func_array($cb, array($f, $this->cf.$f->filename));
 				if (!empty($vars))
 				foreach ($vars as $k => $v)
 				{
@@ -584,6 +670,7 @@ class FileManager extends Module
 			$this->vars['fipath'] = htmlspecialchars($f->path);
 			$this->vars['type'] = 'files';
 			$this->vars['index'] = $ix;
+			$this->vars['info'] = $f->info;
 			if (!empty($f->icon)) $this->vars['icon'] = $f->icon;
 			else $this->vars['icon'] = '';
 			$this->vars['ftitle'] = isset($f->info['title']) ?
@@ -625,7 +712,21 @@ class FileManager extends Module
 
 	function TagQuickOpt($t, $guts)
 	{
-		return $this->curfilter->FFGetQuickOpts($this->curfile, $guts);
+		$file = $this->curfile;
+
+		$d['opt'] = '';
+
+		if ($this->Behavior->QuickCaptions)
+		{
+			$d['opt'] .= '<textarea name="'.$this->Name.'_titles['.$file->filename.
+				']" rows="2" cols="30">'.
+				@htmlspecialchars(stripslashes($file->info['title'])).
+				'</textarea>';
+		}
+
+		$d['opt'] .= $this->curfilter->FFGetQuickOpts($file, $guts);
+
+		return VarParser::Parse($guts, $d);
 	}
 
 	function TagDetails($t, $g, $a)
@@ -651,8 +752,17 @@ class FileManager extends Module
 
 	function TagQuickOptFinal($t, $guts)
 	{
+		$ret = '';
+
+		if ($this->Behavior->AllowEdit && $this->Behavior->QuickCaptions)
+		{
+			$ret .= '<input type="submit" name="'.$this->Name.'_action" value="Update Captions" />';
+		}
+
 		if (isset($this->curfilter))
-			return $this->curfilter->FFGetQuickOptFinal(@$this->curfile);
+			$ret .= $this->curfilter->FFGetQuickOptFinal(@$this->curfile);
+
+		return $ret;
 	}
 
 	function TagOptions($t, $guts)
@@ -728,84 +838,6 @@ class FileManager extends Module
 			}
 		}
 		return $ret.'</table>';
-	}
-
-	/**
-	* Return the display.
-	*
-	* @param string $target Target script.
-	* @param string $action Current action, usually stored in Server::GetVar('ca').
-	* @return string Output.
-	*/
-	function Get()
-	{
-		if (!$this->Active) return;
-
-		if (!file_exists($this->Root.$this->cf))
-			$this->cf = '';
-
-		$relpath = Server::GetRelativePath(dirname(__FILE__));
-
-		$this->mass_avail = $this->Behavior->MassAvailable();
-
-		//TODO: Get rid of this.
-		$fi = new FileInfo($this->Root.$this->cf);
-
-		global $me;
-		$this->vars['target'] = $this->Behavior->Target;
-
-		$ex = HM::ParseURL($this->Behavior->Target);
-		$ex['args'][$this->Name.'_action'] = 'upload';
-		$ex['args']['PHPSESSID'] = Server::GetVar('PHPSESSID');
-		$this->vars['java_target'] = HM::URL($ex['url'], $ex['args']);
-
-		$this->vars['root'] = $this->Root;
-		$this->vars['cf'] = $this->cf;
-
-		$this->vars['filename'] = $fi->filename;
-		$this->vars['path'] = $this->Root.$this->cf;
-		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
-		$this->vars['relpath'] = $relpath;
-		$this->vars['host'] = Server::GetVar('HTTP_HOST');
-		$this->vars['sid'] = Server::GetVar('PHPSESSID');
-		$this->vars['behavior'] = $this->Behavior;
-
-		$this->vars['folders'] = count($this->files['folders']);
-		$this->vars['files'] = count($this->files['files']);
-
-		$t = new Template();
-		$t->Set($this->vars);
-
-		#$t->ReWrite('form', array('Form', 'TagForm'));
-		$t->ReWrite('header', array(&$this, 'TagHeader'));
-		$t->ReWrite('path', array(&$this, 'TagPath'));
-		$t->ReWrite('download', array(&$this, 'TagDownload'));
-		$t->ReWrite('search', array(&$this, 'TagSearch'));
-
-		$t->ReWrite('behavior', array(&$this, 'TagBehavior'));
-
-		$t->ReWrite('details', array(&$this, 'TagDetails'));
-		$t->ReWrite('directory', array(&$this, 'TagDirectory'));
-		$t->ReWrite('folders', array(&$this, 'TagFolders'));
-		$t->ReWrite('folder', array(&$this, 'TagFolder'));
-		$t->ReWrite('files', array(&$this, 'TagFiles'));
-		$t->ReWrite('file', array(&$this, 'TagFile'));
-		$t->ReWrite('check', array(&$this, 'TagCheck'));
-		$t->ReWrite('quickoptfinal', array(&$this, 'TagQuickOptFinal'));
-
-		$t->ReWrite('options', array(&$this, 'TagOptions'));
-		$t->ReWrite('addopts', array(&$this, 'TagAddOpts'));
-
-		$fi = new FileInfo($this->Root.$this->cf);
-
-		$t->Set('fn_name', $this->Name);
-		$t->Set($this->View);
-
-		$ret['head'] = '<script type="text/javascript"
-				src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
-		$ret['default'] = $t->ParseFile($this->Template);
-
-		return $ret;
 	}
 
 	/**
@@ -888,10 +920,6 @@ class FileManager extends Module
 				$ret .= "<input id=\"butSelAll{$type}\" type=\"button\"
 					onclick=\"docmanSelAll('{$type}');\"
 					value=\"Select all {$type}\" />";
-			if ($this->Behavior->AllowEdit && $this->Behavior->QuickCaptions)
-			{
-				$ret .= '<input type="submit" name="ca" value="Update Captions" />';
-			}
 		}
 		return $ret;
 	}
@@ -960,14 +988,6 @@ class FileManager extends Module
 		}
 		else $d['butdown'] = '';
 
-		if ($this->Behavior->QuickCaptions)
-		{
-			$d['caption'] = '<textarea name="titles['.$file->filename.
-				']" rows="2" cols="30">'.
-				@htmlspecialchars(stripslashes($file->info['title'])).
-				'</textarea>';
-		}
-
 		return $d;
 	}
 
@@ -988,7 +1008,7 @@ class FileManager extends Module
 		{
 			if ($file[0] == '.') continue;
 
-			$newfi = new FileInfo($this->Root.$this->cf.'/'.$file, $this->Filters);
+			$newfi = new FileInfo("{$this->Root}{$this->cf}/{$file}", $this->Filters);
 			if (!$newfi->show) continue;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
 			{

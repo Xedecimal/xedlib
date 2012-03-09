@@ -63,7 +63,7 @@ class Gallery extends Module
 			$this->f->FFGetInfo($fi);
 
 			$du['editor'] = Server::GetVar('editor');
-			$du['galcf'] = Server::GetVar('galcf', '').'/'.$fi->path;
+			$du['galcf'] = Server::GetVar('galcf', '').'/'.$fi->filename;
 			$d['url'] = HM::URL($me, $du);
 
 			$d['name'] = $fi->filename;
@@ -89,7 +89,7 @@ class Gallery extends Module
 			if ($ix >= count($this->files['files'])-1) $d['class'] = ' last';
 			else $d['class'] = '';
 
-			$d['fullname'] = $fi->path;
+			$d['fullname'] = HM::urlencode_path($fi->path);
 			$d['idx'] = $ix;
 			$d['name'] = $this->GetCaption($fi);
 			$d['path'] = Server::GetVar('galcf', '');
@@ -99,48 +99,6 @@ class Gallery extends Module
 			$out .= $vp->ParseVars($guts, $d);
 		}
 		return $out;
-
-		/*if ($this->Behavior->PageCount != null)
-		{
-			$tot = GetFlatPage($files['files'], Server::GetVar('cp'), $this->Behavior->PageCount);
-		}
-		else $tot = $files['files'];
-
-		$ix = Server::GetVar('cp')*$this->Behavior->PageCount;
-		$body .= "<tr class=\"images\"><td>\n";
-
-		foreach ($tot as $file)
-		{
-			if (isset($file->icon) && file_exists($file->icon))
-			{
-				if (isset($file->icon) && file_exists($file->icon))
-				{
-					$twidth = $file->info['thumb_width']+16;
-					$theight = $file->info['thumb_height']+60;
-					$url = HM::URL($me, array(
-						'view' => $ix++,
-						'galcf' => "$path",
-						'cp' => Server::GetVar('cp')
-					));
-					$caption = $this->GetCaption($file);
-
-				$body .= <<<EOF
-<div class="gallery_cell" style="overflow: auto; width: {$twidth}px; height:{$theight}px">
-<table class="gallery_shadow">
-<tr><td>
-<a href="{$url}#fullview">
-<img src="{$path}/t_{$file->filename}" alt="thumb" /></a></td><td class="gallery_shadow_right">
-</td></tr>
-<tr>
-<td class="gallery_shadow_bottom"></td>
-<td class="gallery_shadow_bright"></td>
-</tr>
-</table><div class="gallery_caption">$caption</div></div>
-EOF;
-				}
-			}
-		}
-		$body .= '</td>';*/
 	}
 
 	function TagImage($t, $guts)

@@ -129,9 +129,8 @@
 							<input type="checkbox" class="check_folder"
 							id="{{fn_name}}_sel_{{type}}_{{index}}"
 							name="{{fn_name}}_sels[]" value="{{fipath}}" />
-					</check>
-<a href="{{url}}">{{name}}</a></td>
-					<td>{{caption}}</td>
+					</check></td>
+					<td class="folder-caption"><a href="{{url}}">{{name}}</a><br />{{caption}}</td>
 				</tr>
 				</folder>
 			</table>
@@ -162,8 +161,9 @@
 				</tr>
 				</file>
 			</table>
-			<QuickOptFinal />
 		</files>
+
+		<QuickOptFinal />
 </directory>
 
 <details>

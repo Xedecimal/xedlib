@@ -48,15 +48,10 @@ class FilterGallery extends FilterDefault
 		else $abs = "$dir/{$fi->filename}";
 
 		$relpath = Server::GetRelativePath($abs);
-		$path = dirname($relpath).'/'.urlencode(basename($relpath));
+		$path = HM::urlencode_path(dirname($relpath).'/'.basename($relpath));
 
 		$atrs['SRC'] = $path;
 
-		//if ($this->Behavior->UseThumbs)
-		//{
-			//$atrs['WIDTH'] = $fi->info['thumb_width'];
-			//$atrs['HEIGHT'] = $fi->info['thumb_height'];
-		//}
 		$atrs['ALT'] = 'icon';
 
 		if (file_exists($abs)) $fi->icon =
@@ -135,7 +130,7 @@ class FilterGallery extends FilterDefault
 	 */
 	function FFRename(&$fi, $newname)
 	{
-		parent::Rename($fi, $newname);
+		parent::FFRename($fi, $newname);
 		$thumb = $fi->dir.'/t_'.basename($fi->filename);
 		$ttarget = dirname($newname).'/t_'.basename($newname);
 		if (file_exists($thumb)) rename($thumb, $ttarget);
@@ -296,7 +291,7 @@ class FilterGallery extends FilterDefault
 		else # Not literal, maintain aspect ratio
 		{
 			# Get a scale factor
-			if ($nx < $ny) $sf = ($nx / $sx);
+			if ($sx > $sy) $sf = ($nx / $sx);
 			else $sf = ($ny / $sy);
 
 			$dx = $sx * $sf;
