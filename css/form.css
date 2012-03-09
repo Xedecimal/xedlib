@@ -1,5 +1,6 @@
 fieldset { border: 0; margin-top: 1em; }
 fieldset legend { font-size: larger; font-weight: bold; }
+fieldset fieldset { font-size: inherit; font-weight: normal; }
 
 /* Vertical List Style Forms */
 
@@ -16,3 +17,5 @@ fieldset td input[type=text] { width: 100%; }
 .tright { text-align: right; }
 
 select { padding: 2px; border: 1px; }
+
+.ui-button .ui-button-text, input.ui-button { padding: 0 1em; }
