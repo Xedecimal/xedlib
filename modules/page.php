@@ -16,6 +16,9 @@ class ModPage extends Module
 		$name = @$_d['q'][0];
 
 		if ($name == 'part') $name = $_d['q'][1];
+		# $_d['page.strict'] will not present if url contains pagename/extra
+		# data.
+		if (!empty($_d['page.strict']) && !empty($_d['q'][1])) return;
 		$file = "content/{$name}.xml";
 		if (!file_exists($file)) $file = "content/{$name}/{$name}.xml";
 
