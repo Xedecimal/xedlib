@@ -77,6 +77,8 @@ class Gallery extends Module
 
 	function TagFile($t, $guts)
 	{
+		global $_d;
+
 		$out = '';
 		$vp = new VarParser();
 		$vp->Behavior->Bleed = false;
@@ -89,7 +91,7 @@ class Gallery extends Module
 			if ($ix >= count($this->files['files'])-1) $d['class'] = ' last';
 			else $d['class'] = '';
 
-			$d['fullname'] = HM::urlencode_path($fi->path);
+			$d['fullname'] = HM::urlencode_path($_d['app_abs'].'/'.$fi->path);
 			$d['idx'] = $ix;
 			$d['name'] = $this->GetCaption($fi);
 			$d['path'] = Server::GetVar('galcf', '');
@@ -305,23 +307,19 @@ class GalleryBehavior
 
 class GalleryAdmin extends FileManager
 {
-	/**
-	* Gallery based file manager instance.
-	*
-	* @var FileManager
-	*/
-	private $fm;
+	public $Name = 'admin/gallery';
 
 	function __construct()
 	{
 		parent::__construct();
 
 		global $me, $_d;
-		$this->CheckActive('gallery');
+		$this->CheckActive($this->Name);
 
+		$this->Behavior->Target = '{{app_abs}}/'.$this->Name;
 		$this->Name = 'fmgal';
 		$this->Root = 'galimg';
-		$this->Filters = array('Gallery');
+		$this->Filters = array('FilterGallery');
 	}
 
 	function Link()
