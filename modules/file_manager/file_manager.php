@@ -451,6 +451,7 @@ class FileManager extends Module
 
 		$t->ReWrite('options', array(&$this, 'TagOptions'));
 		$t->ReWrite('addopts', array(&$this, 'TagAddOpts'));
+		$t->ReWrite('quickoptfinal', array(&$this, 'TagQuickOptFinal'));
 
 		$fi = new FileInfo($this->Root.$this->cf);
 
@@ -1008,7 +1009,7 @@ class FileManager extends Module
 		{
 			if ($file[0] == '.') continue;
 
-			$newfi = new FileInfo("{$this->Root}{$this->cf}/{$file}", $this->Filters);
+			$newfi = new FileInfo("{$this->Root}/{$this->cf}/{$file}", $this->Filters);
 			if (!$newfi->show) continue;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
 			{
