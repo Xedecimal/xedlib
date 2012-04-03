@@ -388,21 +388,20 @@ class ModUserAdmin extends Module
 		if (@$_d['q'][0] != 'user') return;
 
 		global $mods;
-		$modUser = $mods['User'];
 
-		$modUser->_ds[0][0]->Description = 'User';
-		$modUser->_ds[0][0]->DisplayColumns = array(
+		$_d['user.datasets'][0][0]->Description = 'User';
+		$_d['user.datasets'][0][0]->DisplayColumns = array(
 			'usr_name' => new DisplayColumn('Name'),
 			'usr_access' => new DisplayColumn('Access', 'socallback')
 		);
-		$modUser->_ds[0][0]->FieldInputs = array(
+		$_d['user.datasets'][0][0]->FieldInputs = array(
 			'usr_name' => new FormInput('Name'),
 			'usr_pass' => new FormInput('Password', 'password'),
 			'usr_access' => new FormInput('Access', 'select', null,
-				ArrayToSelOptions($_d['user.levels']))
+				FormOption::FromArray($_d['user.levels']))
 		);
 
-		$this->edUser = new EditorData('user', $mods['User']->_ds[0][0]);
+		$this->edUser = new EditorData('user', $_d['user.datasets'][0][0]);
 		$this->edUser->Behavior->Search = false;
 		$this->edUser->Behavior->Target = $_d['app_abs'].'/user';
 		$this->edUser->Prepare();
@@ -413,7 +412,7 @@ class ModUserAdmin extends Module
 		global $_d;
 
 		if (@$_d['q'][0] != 'user') return;
-		if (User::RequireAccess(2)) return $this->edUser->GetUI();
+		if (User::RequireAccess(2)) return $this->edUser->Get();
 	}
 }
 
