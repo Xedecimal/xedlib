@@ -7,9 +7,11 @@ fieldset fieldset { font-size: inherit; font-weight: normal; }
 fieldset ul { list-style: none; padding: 0; margin: 0; }
 fieldset li { margin: 1em 0.5em; float: left; }
 fieldset li label { display: block; }
+fieldset li label.inline { display: inline; }
 fieldset li input { overflow: hidden; }
 fieldset li input.submit { width: auto; }
 fieldset li label input { width: auto; }
+fieldset li fieldset label { display: inline; }
 
 /* Horizontal Table Style Forms */
 
