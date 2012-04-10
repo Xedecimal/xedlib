@@ -43,6 +43,8 @@ class FormEmail extends Module
 	{
 		global $_d;
 
+		if (!$this->Active) return;
+
 		$t = new Template($_d);
 		$t->Behavior->Bleed = false;
 		$t->ReWrite('input', array('Form', 'TagInput'));
@@ -85,9 +87,7 @@ class FormEmail extends Module
 		$this->body = $t->ParseFile($this->_email_template);
 
 		if ($send)
-		{
 			mail($this->_to, $this->_subject, $this->body, implode($headers, "\r\n"));
-		}
 
 		if (!empty($this->debug))
 		{
@@ -98,6 +98,7 @@ class FormEmail extends Module
 		}
 	}
 
+	# @TODO: Depricated, we don't use $_fields anymore.
 	function TagField($t, $g)
 	{
 		foreach ($this->_fields as $n => $f)
@@ -129,8 +130,13 @@ class FormEmail extends Module
 			if (is_array($this->_data[$m[1]]))
 			{
 				$l = $this->_labels[$i];
-				foreach ($this->_data[$m[1]] as $ix => $val)
-					$arrs[$ix][$l] = $val;
+
+				$row['name'] = $l;
+				$row['value'] = '';
+
+				foreach ($this->_data[$m[1]] as $ix => $val) $row['value'] .= ' '.$val;
+
+				$rows[] = $row;
 			}
 			else # Non-repeating value
 			{
