@@ -659,6 +659,8 @@ class EditorData extends Module
 
 		if ($this->type == CONTROL_SIMPLE)
 		{
+			$ci = Server::GetState($this->Name.'_ci');
+
 			if (file_exists($ci))
 				$this->values = unserialize(file_get_contents($ci));
 			else
