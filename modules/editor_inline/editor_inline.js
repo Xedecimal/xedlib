@@ -1,13 +1,10 @@
-
-function inline_mce_save(ed)
-{
+function inline_mce_save(ed) {
 	var el = $(ed.getElement());
 	var t = el.data('target');
 	var handler = el.data('handler');
 	var post = { type: handler, target: t, content: ed.getContent() }
 	$.post('editor_inline/save', post, function () { alert('Saved.'); });
 }
-
 
 $(function () {
 	$('.editor-content').each(function () {
@@ -41,7 +38,6 @@ $(function () {
 		force_p_newlines: false,
 		forced_root_block: false
 	});
-
 
 	$('.inline-reset').live('click', function () {
 		if (!confirm('Are you sure you wish to reset your changes to this section to it\'s original content?')) return false;
