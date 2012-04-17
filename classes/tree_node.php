@@ -69,7 +69,7 @@ class TreeNode
 		if ($this->id == $id) return $this;
 
 		if (is_array($this->children))
-		foreach ($this->children as $c)
+		foreach ($this->children as &$c)
 		{
 			if ($c->id == $id) return $c;
 			else

@@ -132,7 +132,7 @@ class ModNav extends Module
 					if (empty($tn))
 					{
 						# Add Child
-						$tn = new TreeNode(null, $d);
+						$tn = new TreeNode($t, $d);
 						$tnp->AddChild($tn);
 					}
 				}
@@ -142,17 +142,21 @@ class ModNav extends Module
 				{
 					$tnp = $r->Find($d);
 
+					if ($ix == (count($ep)-1)) $nd = $t;
+					else $nd = null;
+
 					# There is no parent for this item.
 					if (empty($tnp))
 					{
+						# This is the actual definition of this root item.
+						$tn = new TreeNode($nd, $d);
+
 						# Add this to root.
-						$tn = new TreeNode(null, $d);
 						$r->AddChild($tn);
 					}
+					else if (empty($tnp->data)) $tnp->data = $nd;
 				}
 			}
-
-			$tn->data = $t;
 		}
 
 		return $r;
