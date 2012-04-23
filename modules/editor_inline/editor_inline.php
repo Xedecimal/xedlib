@@ -2,7 +2,7 @@
 
 class EditorInline extends Module
 {
-	public $Name = 'editor_inline';
+	public $Name = 'inline';
 
 	function Link()
 	{
@@ -20,9 +20,9 @@ class EditorInline extends Module
 
 		if ($_d['q'][1] == 'save')
 		{
-			$type = Server::GetVar('type');
-			$target = Server::GetVar('target');
-			$content = Server::GetVar('content');
+			$type = Server::GetVar('h');
+			$target = Server::GetVar('t');
+			$content = Server::GetVar('data');
 
 			if (empty($type) || $type == 'file')
 			{
@@ -53,7 +53,8 @@ class EditorInline extends Module
 		$p_js = Module::P('editor_inline/editor_inline.js');
 		$ret['head'] = <<<EOF
 <link rel="stylesheet" type="text/css" href="{$p_css}" />
-<script type="text/javascript" src="{{app_abs}}/js/tiny_mce/jquery.tinymce.js"></script>
+<script type="text/javascript" src="{{app_abs}}/js/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="{{app_abs}}/js/ckeditor/adapters/jquery.js"></script>
 <script type="text/javascript" src="{$p_js}"></script>
 EOF;
 
@@ -64,7 +65,9 @@ EOF;
 	{
 		$data = $g;
 
-		$a['ID'] = @$a['HANDLER'].'-'.$a['TARGET'];
+		$a['ID'] = '';
+		if (isset($a['HANDLER'])) $a['ID'] .= $a['HANDLER'].'_';
+			$a['ID'] .= $a['TARGET'];
 		if (isset($a['TARGET']))
 		{
 			if (file_exists($a['TARGET'])) $data = file_get_contents($a['TARGET']);
@@ -81,7 +84,12 @@ EOF;
 
 		if (User::RequireAccess(1))
 		{
-			return '<div'.HM::GetAttribs($a).'>'.$data.'</div>';
+			$atrs = HM::GetAttribs($a);
+			return <<<EOF
+<!-- <form method="post" action="inline/save"> -->
+<div$atrs>$data</div>
+<!-- </form> -->
+EOF;
 		}
 		return $data;
 	}
