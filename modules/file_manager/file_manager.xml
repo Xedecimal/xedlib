@@ -156,7 +156,7 @@
 						value="{{fipath}}" />
 					</td>
 					</check>
-					<td><p><a href="{{url}}">{{filename}}</a><br />{{caption}}</p></td>
+					<td><p><a class="a-file" href="{{url}}">{{filename}}</a><br />{{caption}}</p></td>
 					<quickopt><td>{{opt}}</td></quickopt>
 				</tr>
 				</file>

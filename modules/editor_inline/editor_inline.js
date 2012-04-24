@@ -49,8 +49,7 @@ $(function () {
 
 	$('.editor-content[data-target]').click(function () {
 		$(this).ckeditor({
-			filebrowserBrowseUrl : '/inimages',
-			filebrowserUploadUrl : '/inimages/upload',
+			filebrowserBrowseUrl: 'inline/images',
 			toolbar: 'Custom'
 		});
 	});

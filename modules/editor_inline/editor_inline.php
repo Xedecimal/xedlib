@@ -37,6 +37,7 @@ class EditorInline extends Module
 
 			die(json_encode(array('msg' => 'Success', 'target' => $target)));
 		}
+
 		if (@$_d['q'][1] == 'reset')
 		{
 			$file = Server::GetVar('file');
@@ -49,6 +50,24 @@ class EditorInline extends Module
 	{
 		if (!User::RequireAccess(1)) return;
 
+		global $_d;
+
+		if (@$_d['q'][1] == 'images')
+		{
+			require_once('xedlib/modules/file_manager/file_manager.php');
+			$fm = new FileManager;
+			$fm->Active = true;
+			$fm->Behavior->Target = 'images';
+			$fm->Filters = array('FilterGallery');
+			$fm->Root = 'img/upload';
+			$fm->Behavior->AllowAll();
+			$fm->Prepare();
+			$ret = $fm->Get();
+			$p_js = Module::P('editor_inline/inline_images.js');
+			$ret['head'] .= '<script type="text/javascript" src="'.$p_js.'"></script>';
+			return $ret;
+		}
+
 		$p_css = Module::P('editor_inline/editor_inline.css');
 		$p_js = Module::P('editor_inline/editor_inline.js');
 		$ret['head'] = <<<EOF
@@ -59,6 +78,11 @@ class EditorInline extends Module
 EOF;
 
 		return $ret;
+	}
+
+	function CallbackFileImages()
+	{
+		return 'Hello!';
 	}
 
 	function TagInlineEditor($t, $g, $a)
@@ -85,11 +109,7 @@ EOF;
 		if (User::RequireAccess(1))
 		{
 			$atrs = HM::GetAttribs($a);
-			return <<<EOF
-<!-- <form method="post" action="inline/save"> -->
-<div$atrs>$data</div>
-<!-- </form> -->
-EOF;
+			return '<div'.$atrs.'>'.$data.'</div>';
 		}
 		return $data;
 	}
