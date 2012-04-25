@@ -209,7 +209,7 @@ EOF;
 			if ($fi->attr('TYPE') == 'date') $fi->attr('TYPE', 'daterange');
 			$fname = $fi->attr('NAME');
 			$field = $fi->Get($this->Name);
-			$fi->attr('value', Server::GetVar($fname));
+			$fi->Value(Server::GetVar($fname));
 
 			# Configure the checkbox.
 
