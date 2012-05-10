@@ -58,20 +58,24 @@ class ModNav extends Module
 				if ($ix++ > 0 && !empty($_d['nav.sep']) && $depth < 0)
 					$ret .= $_d['nav.sep'];
 
-				$liatrs = '';
+				$liratrs = array();
+				if ($ix == count($link->children))
+					@$liratrs['CLASS'] .= ' last';
 
 				if (is_string($c->data))
-					$link = '<a href="'.$c->data.'">'.str_replace('\\', '/', $c->id).'</a>';
-				else if (isset($c->data['raw'])) $link = $c->data['raw'];
+					$slink = '<a href="'.$c->data.'">'.str_replace('\\', '/', $c->id).'</a>';
+				else if (isset($c->data['raw'])) $slink = $c->data['raw'];
 				else if (is_array($c->data))
-					$link = '<a'.HM::GetAttribs($c->data).'>'.$c->id.'</a>';
-				else if (is_string($c)) $link = $c;
-				else $link = $c->id;
+					$slink = '<a'.HM::GetAttribs($c->data).'>'.$c->id.'</a>';
+				else if (is_string($c)) $slink = $c;
+				else $slink = $c->id;
 
 				if (is_array($c->data))
-					$liatrs = HM::GetAttribs(@$c->data['liatrs']);
+					$liratrs = @$c->data['liatrs'];
 
-				$ret .= "<li$liatrs>$link";
+				$liatrs = HM::GetAttribs($liratrs);
+
+				$ret .= "<li$liatrs>$slink";
 				$ret .= ModNav::GetLinks($c, null, $depth+1);
 				$ret .= '</li>';
 			}
@@ -95,7 +99,7 @@ class ModNav extends Module
 			if (strcmp($end, $rw) == 0)
 			{
 				$els = explode('/', $t);
-				foreach ($els as $ix => $e)
+				foreach ($els as $e)
 				{
 					$l = $_d['nav.links'][$t];
 					if (!is_array($l)) $l = array('HREF' => $l);
