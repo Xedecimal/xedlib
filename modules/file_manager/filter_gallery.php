@@ -50,19 +50,14 @@ class FilterGallery extends FilterDefault
 		$relpath = Server::GetRelativePath($abs);
 		$path = HM::urlencode_path(dirname($relpath).'/'.basename($relpath));
 
-		$atrs['SRC'] = $path;
-
-		$atrs['ALT'] = 'icon';
-
-		if (file_exists($abs)) $fi->icon =
-			'<img'.HM::GetAttribs($atrs).' />';
+		if (file_exists($abs)) $fi->icon = $path;
 
 		# Prepare custom folder icon
 
 		if (is_dir($fi->path))
 		{
 			$fs = glob($fi->path.'/.t_image.*');
-			if (!empty($fs)) $fi->vars['icon'] = '<img src="'.$fs[0].'" alt="Icon" />';
+			if (!empty($fs)) $fi->vars['icon'] = $fs[0];
 			else $fi->vars['icon'] = FileManager::GetIcon($fi);
 		}
 		return $fi;

@@ -1,17 +1,4 @@
-function inline_mce_save(ed) {
-	var el = $(ed.getElement());
-	var t = el.data('target');
-	var handler = el.data('handler');
-	var post = { type: handler, target: t, content: ed.getContent() }
-	$.post('editor_inline/save', post, function () { alert('Saved.'); });
-}
-
 $(function () {
-	/*$('.editor-content').each(function () {
-		if (!$(this).data('noreset'))
-			$(this).before('<a href="'+$(this).data('target')+'" class="inline-reset">Reset</a>');
-	});*/
-
 	CKEDITOR.plugins.registered['save']=
 	{
 		init : function( editor )
@@ -47,7 +34,7 @@ $(function () {
 		{ name: 'colors', items : [ 'TextColor','BGColor' ] }
 	];
 
-	$('.editor-content[data-target]').click(function () {
+	$('.editor-content[data-target]').live('click', function () {
 		$(this).ckeditor({
 			filebrowserBrowseUrl: 'inline/images',
 			toolbar: 'Custom'
