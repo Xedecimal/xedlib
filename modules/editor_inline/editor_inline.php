@@ -80,11 +80,6 @@ EOF;
 		return $ret;
 	}
 
-	function CallbackFileImages()
-	{
-		return 'Hello!';
-	}
-
 	function TagInlineEditor($t, $g, $a)
 	{
 		$data = $g;
@@ -102,7 +97,8 @@ EOF;
 			unset($a['HANDLER']);
 		}
 
-		$a['CLASS'] = 'editor-content';
+		if (empty($a['CLASS'])) $a['CLASS'] = '';
+		$a['CLASS'] .= ' editor-content';
 		$a['DATA-TARGET'] = $a['TARGET'];
 		unset($a['TARGET']);
 

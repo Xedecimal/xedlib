@@ -2,7 +2,7 @@ $(function () {
 	$('.a-file').click(function () {
 		var uri = URLToArray(window.location.href);
 		window.opener.CKEDITOR.tools.callFunction(uri['CKEditorFuncNum'],
-			$(this).attr('href'));
+			$(this).data('icon'));
 		window.close();
 		return false;
 	});
