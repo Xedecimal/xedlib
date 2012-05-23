@@ -235,8 +235,6 @@ class Module
 	 */
 	function InstallFields(&$frm) { }
 
-	function AddDataset($name, $ds) { $GLOBALS['_d']['datasets'][$name] = $ds; }
-
 	/**
 	 * Request a previously stored dataset.
 	 *
