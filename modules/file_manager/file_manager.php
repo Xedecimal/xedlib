@@ -123,6 +123,8 @@ class FileManager extends Module
 	{
 		if (!$this->Active) return;
 
+		if (empty($this->Root)) throw new Exception('Invalid root.');
+
 		$act = Server::GetVar($this->Name.'_action');
 		$this->cf = Server::GetVar($this->Name.'_cf');
 
