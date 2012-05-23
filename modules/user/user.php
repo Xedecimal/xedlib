@@ -348,9 +348,9 @@ class User extends Module
 
 class ModUserBehavior
 {
-	public $CreateAccount = true;
-	public $ForgotPassword = true;
-	public $ForgotUsername = true;
+	public $CreateAccount = false;
+	public $ForgotPassword = false;
+	public $ForgotUsername = false;
 	public $Password = true;
 }
 
