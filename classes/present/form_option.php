@@ -175,6 +175,21 @@ class FormOption extends TreeNode
 			$ret[] = $sel[$v]->text;
 		return implode(', ', $ret);
 	}
+
+	/**
+	* A SelOption callback, returns the value by the integer.
+	*/
+	static function CBSelect($ds, $item, $icol, $col = null)
+	{
+		if (is_array($ds->FieldInputs[$col]->attr('VALUE')))
+		foreach ($ds->FieldInputs[$col]->attr('VALUE') as $v)
+		{
+			$res = $v->Find($item[$icol]);
+			if (isset($res)) return $res->text;
+		}
+
+		return $item[$icol];
+	}
 }
 
 ?>
