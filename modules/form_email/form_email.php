@@ -8,7 +8,7 @@ class FormEmail extends Module
 	public $Name = 'email';
 	public $Title = 'Contact Form';
 	protected $_template;
-	protected $_from = 'nobody@nowhere.com';
+	protected $_from = 'email';
 	protected $_to = 'nobody@nowhere.com';
 	protected $_source = 'form';
 
@@ -87,7 +87,9 @@ class FormEmail extends Module
 		$this->body = $t->ParseFile($this->_email_template);
 
 		if ($send)
+		{
 			mail($this->_to, $this->_subject, $this->body, implode($headers, "\r\n"));
+		}
 
 		if (!empty($this->debug))
 		{
@@ -127,7 +129,7 @@ class FormEmail extends Module
 			$row = array();
 
 			# Repeating Value
-			if (is_array($this->_data[$m[1]]))
+			if (is_array(@$this->_data[$m[1]]))
 			{
 				$l = $this->_labels[$i];
 
@@ -141,7 +143,7 @@ class FormEmail extends Module
 			else # Non-repeating value
 			{
 				$row['name'] = $this->_labels[$i];
-				$row['value'] = $this->_data[$m[1]];
+				$row['value'] = @$this->_data[$m[1]];
 				$rows[] = $row;
 			}
 		}
