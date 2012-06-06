@@ -98,6 +98,21 @@ class FormInput
 		if (isset($this->atrs[$attr])) return $this->atrs[$attr];
 	}
 
+	function Value($newval = null)
+	{
+		switch ($this->atrs['TYPE'])
+		{
+			case 'select':
+				if (isset($this->atrs['VALUE'][$newval]))
+					$this->atrs['VALUE'][$newval]->selected = true;
+				return @$this->atrs['VALUE'][$newval]->value;
+			default:
+				if (isset($newval)) $this->atrs['VALUE'] = $newval;
+				return @$this->atrs['VALUE'];
+				break;
+		}
+	}
+
 	/**
 	 * This is eventually going to need to be an array instead of a substr for
 	 * masked fields that do not specify length, we wouldn't know the length

@@ -49,6 +49,7 @@ class FormEmail extends Module
 		$t->Behavior->Bleed = false;
 		$t->ReWrite('input', array('Form', 'TagInput'));
 		$t->ReWrite('field', array(&$this, 'TagField'));
+		$t->Set($this);
 		if ($this->send)
 			return array($this->Name => $t->ParseFile($this->_template_send));
 		return array($this->Name => $t->ParseFile($this->_template));

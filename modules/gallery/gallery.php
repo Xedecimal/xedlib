@@ -308,6 +308,7 @@ class GalleryBehavior
 class GalleryAdmin extends FileManager
 {
 	public $Name = 'admin/gallery';
+	public $Root = 'galimg';
 
 	function __construct()
 	{
@@ -318,7 +319,6 @@ class GalleryAdmin extends FileManager
 
 		$this->Behavior->Target = '{{app_abs}}/'.$this->Name;
 		$this->Name = 'fmgal';
-		$this->Root = 'galimg';
 		$this->Filters = array('FilterGallery');
 	}
 

@@ -123,6 +123,8 @@ class FileManager extends Module
 	{
 		if (!$this->Active) return;
 
+		if (empty($this->Root)) throw new Exception('Invalid root.');
+
 		$act = Server::GetVar($this->Name.'_action');
 		$this->cf = Server::GetVar($this->Name.'_cf');
 
@@ -483,7 +485,7 @@ class FileManager extends Module
 		if (!empty($f->vars['icon'])) return $f->vars['icon'];
 		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
 		else return null;
-		return '<img src="'.$ret.'" alt="icon" style="vertical-align: middle" />';
+		return $ret;
 	}
 
 	function TagPart($t, $guts, $attribs)
@@ -665,7 +667,7 @@ class FileManager extends Module
 				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' => $this->cf.$f->filename));
 			else
-				$this->vars['url'] = htmlspecialchars($this->Root.$this->cf.'/'.$f->filename);
+				$this->vars['url'] = Module::P(htmlspecialchars($this->Root.$this->cf.$f->filename));
 			$this->vars['filename'] = htmlspecialchars($f->filename);
 			$this->vars['caption'] = $this->View->GetCaption($f);
 			$this->vars['fipath'] = htmlspecialchars($f->path);
@@ -939,11 +941,8 @@ class FileManager extends Module
 		$d['class'] = $index % 2 ? 'even' : 'odd';
 
 		$types = $file->type ? 'folders' : 'files';
-		if (isset($file->icon))
-			$d['icon'] = "<img src=\"".HM::URL($file->icon)."\" alt=\"Icon\" />";
-
-		else
-			$d['icon'] = '';
+		if (isset($file->icon)) $d['icon'] = HM::URL($file->icon);
+		else $d['icon'] = '';
 
 		$name = ($this->View->ShowTitle && isset($file->info['title'])) ?
 			$file->info['title'] : $file->filename;

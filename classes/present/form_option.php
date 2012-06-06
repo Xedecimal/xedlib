@@ -80,7 +80,7 @@ class FormOption extends TreeNode
 		}
 		else
 		{
-			$valu = !empty($this->valu) ? ' value="'.$this->valu.'"' : null;
+			$valu = isset($this->valu) ? ' value="'.$this->valu.'"' : null;
 			return "<option{$valu}{$selected}>".htmlspecialchars($this->text).'</option>';
 		}
 	}
@@ -174,6 +174,21 @@ class FormOption extends TreeNode
 		foreach ($array as $ix => $v)
 			$ret[] = $sel[$v]->text;
 		return implode(', ', $ret);
+	}
+
+	/**
+	* A SelOption callback, returns the value by the integer.
+	*/
+	static function CBSelect($ds, $item, $icol, $col = null)
+	{
+		if (is_array($ds->FieldInputs[$col]->attr('VALUE')))
+		foreach ($ds->FieldInputs[$col]->attr('VALUE') as $v)
+		{
+			$res = $v->Find($item[$icol]);
+			if (isset($res)) return $res->text;
+		}
+
+		return $item[$icol];
 	}
 }
 
