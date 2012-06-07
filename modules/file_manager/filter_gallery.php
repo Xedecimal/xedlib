@@ -295,7 +295,7 @@ class FilterGallery extends FilterDefault
 		}
 		$dimg = imagecreatetruecolor((int)$dx, (int)$dy);
 		# Fill transparent
-		imagesavealpha( $dimg, true );
+		imagesavealpha($dimg, true);
 		imagefill($dimg, 0, 0, imagecolorallocatealpha($dimg, 0, 0, 0, 127));
 		ImageCopyResampled($dimg, $img, 0, 0, 0, 0, $dx, $dy, $sx, $sy);
 		return $dimg;

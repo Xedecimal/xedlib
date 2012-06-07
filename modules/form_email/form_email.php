@@ -88,9 +88,7 @@ class FormEmail extends Module
 		$this->body = $t->ParseFile($this->_email_template);
 
 		if ($send)
-		{
 			mail($this->_to, $this->_subject, $this->body, implode($headers, "\r\n"));
-		}
 
 		if (!empty($this->debug))
 		{
