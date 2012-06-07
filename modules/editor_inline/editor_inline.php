@@ -100,6 +100,7 @@ EOF;
 		if (empty($a['CLASS'])) $a['CLASS'] = '';
 		$a['CLASS'] .= ' editor-content';
 		$a['DATA-TARGET'] = $a['TARGET'];
+		if (!empty($a['TB'])) $a['DATA-TB'] = $a['TB'];
 		unset($a['TARGET']);
 
 		if (User::RequireAccess(1))

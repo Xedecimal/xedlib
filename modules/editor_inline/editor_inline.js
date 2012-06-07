@@ -34,10 +34,17 @@ $(function () {
 		{ name: 'colors', items : [ 'TextColor','BGColor' ] }
 	];
 
+	CKEDITOR.config.toolbar_Simple = [
+		{ name: 'document', items : [ 'Save' ] }
+	];
+
 	$('.editor-content[data-target]').live('click', function () {
+		var tb = 'Custom';
+		if ($(this).data('tb'))
+			tb = $(this).data('tb');
 		$(this).ckeditor({
 			filebrowserBrowseUrl: 'inline/images',
-			toolbar: 'Custom'
+			toolbar: tb
 		});
 	});
 
