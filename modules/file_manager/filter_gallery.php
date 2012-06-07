@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__).'/file_manager.php');
 require_once(dirname(__FILE__).'/filter_default.php');
 
 class FilterGallery extends FilterDefault
@@ -261,7 +262,7 @@ class FilterGallery extends FilterDefault
 	{
 		$img = imagecreatefromstring(file_get_contents($file));
 		$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-		imagejpeg($img, $dest);
+		imagepng($img, $dest);
 	}
 
 	/**
@@ -293,6 +294,9 @@ class FilterGallery extends FilterDefault
 			$dy = $sy * $sf;
 		}
 		$dimg = imagecreatetruecolor((int)$dx, (int)$dy);
+		# Fill transparent
+		imagesavealpha( $dimg, true );
+		imagefill($dimg, 0, 0, imagecolorallocatealpha($dimg, 0, 0, 0, 127));
 		ImageCopyResampled($dimg, $img, 0, 0, 0, 0, $dx, $dy, $sx, $sy);
 		return $dimg;
 	}
