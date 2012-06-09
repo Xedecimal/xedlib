@@ -393,6 +393,7 @@ class EditorData extends Module
 		}
 		else $this->type = CONTROL_SIMPLE;
 		$this->sorting = ED_SORT_MANUAL;
+		$this->CheckActive($this->Name);
 	}
 
 	/**
@@ -414,6 +415,8 @@ class EditorData extends Module
 	 */
 	function Prepare()
 	{
+		if (!$this->Active) return;
+
 		$act = Server::GetState($this->Name.'_action');
 
 		if ($this->sorting == ED_SORT_TABLE)
@@ -713,6 +716,8 @@ class EditorData extends Module
 	 */
 	function Get()
 	{
+		if (!$this->Active) return;
+
 		$this->Behavior->Target = $this->Name;
 
 		$t = new Template();
