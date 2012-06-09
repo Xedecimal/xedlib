@@ -20,7 +20,7 @@
 <div class="files">
 <file>
 <div class="file{{class}}">
-<a href="{{fullname}}" class="gal">{{icon}}
+<a href="{{fullname}}" class="gal"><img src="{{icon}}" />
 <div class="caption">{{name}}</div></a>
 </div> <!-- file -->
 </file>
