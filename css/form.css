@@ -15,6 +15,7 @@ fieldset li fieldset label { display: inline; }
 
 /* Horizontal Table Style Forms */
 
+.checks label { display: inline; padding: 0; }
 fieldset td label { display: block; text-align: right; padding: 5px; }
 fieldset td input[type=text] { width: 100%; }
 .tright { text-align: right; }

@@ -13,7 +13,7 @@ $(function () {
 						t: $(editor.element.$).data('target'),
 						data: $(editor.element.$).html()
 					};
-					$.post('inline/save', post, function () {
+					$.post('?rw=inline/save', post, function () {
 						editor.destroy();
 					});
 				}}

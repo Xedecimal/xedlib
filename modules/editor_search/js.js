@@ -9,11 +9,12 @@ $(function () {
 		if (!$(this).attr('checked')) $('#hidden_'+targ).hide();
 		$('#hidden_'+targ.replace('.', '\\.')).showHide($(this).attr('checked'));
 		$(this).click(function () {
+			var obj = $('#hidden_'+targ.replace('.', '\\.'));
 			$('#hidden_'+targ.replace('.', '\\.')).showHide($(this).attr('checked'));
 		});
 	});
 
-	$('.delResult').click(function () {
+	$('.delResult').live('click', function () {
 		if (confirm('Are you sure you wish to delete this entry?'))
 		{
 			var id = $(this).attr('href').match(/(\d+)$/)[1];
@@ -24,5 +25,13 @@ $(function () {
 		return false;
 	});
 
-	$('.actions a').button();
+	$('.actions a,.action').button();
+
+	$('#but-search').click(function () {
+		$form = $('#data_search_'+$(this).data('name'));
+		$.post($form.attr('action'), $form.serialize(), function (data) {
+			$('#div-results').html(data);
+			$('.actions a,.action').button();
+		});
+	});
 });
