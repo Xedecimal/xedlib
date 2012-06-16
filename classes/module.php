@@ -18,7 +18,8 @@ class Module
 		}
 
 		$_d['xl_dir'] = realpath(dirname(__FILE__).'/../');
-		$_d['xl_abs'] = Server::GetRelativePath($_d['xl_dir']);
+		if (!isset($_d['xl_abs']))
+			$_d['xl_abs'] = Server::GetRelativePath($_d['xl_dir']);
 		$_d['app_dir'] = $root_path;
 		if (!isset($_d['app_abs']))
 			$_d['app_abs'] = Server::GetRelativePath($root_path);
