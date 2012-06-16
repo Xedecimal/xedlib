@@ -225,14 +225,17 @@ class FormInput
 				$vp = new VarParser();
 				if (!empty($this->atrs['VALUE']))
 				{
-					@$this->atrs['CLASS'] .= ' checks';
 					$divAtrs = $this->atrs;
+					@$divAtrs['CLASS'] .= ' checks';
 					unset($divAtrs['TYPE'], $divAtrs['VALUE'], $divAtrs['NAME']);
 					$ret .= '<div'.HM::GetAttribs($divAtrs).'>';
 					$newsels = $this->GetValue($persist);
 					foreach ($newsels as $id => $val)
+					{
 						$ret .= $val->RenderCheck(array(
-							'NAME' => $this->atrs['NAME'].'[]'));
+							'NAME' => $this->atrs['NAME'].'[]',
+							'ID' => $this->atrs['NAME'].'-'.$id));
+					}
 					$ret .= '</div>';
 				}
 				return $ret;

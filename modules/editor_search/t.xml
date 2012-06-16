@@ -1,5 +1,7 @@
 <div class="data-search">
-<style type="text/css">@import url('{{app_abs}}/xedlib/modules/editor_search/css.css')</style>
+<style type="text/css">
+	@import url('{{app_abs}}/xedlib/modules/editor_search/css.css');
+</style>
 <results>
 <div>
 <result>
@@ -9,9 +11,7 @@
 		<li><label>{{text}}</label>{{val}}</li>
 	</result_field>
 	</ul>
-	<div class="actions">
-		<result_button><a>{{text}}</a></result_button>
-	</div>
+	<div class="actions"><result_button><a>{{text}}</a></result_button></div>
 	</fieldset>
 </result>
 «
@@ -21,6 +21,7 @@
 </results>
 
 <search>
+<div id="div-search">
 <!-- Begin Form: {{form_name}} -->
 <form method="post" action="{{app_abs}}/{{name}}/search" id="data_search_{{name}}">
 <script type="text/javascript" src="editor_search/js.js"></script>
@@ -33,10 +34,14 @@
 </tr></searchfield>
 </table>
 </fieldset>
-<input type="submit" name="butSubmit" value="Search" />
+<input type="button" class="action" id="but-search" data-name="{{name}}"
+	value="Search" />
 <input type="submit" name="butSubmit" value="Save Results as CSV" />
 </form>
 <!-- End Form: {{form_name}} -->
+
+<div id="div-results"></div>
+</div> <!-- #div-search -->
 </search>
 
-</div>
+</div> <!-- #data-search -->
