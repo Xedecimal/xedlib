@@ -1,6 +1,8 @@
 <?php
 
-class ModArticles extends Module
+require_once('xedlib/classes/data/data_set.php');
+
+class Articles extends Module
 {
 	public $Block = 'articles';
 	public $Name = 'articles';
@@ -52,15 +54,15 @@ class ModArticles extends Module
 		$t->ReWrite('articles', array($this, 'TagArticles'));
 		$t->Set('foot', @$this->_foot);
 		$t->Behavior->Bleed = false;
-		return $t->ParseFile($this->_template);
+		return array($this->Name => $t->ParseFile($this->_template));
 	}
 }
 
-class ModArticle extends Module
+class Article extends Module
 {
 	public $Block = 'article';
 	public $Name = 'article';
-	protected $ID = 'art_id';
+	protected $ID = 'nws_id';
 
 	protected $_template;
 
@@ -109,7 +111,7 @@ class ModArticle extends Module
 	}
 }
 
-class ModArticleAdmin extends Module
+class ArticleAdmin extends Module
 {
 	/**
 	* Associated news editor.
@@ -119,13 +121,13 @@ class ModArticleAdmin extends Module
 	private $edNews;
 
 	public $Name = 'news';
-	protected $ID = 'id';
+	protected $ID = 'nws_id';
 
-	function Auth() { return ModUser::RequireAccess(1); }
+	function Auth() { return User::RequireAccess(1); }
 
 	function __construct()
 	{
-		require_once('xedlib/a_editor.php');
+		require_once('xedlib/modules/editor_data/editor_data.php');
 		global $_d;
 
 		if (empty($this->_source))
@@ -138,26 +140,27 @@ class ModArticleAdmin extends Module
 	{
 		global $_d, $me;
 
-		if (!ModUser::RequireAccess(2)) return;
-		$_d['nav.links']['News'] = '{{app_abs}}/'.$this->Name;
+		if (!User::RequireAccess(1)) return;
+
+		$_d['nav.links']['Admin/News'] = '{{app_abs}}/'.$this->Name;
 	}
 
 	function Prepare()
 	{
 		global $_d;
-		if (!ModUser::RequireAccess(1)) return;
+		if (!User::RequireAccess(1)) return;
 
 		if (empty($this->_source->Description))
-			$this->_source->Description = 'Articles';
+			$this->_source->Description = 'Article';
 		if (empty($this->_source->DisplayColumns))
 			$this->_source->DisplayColumns = array(
-				'title' => new DisplayColumn('Title')
+				'nws_title' => new DisplayColumn('Title')
 			);
 		if (empty($this->_source->FieldInputs))
 			$this->_source->FieldInputs = array(
-				'date' => new FormInput('Date', 'date'),
-				'title' => new FormInput('Title'),
-				'body' => new FormInput('Body', 'area', null, null,
+				'nws_date' => new FormInput('Date', 'date'),
+				'nws_title' => new FormInput('Title'),
+				'nws_body' => new FormInput('Body', 'area', null, null,
 					array('rows' => 10, 'width' => "100%"))
 			);
 
@@ -173,7 +176,7 @@ class ModArticleAdmin extends Module
 		global $_d;
 
 		if (!$this->Active) return;
-		if (!ModUser::RequireAccess(1)) return;
+		if (!User::RequireAccess(1)) return;
 
 		return $this->edNews->Get();
 	}

@@ -1,6 +1,6 @@
 <newsdetail>
 <div class="news_item">
-<h2 class="news_title">{{title}}</h2>
-<p class="news_body">{{body}}</p>
+<h1 class="news_title">{{nws_title}}</h1>
+<p class="news_body">{{nws_body}}</p>
 </div>
 </newsdetail>

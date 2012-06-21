@@ -23,3 +23,5 @@ fieldset td input[type=text] { width: 100%; }
 select { padding: 1px; }
 
 .ui-button .ui-button-text, input.ui-button { padding: 0 1em; }
+
+.form-vertical fieldset li { float: none; }
