@@ -1,22 +1,22 @@
-fieldset { border: 0; margin-top: 1em; }
-fieldset legend { font-size: larger; font-weight: bold; }
-fieldset fieldset { font-size: inherit; font-weight: normal; }
+.xlform fieldset { border: 0; margin-top: 1em; }
+.xlform fieldset legend { font-size: larger; font-weight: bold; }
+.xlform fieldset fieldset { font-size: inherit; font-weight: normal; }
 
 /* Vertical List Style Forms */
 
-fieldset ul { list-style: none; padding: 0; margin: 0; }
-fieldset li { margin: 1em 0.5em; float: left; }
-fieldset li label { display: block; }
-fieldset li label.inline { display: inline; }
-fieldset li input { overflow: hidden; }
-fieldset li input.submit { width: auto; }
-fieldset li label input { width: auto; }
-fieldset li fieldset label { display: inline; }
+.xlform fieldset ul { list-style: none; padding: 0; margin: 0; }
+.xlform fieldset li { margin: 1em 0.5em; float: left; }
+.xlform fieldset li label { display: block; }
+.xlform fieldset li label.inline { display: inline; }
+.xlform fieldset li input { overflow: hidden; }
+.xlform fieldset li input.submit { width: auto; }
+.xlform fieldset li label input { width: auto; }
+.xlform fieldset li fieldset label { display: inline; }
 
 /* Horizontal Table Style Forms */
 
-fieldset td label { display: block; text-align: right; padding: 5px; }
-fieldset td input[type=text] { width: 100%; }
+.xlform fieldset td label { display: block; text-align: right; padding: 5px; }
+.xlform fieldset td input[type=text] { width: 100%; }
 .tright { text-align: right; }
 
 select { padding: 1px; }
