@@ -253,9 +253,10 @@ class User extends Module
 		return $ret;
 	}
 
-	static function RequireAccess($level)
+	static function RequireAccess($level, $exact = false)
 	{
 		global $_d;
+		if ($exact) return @$_d['user.user'][$_d['user.cols.access']] == $level;
 		if (@$_d['user.user'][$_d['user.cols.access']] >= $level) return true;
 		return false;
 	}
