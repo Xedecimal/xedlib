@@ -2,7 +2,7 @@
 <fieldset>
 <legend>{{Title}}</legend>
 <ul>
-	<field><li style="{{style}}"><label for="{{fid}}">{{name}}</label>{{field}}</li>
+	<field><li style="{{style}}">{{field}}<label for="{{fid}}">{{name}}</label></li>
 </field>
 	<li class="clear"><label for="submit"></label><input type="submit" id="submit" value="Send" /></li>
 </ul>

@@ -22,7 +22,8 @@ class FormEmail extends Module
 		$this->_fields = array(
 			'Name' => new FormInput('Name', null, 'name'),
 			'Email' => new FormInput('Email', null, 'email'),
-			'Message' => new FormInput('Message', 'area', 'message')
+			'Message' => new FormInput('Message', 'area', 'message'),
+			'' => new FormInput(null, 'captcha')
 		);
 		$this->send = false;
 	}

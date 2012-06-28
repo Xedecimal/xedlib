@@ -1366,7 +1366,7 @@ class EditorData extends Module
 			$d['form_title'] = "{$frm->State} {$frm->Description}";
 			$atrs['METHOD'] = 'post';
 			$atrs['ACTION'] = $this->Behavior->Target;
-			$atrs['CLASS'] = 'form';
+			$atrs['CLASS'] = 'form-vertical';
 			foreach ($this->ds->FieldInputs as $fi)
 				if ($fi->atrs['TYPE'] == 'file')
 					$atrs['ENCTYPE'] = 'multipart/form-data';
