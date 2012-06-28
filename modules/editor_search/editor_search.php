@@ -18,7 +18,7 @@ class EditorSearch extends Module
 	function __construct()
 	{
 		$this->Behavior = new EditorSearchBehavior();
-		$this->Behavior->Buttons['View'] = array(
+		$this->Behavior->Buttons['View Details'] = array(
 			'href' => "{{app_abs}}/{$this->Name}/view/{{id}}",
 			'target' => '_blank'
 		);
