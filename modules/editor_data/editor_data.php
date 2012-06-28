@@ -156,7 +156,7 @@ class HandlerFile extends EditorHandler
 	 * @param mixed $ownership Identification of the owner for the associated
 	 * target.
 	 */
-	function HandlerFile($fm, $target, $conditions = null, $ownership = null)
+	function __construct($fm, $target, $conditions = null, $ownership = null)
 	{
 		$this->fm = $fm;
 		$this->target = $target;
@@ -196,7 +196,7 @@ class HandlerFile extends EditorHandler
 				{
 					if ($inserted[$col] == $val && !file_exists($dst))
 					{
-						mkrdir($dst, 0777);
+						mkdir($dst, 0777, true);
 						if ($this->ownership)
 						{
 							$fi = new FileInfo($dst);
