@@ -205,6 +205,12 @@ class Module
 		return $active;
 	}
 
+	function GetName()
+	{
+		if (is_array($this->Name)) return $this->Name[0];
+		return $this->Name;
+	}
+
 	function Auth() { return true; }
 
 	/**
