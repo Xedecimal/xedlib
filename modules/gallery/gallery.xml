@@ -11,7 +11,7 @@
 <div class="folders">
 <folder>
 <div class="folder">
-<a href="{{url}}">{{icon}}
+<a href="{{url}}"><img src="{{icon}}" alt="Icon" />
 <div class="caption">{{name}}</div></a>
 </div> <!-- .folder -->
 </folder>

@@ -58,7 +58,7 @@ class FilterGallery extends FilterDefault
 		if (is_dir($fi->path))
 		{
 			$fs = glob($fi->path.'/.t_image.*');
-			if (!empty($fs)) $fi->vars['icon'] = $fs[0];
+			if (!empty($fs)) $fi->vars['icon'] = Module::P($fs[0]);
 			else $fi->vars['icon'] = FileManager::GetIcon($fi);
 		}
 		return $fi;
