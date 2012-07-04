@@ -187,6 +187,8 @@ class Module
 
 	function CheckActive($name, $return = false)
 	{
+		global $_d;
+
 		if (is_array($name))
 		{
 			foreach ($name as $n)
@@ -197,9 +199,7 @@ class Module
 		$items = explode('/', $name);
 
 		$active = true;
-		foreach ($items as $ix => $i)
-			if (@$GLOBALS['_d']['q'][$ix] != $i)
-				$active = false;
+		foreach ($items as $ix => $i) if (@$_d['q'][$ix] != $i) $active = false;
 
 		if (!$return) $this->Active = $active;
 		return $active;
