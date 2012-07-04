@@ -222,7 +222,7 @@ class Gallery extends Module
 		//Gallery settings
 		$fig = new FileInfo($this->Root);
 		$this->FileManager->GetFilter($fig, $this->Root, array('FilterGallery'));
-		$t->Set('file_thumb_width', $fig->info['thumb_width']+20);
+		$t->Set('file_thumb_width', $fig->info['thumb_width']);
 		$t->Set('file_thumb_height', $fig->info['thumb_height']+50);
 
 		$fi = new FileInfo($this->Root.$path);
