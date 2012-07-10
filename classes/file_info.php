@@ -94,7 +94,7 @@ class FileInfo
 
 		$this->bitpos = 0;
 		$this->path = $source;
-		$this->dir = dirname(realpath($source));
+		$this->dir = dirname($source);
 		$this->filename = basename($source);
 		$this->show = true;
 
