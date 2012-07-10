@@ -108,7 +108,7 @@ class FileManager extends Module
 	function __construct()
 	{
 		$this->Behavior = new FileManagerBehavior();
-		$this->Behavior->Target = $this->Name;
+		$this->Behavior->Target = $this->GetName();
 		$this->View = new FileManagerView();
 		$this->Template = dirname(__FILE__).'/file_manager.xml';
 		$this->CheckActive($this->Name);
@@ -457,11 +457,15 @@ class FileManager extends Module
 
 		$fi = new FileInfo($this->Root.$this->cf);
 
-		$t->Set('fn_name', $this->Name);
+		$t->Set('fn_name', $this->GetName());
 		$t->Set($this->View);
 
-		$ret['head'] = '<script type="text/javascript"
-				src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
+		global $_d;
+		if (empty($_d['fm_head']))
+			$ret['head'] = '<script type="text/javascript"
+					src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
+		$_d['fm_head'] = true;
+
 		$ret['default'] = $t->ParseFile($this->Template);
 
 		return $ret;

@@ -156,7 +156,7 @@ class HandlerFile extends EditorHandler
 	 * @param mixed $ownership Identification of the owner for the associated
 	 * target.
 	 */
-	function HandlerFile($fm, $target, $conditions = null, $ownership = null)
+	function __construct($fm, $target, $conditions = null, $ownership = null)
 	{
 		$this->fm = $fm;
 		$this->target = $target;
@@ -196,7 +196,7 @@ class HandlerFile extends EditorHandler
 				{
 					if ($inserted[$col] == $val && !file_exists($dst))
 					{
-						mkrdir($dst, 0777);
+						mkdir($dst, 0777, true);
 						if ($this->ownership)
 						{
 							$fi = new FileInfo($dst);
@@ -393,6 +393,7 @@ class EditorData extends Module
 		}
 		else $this->type = CONTROL_SIMPLE;
 		$this->sorting = ED_SORT_MANUAL;
+		$this->CheckActive($this->Name);
 	}
 
 	/**
@@ -414,6 +415,8 @@ class EditorData extends Module
 	 */
 	function Prepare()
 	{
+		if (!$this->Active) return;
+
 		$act = Server::GetState($this->Name.'_action');
 
 		if ($this->sorting == ED_SORT_TABLE)
@@ -713,6 +716,8 @@ class EditorData extends Module
 	 */
 	function Get()
 	{
+		if (!$this->Active) return;
+
 		$this->Behavior->Target = $this->Name;
 
 		$t = new Template();
@@ -1361,7 +1366,7 @@ class EditorData extends Module
 			$d['form_title'] = "{$frm->State} {$frm->Description}";
 			$atrs['METHOD'] = 'post';
 			$atrs['ACTION'] = $this->Behavior->Target;
-			$atrs['CLASS'] = 'form';
+			$atrs['CLASS'] = 'form-vertical';
 			foreach ($this->ds->FieldInputs as $fi)
 				if ($fi->atrs['TYPE'] == 'file')
 					$atrs['ENCTYPE'] = 'multipart/form-data';

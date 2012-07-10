@@ -18,7 +18,7 @@ class EditorSearch extends Module
 	function __construct()
 	{
 		$this->Behavior = new EditorSearchBehavior();
-		$this->Behavior->Buttons['View'] = array(
+		$this->Behavior->Buttons['View Details'] = array(
 			'href' => "{{app_abs}}/{$this->Name}/view/{{id}}",
 			'target' => '_blank'
 		);
@@ -33,6 +33,7 @@ class EditorSearch extends Module
 
 		$this->CheckActive($this->Name);
 		$this->_template = Module::L('editor_search/t.xml');
+		$this->_template_results = Module::L('editor_search/results.xml');
 	}
 
 	function Prepare()
@@ -161,6 +162,13 @@ EOF;
 				.$ci.'"></script>';
 			return $ret.$t->ParseFile($this->Form);
 		}
+		else if ($ci == 'search')
+		{
+			$t->ReWrite('result', array($this, 'TagResult'));
+			$t->ReWrite('page', array($this, 'TagPage'));
+			$t->Set('count', $this->count);
+			die($t->Parsefile($this->_template_results));
+		}
 		else
 		{
 			$t->ReWrite('search', array($this, 'TagSearch'));
@@ -207,6 +215,7 @@ EOF;
 			$fi->attr('NAME', $sf);
 
 			if ($fi->attr('TYPE') == 'date') $fi->attr('TYPE', 'daterange');
+			if ($fi->attr('TYPE') == 'select') $fi->attr('TYPE', 'checks');
 			$fname = $fi->attr('NAME');
 			$field = $fi->Get($this->Name);
 			$fi->Value(Server::GetVar($fname));
@@ -241,14 +250,8 @@ EOF;
 		$fi = $this->_ds->FieldInputs[$col];
 		$fi->attr('NAME', $col);
 
-		if ($fi->attr('TYPE') == 'select')
-		{
-			$query['match'][$col] = Database::SqlOr($val);
-		}
-		if ($fi->attr('TYPE') == 'checks')
-		{
-			$query['match'][$col] = Database::SqlOr(Database::SqlIn(implode(', ', $val)));
-		}
+		if ($fi->attr('TYPE') == 'checks' || $fi->attr('TYPE') == 'select')
+			$query['match'][$col] = Database::SqlAnd(Database::SqlIn($val));
 		else if (preg_match('/([^.]+)\.(.*)/', $col, $ms))
 			foreach ($this->fs[$col] as $ix => $v)
 				$query['having'][] = " FIND_IN_SET($v, $ms[2]) > 0";

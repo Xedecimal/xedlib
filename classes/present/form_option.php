@@ -60,9 +60,9 @@ class FormOption extends TreeNode
 		else
 		{
 			$valu = isset($this->valu) ? ' value="'.$this->valu.'"' : null;
-			return '<label><input type="checkbox" value="'.$this->valu.'"'
-				.HM::GetAttribs($atrs).' />'.htmlspecialchars($this->text)
-					.'</label>';
+			return '<input type="checkbox" value="'.$this->valu.'"'
+				.HM::GetAttribs($atrs).' /> <label for="'.@$atrs['ID'].'">'
+				.htmlspecialchars($this->text).'</label><br />';
 		}
 	}
 

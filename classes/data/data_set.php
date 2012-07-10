@@ -408,7 +408,9 @@ class DataSet
 				if (!empty($val['cmp']))
 					$val['val'] = " {$val['cmp']} {$val['val']}";
 				else if (@$val['opt'] != SQLOPT_UNQUOTE)
+				{
 					$val['val'] = " = {$val['val']}";
+				}
 
 				return $val['val'];
 			}

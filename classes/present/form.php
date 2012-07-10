@@ -221,31 +221,6 @@ class Form extends LayeredOutput
 			($start ? $this->FirstEnd : $this->CellEnd);
 	}
 
-	/*function TagForm($t, $g, $a)
-	{
-		global $PERSISTS;
-		$atrs = HM::GetAttribs($a);
-		$ret = "<form {$this->formAttribs}{$atrs}";
-		if ($this->multipart) $ret .= ' enctype="multipart/form-data"';
-		$ret .= ">\n";
-
-		if ($this->Persist && !empty($PERSISTS))
-		foreach ($PERSISTS as $name => $value)
-			$this->AddHidden($name, $value);
-
-		if (!empty($this->hiddens))
-		foreach ($this->hiddens as $hidden)
-		{
-			$fname = $hidden[3] ? $hidden[0] : $this->name.'_'.$hidden[0];
-			$ret .= "<input type=\"hidden\" id=\"".CleanID($fname)."\"
-				name=\"{$hidden[0]}\" value=\"{$hidden[1]}\"";
-			if (isset($hidden[2])) $ret .= ' '.$hidden[2];
-			$ret .= " />\n";
-		}
-
-		return $ret.$g.'</form>';
-	}*/
-
 	function TagField($t, $g)
 	{
 		$ret = '';
