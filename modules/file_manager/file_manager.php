@@ -1008,7 +1008,10 @@ class FileManager extends Module
 		{
 			if ($file[0] == '.') continue;
 
-			$newfi = new FileInfo("{$this->Root}/{$this->cf}/{$file}", $this->Filters);
+			$p = $this->Root;
+			if (!empty($this->cf)) $p .= '/'.$this->cf;
+			if (!empty($file)) $p .= '/'.$file;
+			$newfi = new FileInfo($p, $this->Filters);
 			if (!$newfi->show) continue;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
 			{

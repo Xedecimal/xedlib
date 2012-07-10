@@ -4,7 +4,7 @@
 <style type="text/css">
 .folder,.file {
 	width: {{file_thumb_width}}px;
-	height: {{file_thumb_height}}px;
+	min-height: {{file_thumb_height}}px;
 }
 </style>
 
