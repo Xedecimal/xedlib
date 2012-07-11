@@ -318,7 +318,6 @@ class GalleryAdmin extends FileManager
 		$this->CheckActive($this->Name);
 
 		$this->Behavior->Target = '{{app_abs}}/'.$this->Name;
-		$this->Name = 'fmgal';
 		$this->Filters = array('FilterGallery');
 	}
 

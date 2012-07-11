@@ -376,7 +376,7 @@ class FileManager extends Module
 			$this->cf .= '/';
 
 		# Append trailing slash.
-		if (substr($this->Root, -1) != '/') $this->Root .= '/';
+		#if (substr($this->Root, -1) != '/') $this->Root .= '/';
 
 		# Verify that this root exists.
 		/*if (!file_exists($this->Root.$this->cf))
@@ -671,7 +671,7 @@ class FileManager extends Module
 				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' => $this->cf.$f->filename));
 			else
-				$this->vars['url'] = Module::P(htmlspecialchars($this->Root.$this->cf.$f->filename));
+				$this->vars['url'] = htmlspecialchars(Module::P($this->Root.$this->cf.$f->filename));
 			$this->vars['filename'] = htmlspecialchars($f->filename);
 			$this->vars['caption'] = $this->View->GetCaption($f);
 			$this->vars['fipath'] = htmlspecialchars($f->path);

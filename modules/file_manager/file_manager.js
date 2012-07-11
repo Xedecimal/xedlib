@@ -31,7 +31,7 @@ $(function () {
 			ui.item.parent().find('.tr-entry').each(function (ix) {
 				indices.push($(this).data('path'));
 			});
-			var target = ui.item.closest('form').attr('action');
+			var target = ui.item.closest('div.file-manager').attr('id');
 			var args = {}
 			args[target+'_action'] = 'sort';
 			args['indices'] = indices;

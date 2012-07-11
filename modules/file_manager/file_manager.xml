@@ -1,4 +1,4 @@
-<div class="file-manager">
+<div class="file-manager" id="{{fn_name}}">
 
 <style type="text/css">
 .file-manager th { text-align: left; }
