@@ -125,8 +125,8 @@ class FileManager extends Module
 
 		if (empty($this->Root)) throw new Exception('Invalid root.');
 
-		$act = Server::GetVar($this->Name.'_action');
-		$this->cf = Server::GetVar($this->Name.'_cf');
+		$act = Server::GetVar($this->GetName(true).'_action');
+		$this->cf = Server::GetVar($this->GetName(true).'_cf');
 
 		# TODO: Only declare $fi once!
 
@@ -245,7 +245,7 @@ class FileManager extends Module
 		else if ($act == 'Delete')
 		{
 			if (!$this->Behavior->AllowDelete) return;
-			$sels = Server::GetVar($this->Name.'_sels');
+			$sels = Server::GetVar($this->GetName(true).'_sels');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -457,7 +457,7 @@ class FileManager extends Module
 
 		$fi = new FileInfo($this->Root.$this->cf);
 
-		$t->Set('fn_name', $this->GetName());
+		$t->Set('fn_name', $this->GetName(true));
 		$t->Set($this->View);
 
 		global $_d;

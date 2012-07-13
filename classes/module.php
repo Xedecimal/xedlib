@@ -205,10 +205,13 @@ class Module
 		return $active;
 	}
 
-	function GetName()
+	function GetName($clean = false)
 	{
-		if (is_array($this->Name)) return $this->Name[0];
-		return $this->Name;
+		if (is_array($this->Name)) $ret = $this->Name[0];
+		else $ret = $this->Name;
+
+		if ($clean) return str_replace('/', '_', $ret);
+		return $ret;
 	}
 
 	function Auth() { return true; }
