@@ -4,7 +4,7 @@
 <ul>
 	<field>
 		<li>{{field}}
-		<label class="field_text">{{text}}</label>
+		<label for="{{id}}" class="field_text">{{text}}</label>
 		<error><span class="error">{{help}}</span></error>
 	</li></field>
 </ul>

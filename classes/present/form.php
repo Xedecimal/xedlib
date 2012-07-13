@@ -233,8 +233,10 @@ class Form extends LayeredOutput
 		{
 			$d['even_odd'] = ($ix++ % 2) ? 'even' : 'odd';
 			$d['text'] = !empty($in->text) ? $in->text : '';
+			$d['id'] = '';
 			if (is_object($in) && strtolower(get_class($in)) == 'forminput')
 			{
+				$d['id'] = HM::CleanID($in->atrs['ID']);
 				$d['field'] = $in->Get($this->name);
 				$d['help'] = $in->help;
 			}
