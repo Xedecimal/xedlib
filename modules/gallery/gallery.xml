@@ -1,13 +1,6 @@
 <div class="gallery">
 <p><breadcrumb source="galcf" sep=" &raquo; " root="Gallery" /></p>
 
-<style type="text/css">
-.folder,.file {
-	width: {{file_thumb_width}}px;
-	min-height: {{file_thumb_height}}px;
-}
-</style>
-
 <div class="folders">
 <folder>
 <div class="folder">
