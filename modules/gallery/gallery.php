@@ -310,6 +310,8 @@ class GalleryAdmin extends FileManager
 	public $Name = 'admin/gallery';
 	public $Root = 'galimg';
 
+	function Auth() { return User::RequireAccess(1); }
+
 	function __construct()
 	{
 		parent::__construct();
