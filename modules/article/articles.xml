@@ -1,7 +1,7 @@
 <null>
 <articles>
 <ul class="articles">
-<article><li class="article">{{nws_title}}</li></article>
+<article><li class="article"><a href="{{app_abs}}/{{target}}/{{nws_id}}">{{nws_title}}</a> <small>- {{date}}</small></li></article>
 </ul>
 </articles>
 {{foot}}
