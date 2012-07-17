@@ -159,7 +159,7 @@ class FormInput
 		{
 			$atrs = $this->atrs;
 			unset($atrs['TYPE']);
-			return '<input type="text" name="c" value="" style="display: none;"'.HM::GetAttribs($atrs).' />';
+			return '<input type="text" value="" style="display: none;"'.HM::GetAttribs($atrs).' />';
 		}
 		if ($this->atrs['TYPE'] == 'spamblock')
 		{
