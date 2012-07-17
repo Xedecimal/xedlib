@@ -14,6 +14,8 @@ class EditorSearch extends Module
 	public $Form;
 	/** @var DataSet */
 	protected $_ds;
+	
+	public $FieldName = 'name';
 
 	function __construct()
 	{
@@ -300,7 +302,7 @@ EOF;
 				$this->item = $i;
 
 				$t->Set('res_links', U::RunCallbacks(@$_d['datasearch.cb.head_res'], $this, $i));
-				#$t->Set('name', $i[$this->FieldName]);
+				$t->Set('name', $i[$this->FieldName]);
 				$t->Set('id', $i[$this->_ds->id]);
 				$t->Set($i);
 				$ret .= $t->GetString($g);

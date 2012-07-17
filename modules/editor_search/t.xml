@@ -23,7 +23,7 @@
 <search>
 <div id="div-search">
 <!-- Begin Form: {{form_name}} -->
-<form method="post" action="{{app_abs}}/{{name}}/search" id="data_search_{{name}}">
+<form method="post" action="{{app_abs}}/{{name}}/search" id="data_search_{{name}}" class="xlform">
 <script type="text/javascript" src="editor_search/js.js"></script>
 <fieldset>
 <legend>Select fields to search</legend>
@@ -36,7 +36,7 @@
 </fieldset>
 <input type="button" class="action" id="but-search" data-name="{{name}}"
 	value="Search" />
-<input type="submit" name="butSubmit" value="Save Results as CSV" />
+<input type="submit" name="butSubmit" class="button" value="Save Results as CSV" />
 </form>
 <!-- End Form: {{form_name}} -->
 
