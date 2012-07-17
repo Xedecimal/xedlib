@@ -72,10 +72,12 @@ class Article extends Module
 		$this->_template = Module::L('article/article.xml');
 		if (empty($this->_source))
 			$this->_source = new DataSet($_d['db'], $this->Name, $this->ID);
+		$this->CheckActive($this->Name);
 	}
 
 	function Get()
 	{
+		if (!$this->Active) return;
 		$t = new Template();
 		$t->ReWrite('newsdetail', array(&$this, 'TagNewsDetail'));
 		return $t->ParseFile($this->_template);
