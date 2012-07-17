@@ -20,9 +20,9 @@ class FormEmail extends Module
 		$this->_template_send = Module::L('form_email/send.xml');
 		$this->_email_template = Module::L('form_email/email.xml');
 		$this->_fields = array(
-			'Name' => new FormInput('Name', null, 'name', null, array('class' => 'required')),
-			'Email' => new FormInput('Email', null, 'email'),
-			'Message' => new FormInput('Message', 'area', 'message'),
+			'Name' => new FormInput('Name', null, 'form[name]', null, array('class' => 'required')),
+			'Email' => new FormInput('Email', null, 'form[email]'),
+			'Message' => new FormInput('Message', 'area', 'form[message]'),
 			'' => new FormInput(null, 'captcha', 'c')
 		);
 		$this->send = false;
@@ -84,6 +84,11 @@ class FormEmail extends Module
 		# Find all elements with an id
 		foreach ($sx->xpath('//*[@id]') as $in)
 			$this->_inputs[(string)$in['id']] = (string)$in['name'];
+		foreach ($this->_fields as $text => $f)
+		{
+			$this->_labels[$f->atrs['NAME']] = $text;
+			$this->_inputs[$f->atrs['NAME']] = $f->atrs['NAME'];
+		}
 
 		$t->ReWrite('field', array(&$this, 'TagEmailField'));
 		$this->body = $t->ParseFile($this->_email_template);
@@ -100,7 +105,6 @@ class FormEmail extends Module
 		}
 	}
 
-	# @TODO: Deprecated, we don't use $_fields anymore.
 	function TagField($t, $g)
 	{
 		foreach ($this->_fields as $n => $f)
