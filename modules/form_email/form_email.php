@@ -20,10 +20,10 @@ class FormEmail extends Module
 		$this->_template_send = Module::L('form_email/send.xml');
 		$this->_email_template = Module::L('form_email/email.xml');
 		$this->_fields = array(
-			'Name' => new FormInput('Name', null, 'name'),
+			'Name' => new FormInput('Name', null, 'name', null, array('class' => 'required')),
 			'Email' => new FormInput('Email', null, 'email'),
 			'Message' => new FormInput('Message', 'area', 'message'),
-			'' => new FormInput(null, 'captcha')
+			'' => new FormInput('c', 'captcha')
 		);
 		$this->send = false;
 	}
@@ -100,7 +100,7 @@ class FormEmail extends Module
 		}
 	}
 
-	# @TODO: Depricated, we don't use $_fields anymore.
+	# @TODO: Deprecated, we don't use $_fields anymore.
 	function TagField($t, $g)
 	{
 		foreach ($this->_fields as $n => $f)
