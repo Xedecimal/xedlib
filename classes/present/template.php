@@ -221,7 +221,7 @@ class Template extends LayeredOutput
 		{
 			if (!empty($attribs['DOCTYPE']))
 			{
-				if ($attribs['DOCTYPE'] == 'html5')
+				if ($attribs['DOCTYPE'] == '5')
 					$this->Out('<!DOCTYPE html>');
 				if ($attribs['DOCTYPE'] == 'strict')
 					$this->Out('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
