@@ -18,7 +18,8 @@ class Module
 		}
 
 		$_d['xl_dir'] = realpath(dirname(__FILE__).'/../');
-		$_d['xl_abs'] = Server::GetRelativePath($_d['xl_dir']);
+		if (!isset($_d['xl_abs']))
+			$_d['xl_abs'] = Server::GetRelativePath($_d['xl_dir']);
 		$_d['app_dir'] = $root_path;
 		if (!isset($_d['app_abs']))
 			$_d['app_abs'] = Server::GetRelativePath($root_path);
@@ -123,7 +124,7 @@ class Module
 		if (array_key_exists($block, $_d['blocks']))
 			$_d['blocks'][$block] .= $data;
 		else
-			$_d['blocks']['default'] .= $data;
+			@$_d['blocks']['default'] .= $data;
 	}
 
 	static function cmp_mod($x, $y)
@@ -151,7 +152,6 @@ class Module
 	/** @var boolean */
 	public $Active;
 
-	# Do not make this static. Only allows one of each module per page.
 	public $Name = 'module';
 
 	function DataError($errno)
@@ -235,8 +235,6 @@ class Module
 	 * the user.
 	 */
 	function InstallFields(&$frm) { }
-
-	function AddDataset($name, $ds) { $GLOBALS['_d']['datasets'][$name] = $ds; }
 
 	/**
 	 * Request a previously stored dataset.

@@ -1,6 +1,8 @@
 <?php
 
-class ModArticles extends Module
+require_once('xedlib/classes/data/data_set.php');
+
+class Articles extends Module
 {
 	public $Block = 'articles';
 	public $Name = 'articles';
@@ -11,6 +13,7 @@ class ModArticles extends Module
 	{
 		global $_d;
 		$this->_template = Module::L('article/articles.xml');
+		$this->_map = array();
 	}
 
 	function TagArticle($t, $g)
@@ -35,10 +38,11 @@ class ModArticles extends Module
 			$this->_articles = $this->_source->Get();
 		if (!empty($this->_articles))
 		{
+			$ret = '';
 			foreach ($this->_articles as $a)
 			{
 				$this->_article = $a;
-				@$ret .= $t->GetString($g);
+				$ret .= $t->GetString($g);
 			}
 			return $ret;
 		}
@@ -50,15 +54,15 @@ class ModArticles extends Module
 		$t->ReWrite('articles', array($this, 'TagArticles'));
 		$t->Set('foot', @$this->_foot);
 		$t->Behavior->Bleed = false;
-		return $t->ParseFile($this->_template);
+		return array($this->Name => $t->ParseFile($this->_template));
 	}
 }
 
-class ModArticle extends Module
+class Article extends Module
 {
 	public $Block = 'article';
 	public $Name = 'article';
-	public $ID = 'art_id';
+	protected $ID = 'nws_id';
 
 	protected $_template;
 
@@ -68,12 +72,20 @@ class ModArticle extends Module
 		$this->_template = Module::L('article/article.xml');
 		if (empty($this->_source))
 			$this->_source = new DataSet($_d['db'], $this->Name, $this->ID);
+		$this->CheckActive($this->Name);
+	}
+
+	function Get()
+	{
+		if (!$this->Active) return;
+		$t = new Template();
+		$t->ReWrite('newsdetail', array(&$this, 'TagNewsDetail'));
+		return $t->ParseFile($this->_template);
 	}
 
 	function TagNews($t, $g)
 	{
 		global $_d;
-		if ($_d['q'][0] != $this->Name) return;
 
 		if (empty($_d['q'][1]))
 		{
@@ -88,7 +100,6 @@ class ModArticle extends Module
 	function TagNewsDetail($t, $g)
 	{
 		global $_d;
-		if ($_d['q'][0] != $this->Name) return;
 
 		$ci = @$_d['q'][1];
 
@@ -100,16 +111,9 @@ class ModArticle extends Module
 			return $vp->ParseVars($g, $item);
 		}
 	}
-
-	function Get()
-	{
-		$t = new Template();
-		$t->ReWrite('newsdetail', array(&$this, 'TagNewsDetail'));
-		return $t->ParseFile($this->_template);
-	}
 }
 
-class ModArticleAdmin extends Module
+class ArticleAdmin extends Module
 {
 	/**
 	* Associated news editor.
@@ -121,7 +125,7 @@ class ModArticleAdmin extends Module
 	public $Name = 'news';
 	protected $ID = 'nws_id';
 
-	function Auth() { return ModUser::RequireAccess(1); }
+	function Auth() { return User::RequireAccess(1); }
 
 	function __construct()
 	{
@@ -138,15 +142,18 @@ class ModArticleAdmin extends Module
 	{
 		global $_d, $me;
 
-		$_d['nav.links']['News'] = '{{app_abs}}/'.$this->Name;
+		if (!User::RequireAccess(1)) return;
+
+		$_d['nav.links']['Admin/News'] = '{{app_abs}}/'.$this->Name;
 	}
 
 	function Prepare()
 	{
 		global $_d;
+		if (!User::RequireAccess(1)) return;
 
 		if (empty($this->_source->Description))
-			$this->_source->Description = 'Articles';
+			$this->_source->Description = 'Article';
 		if (empty($this->_source->DisplayColumns))
 			$this->_source->DisplayColumns = array(
 				'nws_title' => new DisplayColumn('Title')
@@ -155,11 +162,12 @@ class ModArticleAdmin extends Module
 			$this->_source->FieldInputs = array(
 				'nws_date' => new FormInput('Date', 'date'),
 				'nws_title' => new FormInput('Title'),
-				'nws_body' => new FormInput('Body', 'area', null, null, array('rows="10" width="100%"'))
+				'nws_body' => new FormInput('Body', 'area', null, null,
+					array('rows' => 10, 'width' => "100%"))
 			);
 
 		global $me;
-		$this->edNews = new EditorData('edNews', $this->_source);
+		$this->edNews = new EditorData($this->Name, $this->_source);
 		$this->edNews->Behavior->Search = false;
 		$this->edNews->Behavior->Target = Module::P($this->Name);
 		$this->edNews->Prepare();
@@ -170,8 +178,9 @@ class ModArticleAdmin extends Module
 		global $_d;
 
 		if (!$this->Active) return;
+		if (!User::RequireAccess(1)) return;
 
-		return $this->edNews->GetUI('edNews');
+		return $this->edNews->Get();
 	}
 }
 

@@ -50,6 +50,7 @@ class Arr
 	 */
 	static function Cln($arr)
 	{
+		if (!is_array($arr)) return $arr;
 		if (substr(phpversion(), 0, 1) != '5') { $copy = $arr; return $copy; }
 		$ret = array();
 

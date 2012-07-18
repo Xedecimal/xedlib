@@ -1,0 +1,16 @@
+<html>
+<head>
+	<script type="text/javascript" src="xedlib/js/jquery.js"></script>
+	<script type="text/javascript" src="js/nicedit/nicedit.js"></script>
+	<script type="text/javascript" src="editor_inline/editor_inline.js"></script>
+	<script type="text/javascript" src="editor_inline/editor_window.js"></script>
+	<script type="text/javascript">var app_abs = '{{app_abs}}'; var target = '{{target}}';</script>
+
+	<link rel="stylesheet" type="text/css" href="js/cledit/jquery.cleditor.css" />
+	<link rel="stylesheet" type="text/css" href="editor_inline/editor_inline.css" />
+</head>
+<body>
+<textarea class="ta-editor" id="editor" data-file="{{file}}" data-handler="{{handler}}"
+	data-target="{{target}}" style="width: 760px; height: 100%;"></textarea>
+</body>
+</html>

@@ -1,16 +1,25 @@
 fieldset { border: 0; margin-top: 1em; }
 fieldset legend { font-size: larger; font-weight: bold; }
+fieldset fieldset { font-size: inherit; font-weight: normal; }
 
 /* Vertical List Style Forms */
 
 fieldset ul { list-style: none; padding: 0; margin: 0; }
+fieldset li label.inline { display: inline; }
+fieldset li input { overflow: hidden; }
 fieldset li input.submit { width: auto; }
 fieldset li label input { width: auto; }
+fieldset li fieldset label { display: inline; }
 
 /* Horizontal Table Style Forms */
 
+.checks label { display: inline; padding: 0; }
 fieldset td label { display: block; text-align: right; padding: 5px; }
 fieldset td input[type=text] { width: 100%; }
 .tright { text-align: right; }
 
-select { padding: 2px; border: 1px; }
+select { padding: 1px; }
+
+.ui-button .ui-button-text, input.ui-button { padding: 0 1em; }
+
+.form-vertical fieldset li { float: none; }

@@ -22,21 +22,6 @@ function TagIToSState($t, $g, $a)
 }
 
 /**
- * A SelOption callback, returns the value by the integer.
- */
-function SOCallback($ds, $item, $icol, $col = null)
-{
-	if (is_array($ds->FieldInputs[$col]->attr('VALUE')))
-	foreach ($ds->FieldInputs[$col]->attr('VALUE') as $v)
-	{
-		$res = $v->Find($item[$icol]);
-		if (isset($res)) return $res->text;
-	}
-
-	return $item[$icol];
-}
-
-/**
 * Rewriting form tag to add additional functionality.
 *
 * @param Template $t

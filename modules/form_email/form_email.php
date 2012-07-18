@@ -8,7 +8,7 @@ class FormEmail extends Module
 	public $Name = 'email';
 	public $Title = 'Contact Form';
 	protected $_template;
-	protected $_from = 'nobody@nowhere.com';
+	protected $_from = 'email';
 	protected $_to = 'nobody@nowhere.com';
 	protected $_source = 'form';
 
@@ -20,9 +20,10 @@ class FormEmail extends Module
 		$this->_template_send = Module::L('form_email/send.xml');
 		$this->_email_template = Module::L('form_email/email.xml');
 		$this->_fields = array(
-			'Name' => new FormInput('Name', null, 'name'),
-			'Email' => new FormInput('Email', null, 'email'),
-			'Message' => new FormInput('Message', 'area', 'message')
+			'Name' => new FormInput('Name', null, 'form[name]', null, array('class' => 'required')),
+			'Email' => new FormInput('Email', null, 'form[email]'),
+			'Message' => new FormInput('Message', 'area', 'form[message]'),
+			'' => new FormInput(null, 'captcha', 'c')
 		);
 		$this->send = false;
 	}
@@ -35,54 +36,73 @@ class FormEmail extends Module
 
 		if (@$_d['q'][1] == 'send')
 		{
-			$this->_data = Server::GetVar($this->_source);
-			$t = new Template();
-			$t->use_getvar = true;
-
-			$headers[] = 'From: '.$this->_from;
-			$headers[] = 'Reply-To: '.$this->_from;
-
-			$this->send = true;
-
-			# Handle Captcha
-			$c = Server::GetVar('c');
-			if (!empty($c)) $this->send = false;
-
-			if (!$this->send) return;
-
-			$sx = simplexml_load_string(file_get_contents($this->_template));
-
-			# Find all label text
-			foreach ($sx->xpath('//label[@for]') as $id)
-				$this->_labels[(string)$id['for']] = (string)$id;
-			# Find all elements with an id
-			foreach ($sx->xpath('//*[@id]') as $in)
-				$this->_inputs[(string)$in['id']] = (string)$in['name'];
-
-			$t->ReWrite('field', array(&$this, 'TagEmailField'));
-			$this->body = $t->ParseFile($this->_email_template);
-
-			if (!empty($this->debug))
-			{
-				var_dump("To: {$this->_to}");
-				var_dump("Subject: {$this->_subject}");
-				var_dump($headers);
-				echo "<pre>$this->body</pre>";
-				die();
-			}
-
-			mail($this->_to, $this->_subject, $this->body, implode($headers, "\r\n"));
+			$this->GenerateMail(true);
 		}
 	}
 
 	function Get()
 	{
+		global $_d;
+
 		if (!$this->Active) return;
-		$t = new Template($this);
+
+		$t = new Template($_d);
+		$t->Behavior->Bleed = false;
 		$t->ReWrite('input', array('Form', 'TagInput'));
 		$t->ReWrite('field', array(&$this, 'TagField'));
-		if ($this->send) return $t->ParseFile($this->_template_send);
-		return $t->ParseFile($this->_template);
+		$t->Set($this);
+		if ($this->send)
+			return array($this->Name => $t->ParseFile($this->_template_send));
+		return array($this->Name => $t->ParseFile($this->_template));
+	}
+
+	function GenerateMail($send = false)
+	{
+		$this->_data = Server::GetVar($this->_source);
+		$t = new Template();
+		$t->use_getvar = true;
+
+		if (strpos($this->_from, '@') == false)
+			$this->_from = $this->_data[$this->_from];
+
+		$headers[] = 'From: '.$this->_from;
+		$headers[] = 'Reply-To: '.$this->_from;
+
+		$this->send = true;
+
+		# Handle Captcha
+		$c = Server::GetVar('c');
+		if (!empty($c)) $this->send = false;
+
+		if (!$this->send) return;
+
+		$sx = simplexml_load_string(file_get_contents($this->_template));
+
+		# Find all label text
+		foreach ($sx->xpath('//label[@for]') as $id)
+			$this->_labels[(string)$id['for']] = (string)$id;
+		# Find all elements with an id
+		foreach ($sx->xpath('//*[@id]') as $in)
+			$this->_inputs[(string)$in['id']] = (string)$in['name'];
+		foreach ($this->_fields as $text => $f)
+		{
+			$this->_labels[$f->atrs['NAME']] = $text;
+			$this->_inputs[$f->atrs['NAME']] = $f->atrs['NAME'];
+		}
+
+		$t->ReWrite('field', array(&$this, 'TagEmailField'));
+		$this->body = $t->ParseFile($this->_email_template);
+
+		if ($send)
+			mail($this->_to, $this->_subject, $this->body, implode($headers, "\r\n"));
+
+		if (!empty($this->debug))
+		{
+			var_dump($headers);
+			var_dump("Subject: {$this->_subject}");
+			echo "Body: <pre>$this->body</pre>";
+			die();
+		}
 	}
 
 	function TagField($t, $g)
@@ -106,7 +126,6 @@ class FormEmail extends Module
 		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
 		$rows = array();
 		foreach ($this->_inputs as $i => $n)
-		//foreach ($this->_fields as $n => $f)
 		{
 			if (!preg_match($preg, $n, $m)) continue;
 			if (!isset($this->_labels[$i])) continue;
@@ -114,16 +133,21 @@ class FormEmail extends Module
 			$row = array();
 
 			# Repeating Value
-			if (is_array($this->_data[$m[1]]))
+			if (is_array(@$this->_data[$m[1]]))
 			{
 				$l = $this->_labels[$i];
-				foreach ($this->_data[$m[1]] as $ix => $val)
-					$arrs[$ix][$l] = $val;
+
+				$row['name'] = $l;
+				$row['value'] = '';
+
+				foreach ($this->_data[$m[1]] as $ix => $val) $row['value'] .= ' '.$val;
+
+				$rows[] = $row;
 			}
 			else # Non-repeating value
 			{
 				$row['name'] = $this->_labels[$i];
-				$row['value'] = $this->_data[$m[1]];
+				$row['value'] = @$this->_data[$m[1]];
 				$rows[] = $row;
 			}
 		}

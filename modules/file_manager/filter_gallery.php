@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__).'/file_manager.php');
 require_once(dirname(__FILE__).'/filter_default.php');
 
 class FilterGallery extends FilterDefault
@@ -48,26 +49,16 @@ class FilterGallery extends FilterDefault
 		else $abs = "$dir/{$fi->filename}";
 
 		$relpath = Server::GetRelativePath($abs);
-		$path = dirname($relpath).'/'.urlencode(basename($relpath));
+		$path = HM::urlencode_path(dirname($relpath).'/'.basename($relpath));
 
-		$atrs['SRC'] = $path;
-
-		//if ($this->Behavior->UseThumbs)
-		//{
-			//$atrs['WIDTH'] = $fi->info['thumb_width'];
-			//$atrs['HEIGHT'] = $fi->info['thumb_height'];
-		//}
-		$atrs['ALT'] = 'icon';
-
-		if (file_exists($abs)) $fi->icon =
-			'<img'.HM::GetAttribs($atrs).' />';
+		if (file_exists($abs)) $fi->icon = $path;
 
 		# Prepare custom folder icon
 
 		if (is_dir($fi->path))
 		{
 			$fs = glob($fi->path.'/.t_image.*');
-			if (!empty($fs)) $fi->vars['icon'] = '<img src="'.$fs[0].'" alt="Icon" />';
+			if (!empty($fs)) $fi->vars['icon'] = $fs[0];
 			else $fi->vars['icon'] = FileManager::GetIcon($fi);
 		}
 		return $fi;
@@ -135,7 +126,7 @@ class FilterGallery extends FilterDefault
 	 */
 	function FFRename(&$fi, $newname)
 	{
-		parent::Rename($fi, $newname);
+		parent::FFRename($fi, $newname);
 		$thumb = $fi->dir.'/t_'.basename($fi->filename);
 		$ttarget = dirname($newname).'/t_'.basename($newname);
 		if (file_exists($thumb)) rename($thumb, $ttarget);
@@ -271,7 +262,7 @@ class FilterGallery extends FilterDefault
 	{
 		$img = imagecreatefromstring(file_get_contents($file));
 		$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-		imagejpeg($img, $dest);
+		imagepng($img, $dest);
 	}
 
 	/**
@@ -295,18 +286,17 @@ class FilterGallery extends FilterDefault
 		}
 		else # Not literal, maintain aspect ratio
 		{
-			if ($sx < $sy)
-			{
-				$dx = $nx * $sx / $sy;
-				$dy = $ny;
-			}
-			else
-			{
-				$dx = $nx;
-				$dy = $ny * $sy / $sx;
-			}
+			# Get a scale factor
+			if ($sx > $sy) $sf = ($nx / $sx);
+			else $sf = ($ny / $sy);
+
+			$dx = $sx * $sf;
+			$dy = $sy * $sf;
 		}
 		$dimg = imagecreatetruecolor((int)$dx, (int)$dy);
+		# Fill transparent
+		imagesavealpha($dimg, true);
+		imagefill($dimg, 0, 0, imagecolorallocatealpha($dimg, 0, 0, 0, 127));
 		ImageCopyResampled($dimg, $img, 0, 0, 0, 0, $dx, $dy, $sx, $sy);
 		return $dimg;
 	}

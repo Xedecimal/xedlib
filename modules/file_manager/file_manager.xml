@@ -1,4 +1,12 @@
-<null>
+<div class="file-manager">
+
+<style type="text/css">
+.file-manager th { text-align: left; }
+.file-manager .box { margin-top: 2em; }
+.file-manager .box_title { font-size: large; }
+.file-manager .icon { cursor: move; }
+</style>
+
 <header>
 <box title="Current Path Location" id="{{fn_name}}_path">
 <path root="Home" sep="&raquo;"> <a href="{{uri}}">{{name}}</a></path>
@@ -6,130 +14,132 @@
 </box>
 </header>
 
-<form action="{{target}}" method="post" enctype="multipart/form-data">
+<form class="form-file-manager" action="{{target}}" method="post" enctype="multipart/form-data">
 
 <options>
-	<box title="File and Folder Tasks" id="{{fn_name}}_tasks">
-	<div class="div-mass-options"> <!-- Mass Options -->
-		<p>With selected files...</p>
-		<behavior type="AllowMove,AllowCopy,AllowLink">
-			<behavior type="AllowMove"><input type="submit"
-				name="{{fn_name}}_action" value="Move To" /></behavior>
-			<behavior type="AllowCopy"><input type="submit"
-				name="{{fn_name}}_action" value="Copy To" /></behavior>
-			<behavior type="AllowLink"><input type="submit"
-				name="{{fn_name}}_action" value="Link In" /></behavior>
-			{{dirsel}}
-		</behavior>
-		<behavior type="AllowDelete"><input type="submit"
-			name="{{fn_name}}_action" value="Delete" class="delete"
-			/></behavior>
-		<behavior type="AllowDownloadZip"><input type="submit"
-			name="{{fn_name}}_action" value="Download Selected" /></behavior>
-	</div> <!-- .mass_options -->
 
-	<search> <!-- Search -->
-	<tr><td class="opt_title">
+<box title="File and Folder Tasks" id="{{fn_name}}_tasks">
+
+<div class="div-mass-options"> <!-- Mass Options -->
+<p>With selected files...</p>
+<behavior type="AllowMove,AllowCopy,AllowLink">
+	<behavior type="AllowMove"><input type="submit"
+		name="{{fn_name}}_action" value="Move To" /></behavior>
+	<behavior type="AllowCopy"><input type="submit"
+		name="{{fn_name}}_action" value="Copy To" /></behavior>
+	<behavior type="AllowLink"><input type="submit"
+		name="{{fn_name}}_action" value="Link In" /></behavior>
+	{{dirsel}}
+</behavior>
+
+<behavior type="AllowDelete"><input type="submit"
+	name="{{fn_name}}_action" value="Delete" class="delete"
+	/></behavior>
+<behavior type="AllowDownloadZip"><input type="submit"
+	name="{{fn_name}}_action" value="Download Selected" /></behavior>
+</div> <!-- .mass_options -->
+
+<search> <!-- Search -->
+<tr><td class="opt_title">
 	<a href="#" onclick="$('#{{fn_name}}_search').toggle('slow'); return false;">Search</a>
-			</td><td>
-				<img id="img{{fn_name}}_search"
-					src="{{xl_abs}}/images/down.png" alt="Visibility" />
-			</td></tr><tr><td colspan="2">
-				<div id="{{fn_name}}_search" style="display: none">
-				<table>
-				<tr><td>Search for</td><td><input type="text" name="cq" /></td></tr>
-				<tr><td></td><td><input type="submit" name="ca" value="Search" /></td></tr>
-				</table>
-				</div>
-			</td></tr>
-			</search>
+</td><td>
+	<img id="img{{fn_name}}_search"
+		src="{{xl_abs}}/images/down.png" alt="Visibility" />
+</td></tr><tr><td colspan="2">
+	<div id="{{fn_name}}_search" style="display: none">
+	<table>
+	<tr><td>Search for</td><td><input type="text" name="cq" /></td></tr>
+	<tr><td></td><td><input type="submit" name="ca" value="Search" /></td></tr>
+	</table>
+	</div>
+</td></tr>
+</search>
 
-			<!-- Upload File -->
-			<behavior type="AllowUpload">
-				<a href="{{fn_name}}_upload" class="a-toggle">Send Files</a>
-				<img id="img{{fn_name}}_upload" src="{{xl_abs}}/images/down.png" alt="Visibility" />
-				<div id="{{fn_name}}_upload" style="display: none">
-					<behavior type="UploadJava">
-					<applet codebase="{{xl_abs}}/java/" code="uploadApplet.class"
-						archive="UploadApplet.jar,commons-codec-1.3.jar,commons-httpclient-3.0.1.jar,commons-logging-1.0.4.jar"
-						width="525" height="100">
-						<param name="host" value="http://{{host}}" />
-						<param name="pathToScript" value="{{target}}?{{fn_name}}_action=Upload&amp;PHPSESSID={{sid}}" />
-						<param name="path" value="{{cf}}" />
-						<param name="uploadMax" value="500000" />
-					</applet>
-					</behavior>
-					<behavior type="UploadNormal">
-						<input type="file" name="cu[]" />
-						<input type="submit" name="{{fn_name}}_action" value="Upload" />
-					</behavior>
-				</div>
-			</behavior>
+<!-- Upload File -->
+<behavior type="AllowUpload">
+	<a href="{{fn_name}}_upload" class="a-toggle">Send Files</a>
+	<img id="img{{fn_name}}_upload" src="{{xl_abs}}/images/down.png" alt="Visibility" />
+	<div id="{{fn_name}}_upload" style="display: none">
+		<behavior type="UploadJava">
+		<applet codebase="{{xl_abs}}/java/" code="uploadApplet.class"
+			archive="UploadApplet.jar,commons-codec-1.3.jar,commons-httpclient-3.0.1.jar,commons-logging-1.0.4.jar"
+			width="525" height="100">
+			<param name="host" value="http://{{host}}" />
+			<param name="pathToScript" value="{{target}}?{{fn_name}}_action=Upload&amp;PHPSESSID={{sid}}" />
+			<param name="path" value="{{cf}}" />
+			<param name="uploadMax" value="500000" />
+		</applet>
+		</behavior>
+		<behavior type="UploadNormal">
+			<input type="file" name="cu[]" />
+			<input type="submit" name="{{fn_name}}_action" value="Upload" />
+		</behavior>
+	</div>
+</behavior>
 
-			<!-- Create Folder -->
-			<behavior type="AllowCreateDir">
-				<a href="{{fn_name}}_create" class="a-toggle">{{TextCreateFolder}}</a>
-				<img id="img{{fn_name}}_create" src="{{xl_abs}}/images/down.png" alt="Visibility" />
-				<div id="{{fn_name}}_create" style="display: none">
-					<input type="text" name="{{fn_name}}_cname" />
-					<input type="submit" name="{{fn_name}}_action" value="Create" /><br/>
-				</div>
-			</behavior>
+<!-- Create Folder -->
+<behavior type="AllowCreateDir">
+	<a href="{{fn_name}}_create" class="a-toggle">{{TextCreateFolder}}</a>
+	<img id="img{{fn_name}}_create" src="{{xl_abs}}/images/down.png" alt="Visibility" />
+	<div id="{{fn_name}}_create" style="display: none">
+		<input type="text" name="{{fn_name}}_cname" />
+		<input type="submit" name="{{fn_name}}_action" value="Create" /><br/>
+	</div>
+</behavior>
 
-			<!-- Rename File / Folder -->
-			<behavior type="AllowRename">
-				<a href="{{fn_name}}_rename" class="a-toggle">Rename this file or folder</a>
-				<img id="img{{fn_name}}_rename" src="{{xl_abs}}/images/down.png" alt="Visibility" />
-				<div id="{{fn_name}}_rename" style="display: none">
-				<input type="text" name="{{fn_name}}_rname" value="{{filename}}" />
-				<input type="submit" name="{{fn_name}}_action" value="Rename" /><br/>
-				</div>
-			</behavior>
+<!-- Rename File / Folder -->
+<behavior type="AllowRename">
+	<a href="{{fn_name}}_rename" class="a-toggle">Rename this file or folder</a>
+	<img id="img{{fn_name}}_rename" src="{{xl_abs}}/images/down.png" alt="Visibility" />
+	<div id="{{fn_name}}_rename" style="display: none">
+	<input type="text" name="{{fn_name}}_rname" value="{{filename}}" />
+	<input type="submit" name="{{fn_name}}_action" value="Rename" /><br/>
+	</div>
+</behavior>
 
-			<!-- Additional Settings -->
-			<behavior type="AllowEdit">
-				<a href="{{fn_name}}_edit" class="a-toggle">Additional Settings</a>
-				<img id="img{{fn_name}}_edit" src="{{xl_abs}}/images/down.png" alt="Visibility" />
-				<div id="{{fn_name}}_edit" style="display: none">
-				<addopts>
-					<tr><td>{{text}}</td><td>{{field}}</td></tr>
-				</addopts>
-				</div>
-			</behavior>
-		</box>
+<!-- Additional Settings -->
+<behavior type="AllowEdit">
+	<a href="{{fn_name}}_edit" class="a-toggle">Additional Settings</a>
+	<img id="img{{fn_name}}_edit" src="{{xl_abs}}/images/down.png" alt="Visibility" />
+	<div id="{{fn_name}}_edit" style="display: none">
+	<addopts>
+		<tr><td>{{text}}</td><td>{{field}}</td></tr>
+	</addopts>
+	</div>
+</behavior>
+
+</box>
 </options>
 
 <directory>
 		<folders>
 		<box title="Folders">
-			<table>
+			<table class="table-listing">
 				<check><tr>
-					<td>&nbsp;</td>
-					<td><input type="checkbox" class="in-sel-folders"
-						id="{{fn_name}}-sel-folders" /></td>
-					<td><label for="{{fn_name}}-sel-folders">Select All</label></td>
+					<th>&nbsp;</th>
+					<th><label><input type="checkbox" class="in-sel-folders"
+						id="{{fn_name}}-sel-folders" />Select All</label></th>
+					<th>Caption</th>
 				</tr></check>
 				<folder>
-					<tr>
-					<td align="right">{{icon}}</td>
+					<tr class="tr-entry" data-path="{{fipath}}">
+					<td class="icon"><img src="{{icon}}" alt="Icon" /></td>
+					<td>
 					<check>
-						<td>
 							<input type="checkbox" class="check_folder"
 							id="{{fn_name}}_sel_{{type}}_{{index}}"
 							name="{{fn_name}}_sels[]" value="{{fipath}}" />
-						</td>
-					</check>
+					</check></td>
 					<td class="folder-caption"><a href="{{url}}">{{name}}</a><br />{{caption}}</td>
-					<td>{{butup}}</td>
-					<td>{{butdown}}</td>
 				</tr>
 				</folder>
 			</table>
 		</box>
 		</folders>
+
 		<files>
-		<box title="Files">
-			<table>
+		<h3>Files</h3>
+			<table class="table-listing">
 				<check><tr>
 					<td>&nbsp;</td>
 					<td><input type="checkbox" class="in-sel-files"
@@ -137,8 +147,8 @@
 					<td><label for="{{fn_name}}-sel-files">Select All</label></td>
 				</tr></check>
 				<file>
-				<tr>
-					<td align="right">{{icon}}</td>
+				<tr class="tr-entry" data-path="{{fipath}}">
+					<td class="icon"><img src="{{icon}}" alt="Icon" /></td>
 					<check>
 					<td>
 						<input type="checkbox" class="check_file"
@@ -146,16 +156,14 @@
 						value="{{fipath}}" />
 					</td>
 					</check>
-					<td><p><a href="{{url}}">{{filename}}</a><br />{{caption}}</p></td>
+					<td><p><a class="a-file" data-icon="{{icon}}" href="{{url}}">{{filename}}</a><br />{{caption}}</p></td>
 					<quickopt><td>{{opt}}</td></quickopt>
-					<td>{{butup}}</td>
-					<td>{{butdown}}</td>
 				</tr>
 				</file>
 			</table>
-			<QuickOptFinal />
-		</box>
 		</files>
+
+		<QuickOptFinal />
 </directory>
 
 <details>
@@ -172,4 +180,5 @@
 </details>
 
 </form>
-</null>
+
+</div>

@@ -1,0 +1,5 @@
+.actions a { margin: 1em; }
+.hidden { display: none; }
+.field_text { vertical-align: top; }
+fieldset ul { overflow: hidden; }
+fieldset ul li { margin: 1em 2em; }

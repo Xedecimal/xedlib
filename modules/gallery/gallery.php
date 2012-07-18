@@ -57,22 +57,16 @@ class Gallery extends Module
 
 		$out = '';
 		$vp = new VarParser();
-		$dp = opendir($this->Root.$this->path);
-		while ($file = readdir($dp))
+
+		foreach ($this->files['folders'] as $fi)
 		{
-			if ($file[0] == '.') continue;
-
-			$p = $this->Root.$this->path.'/'.$file;
-			if (!is_dir($p)) continue;
-
-			$fi = new FileInfo($this->Root.$this->path.'/'.$file);
 			$this->f->FFGetInfo($fi);
 
 			$du['editor'] = Server::GetVar('editor');
-			$du['galcf'] = Server::GetVar('galcf', '').'/'.$file;
+			$du['galcf'] = Server::GetVar('galcf', '').'/'.$fi->filename;
 			$d['url'] = HM::URL($me, $du);
 
-			$d['name'] = $file;
+			$d['name'] = $fi->filename;
 			$d['icon'] = $fi->vars['icon'];
 			$d['editor'] = Server::GetVar('editor');
 
@@ -83,6 +77,8 @@ class Gallery extends Module
 
 	function TagFile($t, $guts)
 	{
+		global $_d;
+
 		$out = '';
 		$vp = new VarParser();
 		$vp->Behavior->Bleed = false;
@@ -95,7 +91,7 @@ class Gallery extends Module
 			if ($ix >= count($this->files['files'])-1) $d['class'] = ' last';
 			else $d['class'] = '';
 
-			$d['fullname'] = $fi->path;
+			$d['fullname'] = HM::urlencode_path($_d['app_abs'].'/'.$fi->path);
 			$d['idx'] = $ix;
 			$d['name'] = $this->GetCaption($fi);
 			$d['path'] = Server::GetVar('galcf', '');
@@ -105,48 +101,6 @@ class Gallery extends Module
 			$out .= $vp->ParseVars($guts, $d);
 		}
 		return $out;
-
-		/*if ($this->Behavior->PageCount != null)
-		{
-			$tot = GetFlatPage($files['files'], Server::GetVar('cp'), $this->Behavior->PageCount);
-		}
-		else $tot = $files['files'];
-
-		$ix = Server::GetVar('cp')*$this->Behavior->PageCount;
-		$body .= "<tr class=\"images\"><td>\n";
-
-		foreach ($tot as $file)
-		{
-			if (isset($file->icon) && file_exists($file->icon))
-			{
-				if (isset($file->icon) && file_exists($file->icon))
-				{
-					$twidth = $file->info['thumb_width']+16;
-					$theight = $file->info['thumb_height']+60;
-					$url = HM::URL($me, array(
-						'view' => $ix++,
-						'galcf' => "$path",
-						'cp' => Server::GetVar('cp')
-					));
-					$caption = $this->GetCaption($file);
-
-				$body .= <<<EOF
-<div class="gallery_cell" style="overflow: auto; width: {$twidth}px; height:{$theight}px">
-<table class="gallery_shadow">
-<tr><td>
-<a href="{$url}#fullview">
-<img src="{$path}/t_{$file->filename}" alt="thumb" /></a></td><td class="gallery_shadow_right">
-</td></tr>
-<tr>
-<td class="gallery_shadow_bottom"></td>
-<td class="gallery_shadow_bright"></td>
-</tr>
-</table><div class="gallery_caption">$caption</div></div>
-EOF;
-				}
-			}
-		}
-		$body .= '</td>';*/
 	}
 
 	function TagImage($t, $guts)
@@ -197,7 +151,7 @@ EOF;
 		$this->FileManager->Filters = array('FilterGallery');
 		$this->FileManager->Root = $this->Root.$path;
 		$this->FileManager->Behavior->ShowAllFiles = true;
-		$this->FileManager->View->Sort = $this->Display->Sort;
+		$this->FileManager->Behavior->Sort = $this->Display->Sort;
 		$this->files = $this->FileManager->GetDirectory();
 
 		$t = new Template();
@@ -328,7 +282,7 @@ class GalleryDisplay
 	public $CaptionRight = '';
 
 	/**
-	 * Method of sorting this gallery, can be SORT_MANUAL or SORT_NONE.
+	 * Method of sorting this gallery, can be FM_SORT_MANUAL or FM_SORT_NONE.
 	 * @var int
 	 */
 	public $Sort;
@@ -353,23 +307,19 @@ class GalleryBehavior
 
 class GalleryAdmin extends FileManager
 {
-	/**
-	* Gallery based file manager instance.
-	*
-	* @var FileManager
-	*/
-	private $fm;
+	public $Name = 'admin/gallery';
+	public $Root = 'galimg';
 
 	function __construct()
 	{
 		parent::__construct();
 
 		global $me, $_d;
-		$this->CheckActive('gallery');
+		$this->CheckActive($this->Name);
 
+		$this->Behavior->Target = '{{app_abs}}/'.$this->Name;
 		$this->Name = 'fmgal';
-		$this->Root = 'galimg';
-		$this->Filters = array('Gallery');
+		$this->Filters = array('FilterGallery');
 	}
 
 	function Link()

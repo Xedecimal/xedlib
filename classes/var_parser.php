@@ -85,13 +85,13 @@ class VarParser
 		{
 			$tree = explode('.', $tvar);
 			$cv = $this->FindVar($tree[0]);
-			for ($ix = 1; $ix < count($tree); $ix++) $cv = $cv[$tree[$ix]];
+			for ($ix = 1; $ix < count($tree); $ix++) $cv = @$cv[$tree[$ix]];
 			return $cv;
 		}
 		global $$tvar;
 		if (is_object($this->vars)) return @$this->vars->$tvar;
-		if (!empty($this->vars) && key_exists($tvar, $this->vars))
-			return $this->vars[$tvar];
+		if (!empty($this->vars) && is_array($this->vars) &&
+			key_exists($tvar, $this->vars)) return $this->vars[$tvar];
 		else if (isset($$tvar)) return $$tvar;
 		else if (defined($tvar)) return constant($tvar);
 		else if (isset($this->data[$tvar])) return $this->data[$tvar];
@@ -104,8 +104,7 @@ class VarParser
 		$vp = new VarParser();
 		$vp->Behavior->Bleed = $bleed;
 		$ret = '';
-		foreach ($items as $id => $i)
-			$ret .= $vp->ParseVars($t, $i);
+		foreach ($items as $id => $i) $ret .= $vp->ParseVars($t, $i);
 		return $ret;
 	}
 }

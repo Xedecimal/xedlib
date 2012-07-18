@@ -393,6 +393,7 @@ class EditorData extends Module
 		}
 		else $this->type = CONTROL_SIMPLE;
 		$this->sorting = ED_SORT_MANUAL;
+		$this->CheckActive($this->Name);
 	}
 
 	/**
@@ -414,6 +415,8 @@ class EditorData extends Module
 	 */
 	function Prepare()
 	{
+		if (!$this->Active) return;
+
 		$act = Server::GetState($this->Name.'_action');
 
 		if ($this->sorting == ED_SORT_TABLE)
@@ -438,7 +441,7 @@ class EditorData extends Module
 					$value = Server::GetVar($this->Name.'_'.$col);
 					if ($in->attr('TYPE') == 'date')
 					{
-						$insert[$col] = Database::TimestampToMySql(strtotime($value));
+						$insert[$col] = date('Y-m-d', strtotime($value));
 					}
 					else if($in->attr('TYPE') == 'datetime')
 					{
@@ -548,7 +551,7 @@ class EditorData extends Module
 					$value = Server::GetVar($this->Name.'_'.$col);
 
 					if ($in->attr('TYPE') == 'date')
-						$update[$col] = $value[2].'-'.$value[0].'-'.$value[1];
+						$update[$col] = date('Y-m-d', strtotime($value));
 					else if ($in->attr('TYPE') == 'datetime')
 					{
 						if ($value[5][0] == 1)
@@ -659,6 +662,8 @@ class EditorData extends Module
 
 		if ($this->type == CONTROL_SIMPLE)
 		{
+			$ci = Server::GetState($this->Name.'_ci');
+
 			if (file_exists($ci))
 				$this->values = unserialize(file_get_contents($ci));
 			else
@@ -711,6 +716,8 @@ class EditorData extends Module
 	 */
 	function Get()
 	{
+		if (!$this->Active) return;
+
 		$this->Behavior->Target = $this->Name;
 
 		$t = new Template();
@@ -1359,7 +1366,7 @@ class EditorData extends Module
 			$d['form_title'] = "{$frm->State} {$frm->Description}";
 			$atrs['METHOD'] = 'post';
 			$atrs['ACTION'] = $this->Behavior->Target;
-			$atrs['CLASS'] = 'form';
+			$atrs['CLASS'] = 'form-vertical';
 			foreach ($this->ds->FieldInputs as $fi)
 				if ($fi->atrs['TYPE'] == 'file')
 					$atrs['ENCTYPE'] = 'multipart/form-data';
@@ -1372,17 +1379,6 @@ class EditorData extends Module
 	function TagSearch($t, $g, $a)
 	{
 		if ($this->Behavior->Search) return $g;
-	}
-
-	/**
-	 * Gets a standard user interface for a single editor's Get() method.
-	 *
-	 * @param string Name of state variable to pass around via GPC.
-	 * @return string Rendered html of associated objects.
-	 */
-	function GetUI($target = 'editor')
-	{
-
 	}
 
 	function Reset()

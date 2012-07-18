@@ -467,6 +467,17 @@ class Template extends LayeredOutput
 		else $this->vars[$var] = $val;
 	}
 
+	public function Concat($g, $items)
+	{
+		$ret = '';
+		foreach ($items as $i)
+		{
+			$this->Set($i);
+			$ret .= $this->GetString($g);
+		}
+		return $ret;
+	}
+
 	/**
 	 * Get a rendered template.
 	 * @param string $template The template file.
@@ -482,6 +493,7 @@ class Template extends LayeredOutput
 
 		$this->data['template.stack'][] = $template;
 		$this->template = $template;
+
 		$ret = $this->GetString(file_get_contents($template));
 		array_pop($this->data['template.stack']);
 		return $ret;

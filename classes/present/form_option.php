@@ -36,11 +36,13 @@ class FormOption extends TreeNode
 	 * @param bool $group
 	 * @param bool $selected
 	 */
-	function __construct($text, $selected = false)
+	function __construct($text, $selected = false, $group = false)
 	{
 		$this->text = $text;
 		$this->selected = $selected;
+		$this->group = $group;
 		$this->disabled = false;
+		$this->children = array();
 	}
 
 	function __tostring() { return $this->text; }
@@ -48,7 +50,7 @@ class FormOption extends TreeNode
 	function RenderCheck($atrs)
 	{
 		if ($this->selected) $atrs['CHECKED'] = 'checked';
-		if (!empty($this->children))
+		if (!empty($this->children) || $this->group)
 		{
 			$ret = '<p><b><i>'.$this->text.'</i></b><br />';
 			foreach ($this->children as $c) $ret .= $c->RenderCheck($atrs);
@@ -58,9 +60,9 @@ class FormOption extends TreeNode
 		else
 		{
 			$valu = isset($this->valu) ? ' value="'.$this->valu.'"' : null;
-			return '<label><input type="checkbox" value="'.$this->valu.'"'
-				.HM::GetAttribs($atrs).' />'.htmlspecialchars($this->text)
-					.'</label>';
+			return '<input type="checkbox" value="'.$this->valu.'"'
+				.HM::GetAttribs($atrs).' /> <label for="'.@$atrs['ID'].'">'
+				.htmlspecialchars($this->text).'</label><br />';
 		}
 	}
 
@@ -78,7 +80,7 @@ class FormOption extends TreeNode
 		}
 		else
 		{
-			$valu = !empty($this->valu) ? ' value="'.$this->valu.'"' : null;
+			$valu = isset($this->valu) ? ' value="'.$this->valu.'"' : null;
 			return "<option{$valu}{$selected}>".htmlspecialchars($this->text).'</option>';
 		}
 	}
@@ -172,6 +174,21 @@ class FormOption extends TreeNode
 		foreach ($array as $ix => $v)
 			$ret[] = $sel[$v]->text;
 		return implode(', ', $ret);
+	}
+
+	/**
+	* A SelOption callback, returns the value by the integer.
+	*/
+	static function CBSelect($ds, $item, $icol, $col = null)
+	{
+		if (is_array($ds->FieldInputs[$col]->attr('VALUE')))
+		foreach ($ds->FieldInputs[$col]->attr('VALUE') as $v)
+		{
+			$res = $v->Find($item[$icol]);
+			if (isset($res)) return $res->text;
+		}
+
+		return $item[$icol];
 	}
 }
 

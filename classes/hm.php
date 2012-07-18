@@ -124,6 +124,11 @@ class HM
 		}
 		return $ret;
 	}
+
+	static function urlencode_path($str)
+	{
+		return str_replace('%2F', '/', rawurlencode($str));
+	}
 }
 
 ?>

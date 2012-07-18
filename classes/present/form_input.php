@@ -98,6 +98,21 @@ class FormInput
 		if (isset($this->atrs[$attr])) return $this->atrs[$attr];
 	}
 
+	function Value($newval = null)
+	{
+		switch ($this->atrs['TYPE'])
+		{
+			case 'select':
+				if (isset($this->atrs['VALUE'][$newval]))
+					$this->atrs['VALUE'][$newval]->selected = true;
+				return @$this->atrs['VALUE'][$newval]->value;
+			default:
+				if (isset($newval)) $this->atrs['VALUE'] = $newval;
+				return @$this->atrs['VALUE'];
+				break;
+		}
+	}
+
 	/**
 	 * This is eventually going to need to be an array instead of a substr for
 	 * masked fields that do not specify length, we wouldn't know the length
@@ -142,7 +157,9 @@ class FormInput
 
 		if ($this->atrs['TYPE'] == 'captcha')
 		{
-			return '<input type="text" name="c" value="" style="display: none;" />';
+			$atrs = $this->atrs;
+			unset($atrs['TYPE']);
+			return '<input type="text" value="" style="display: none;"'.HM::GetAttribs($atrs).' />';
 		}
 		if ($this->atrs['TYPE'] == 'spamblock')
 		{
@@ -210,14 +227,17 @@ class FormInput
 				$vp = new VarParser();
 				if (!empty($this->atrs['VALUE']))
 				{
-					@$this->atrs['CLASS'] .= ' checks';
 					$divAtrs = $this->atrs;
+					@$divAtrs['CLASS'] .= ' checks';
 					unset($divAtrs['TYPE'], $divAtrs['VALUE'], $divAtrs['NAME']);
 					$ret .= '<div'.HM::GetAttribs($divAtrs).'>';
 					$newsels = $this->GetValue($persist);
 					foreach ($newsels as $id => $val)
+					{
 						$ret .= $val->RenderCheck(array(
-							'NAME' => $this->atrs['NAME'].'[]'));
+							'NAME' => $this->atrs['NAME'].'[]',
+							'ID' => $this->atrs['NAME'].'-'.$id));
+					}
 					$ret .= '</div>';
 				}
 				return $ret;
@@ -263,7 +283,7 @@ class FormInput
 			case 'mask':
 				$this->mask_walk = 0;
 				return preg_replace_callback('/t([0-9]+)/',
-					array($this, 'mask_callback'), @$this->mask);
+					array($this, 'mask_callback'), @$this->atrs['DATA-MASK']);
 
 			case 'select':
 			case 'selects':
