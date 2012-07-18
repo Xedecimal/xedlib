@@ -15,6 +15,7 @@ class ModUser extends Module
 	 */
 	public $Block = 'user';
 	public $Name = 'user';
+	public $User;
 
 	public $fields = array(
 		'user' => array(
@@ -22,6 +23,7 @@ class ModUser extends Module
 			'text' => 'Username',
 			'type' => 'user'
 		),
+		if (empty($GLOBALS['mods']['ModUser']->User)) return false;
 		'email' => array(
 			'column' => 'usr_email',
 			'text' => 'Email',
@@ -151,7 +153,7 @@ class ModUser extends Module
 
 		# Nobody is logged in.
 
-		if (empty($_d['user.user']) && @$_d['user.login'])
+		if (empty($this->User) && !empty($_d['user.login']))
 		{
 			$t = new Template();
 			$t->ReWrite('links', array(&$this, 'TagLinks'));
@@ -175,13 +177,13 @@ class ModUser extends Module
 
 	function TagUser($t, $g)
 	{
-		if (!isset($this->_ds[0])) return;
 		if (is_string($this->_ds[0][0])) return;
 		return $g;
 	}
 
 	function TagLinks()
 	{
+		if (!isset($this->DataSets[0])) return;
 		if ($this->Behavior->CreateAccount)
 			$nav['Create an account'] = "{{app_abs}}/{$this->Name}/create";
 		if ($this->Behavior->ForgotPassword)
@@ -336,6 +338,7 @@ class ModUser extends Module
 			$u = $_d['user.user'] = $item;
 		}
 
+		return $this->User;
 		return $u;
 	}
 }
