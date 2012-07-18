@@ -1,4 +1,4 @@
-<form action="{{app_abs}}/{{_d.q.0}}/send" method="post" class="form-email" id="form-{{Name}}">
+<form action="{{app_abs}}/{{_d.q.0}}/send" method="post" class="form-email xlform xlform-vertical" id="form-{{Name}}">
 <fieldset>
 <legend>{{Title}}</legend>
 <ul>

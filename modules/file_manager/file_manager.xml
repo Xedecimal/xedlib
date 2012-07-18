@@ -1,4 +1,4 @@
-<div class="file-manager">
+<div class="file-manager" id="{{fn_name}}">
 
 <style type="text/css">
 .file-manager th { text-align: left; }
@@ -71,7 +71,7 @@
 		</applet>
 		</behavior>
 		<behavior type="UploadNormal">
-			<input type="file" name="cu[]" />
+			<input type="file" name="cu[]" multiple="multiple" />
 			<input type="submit" name="{{fn_name}}_action" value="Upload" />
 		</behavior>
 	</div>

@@ -454,7 +454,7 @@ class CodeReader
 		$this->current = new CodeObject($tok[0]);
 		$this->current->file = $this->file;
 		$this->current->line = $this->line;
-		$this->current->doc = $this->curdoc;
+		$this->current->doc = @$this->curdoc;
 		@$this->current->doc->package = $this->curpackage;
 		$this->current->returning = false;
 
@@ -477,7 +477,7 @@ class CodeReader
 		$this->current = new CodeObject($tok[0]);
 		$this->current->file = $this->file;
 		$this->current->line = $this->line;
-		$this->current->doc = $this->curdoc;
+		$this->current->doc = @$this->curdoc;
 		@$this->current->doc->package = $this->curpackage;
 		$this->curdoc = null;
 	}

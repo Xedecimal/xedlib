@@ -31,7 +31,7 @@ class ModPage extends Module
 		if ($_d['q'][0] == 'part') die(VarParser::Parse($content, $_d));
 
 		if (!empty($content))
-			return '<div class="page_content">'.stripslashes($content).'</div>';
+			return stripslashes($content);
 	}
 }
 

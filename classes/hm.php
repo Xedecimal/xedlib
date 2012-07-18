@@ -26,7 +26,7 @@ class HM
 		if (is_array($attribs))
 		foreach ($attribs as $n => $v)
 		{
-			if (!is_string($v)) continue;
+			if (!is_string($v) && !is_numeric($v)) continue;
 			$ret .= ' '.strtolower($n).'="'.htmlspecialchars($v).'"';
 		}
 		else return ' '.$attribs;

@@ -91,7 +91,7 @@ class Gallery extends Module
 			if ($ix >= count($this->files['files'])-1) $d['class'] = ' last';
 			else $d['class'] = '';
 
-			$d['fullname'] = HM::urlencode_path($_d['app_abs'].'/'.$fi->path);
+			$d['fullname'] = HM::urlencode_path($fi->dir.'/f_'.$fi->filename);
 			$d['idx'] = $ix;
 			$d['name'] = $this->GetCaption($fi);
 			$d['path'] = Server::GetVar('galcf', '');
@@ -222,8 +222,8 @@ class Gallery extends Module
 		//Gallery settings
 		$fig = new FileInfo($this->Root);
 		$this->FileManager->GetFilter($fig, $this->Root, array('FilterGallery'));
-		$t->Set('file_thumb_width', $fig->info['thumb_width']+20);
-		$t->Set('file_thumb_height', $fig->info['thumb_height']+50);
+		$t->Set('file_thumb_width', $fig->info['thumb_width']);
+		$t->Set('file_thumb_height', $fig->info['thumb_height']+60);
 
 		$fi = new FileInfo($this->Root.$path);
 		if ($path != $this->Root) $t->Set('name', $this->GetCaption($fi));
@@ -310,6 +310,8 @@ class GalleryAdmin extends FileManager
 	public $Name = 'admin/gallery';
 	public $Root = 'galimg';
 
+	function Auth() { return User::RequireAccess(1); }
+
 	function __construct()
 	{
 		parent::__construct();
@@ -318,7 +320,6 @@ class GalleryAdmin extends FileManager
 		$this->CheckActive($this->Name);
 
 		$this->Behavior->Target = '{{app_abs}}/'.$this->Name;
-		$this->Name = 'fmgal';
 		$this->Filters = array('FilterGallery');
 	}
 

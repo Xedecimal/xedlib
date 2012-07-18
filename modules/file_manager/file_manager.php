@@ -108,7 +108,7 @@ class FileManager extends Module
 	function __construct()
 	{
 		$this->Behavior = new FileManagerBehavior();
-		$this->Behavior->Target = $this->Name;
+		$this->Behavior->Target = $this->GetName();
 		$this->View = new FileManagerView();
 		$this->Template = dirname(__FILE__).'/file_manager.xml';
 		$this->CheckActive($this->Name);
@@ -125,8 +125,8 @@ class FileManager extends Module
 
 		if (empty($this->Root)) throw new Exception('Invalid root.');
 
-		$act = Server::GetVar($this->Name.'_action');
-		$this->cf = Server::GetVar($this->Name.'_cf');
+		$act = Server::GetVar($this->GetName(true).'_action');
+		$this->cf = Server::GetVar($this->GetName(true).'_cf');
 
 		# TODO: Only declare $fi once!
 
@@ -245,7 +245,7 @@ class FileManager extends Module
 		else if ($act == 'Delete')
 		{
 			if (!$this->Behavior->AllowDelete) return;
-			$sels = Server::GetVar($this->Name.'_sels');
+			$sels = Server::GetVar($this->GetName(true).'_sels');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -376,7 +376,7 @@ class FileManager extends Module
 			$this->cf .= '/';
 
 		# Append trailing slash.
-		if (substr($this->Root, -1) != '/') $this->Root .= '/';
+		#if (substr($this->Root, -1) != '/') $this->Root .= '/';
 
 		# Verify that this root exists.
 		/*if (!file_exists($this->Root.$this->cf))
@@ -457,11 +457,15 @@ class FileManager extends Module
 
 		$fi = new FileInfo($this->Root.$this->cf);
 
-		$t->Set('fn_name', $this->Name);
+		$t->Set('fn_name', $this->GetName(true));
 		$t->Set($this->View);
 
-		$ret['head'] = '<script type="text/javascript"
-				src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
+		global $_d;
+		if (empty($_d['fm_head']))
+			$ret['head'] = '<script type="text/javascript"
+					src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
+		$_d['fm_head'] = true;
+
 		$ret['default'] = $t->ParseFile($this->Template);
 
 		return $ret;
@@ -667,7 +671,7 @@ class FileManager extends Module
 				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' => $this->cf.$f->filename));
 			else
-				$this->vars['url'] = Module::P(htmlspecialchars($this->Root.$this->cf.$f->filename));
+				$this->vars['url'] = htmlspecialchars(Module::P($this->Root.$this->cf.$f->filename));
 			$this->vars['filename'] = htmlspecialchars($f->filename);
 			$this->vars['caption'] = $this->View->GetCaption($f);
 			$this->vars['fipath'] = htmlspecialchars($f->path);
@@ -1008,7 +1012,10 @@ class FileManager extends Module
 		{
 			if ($file[0] == '.') continue;
 
-			$newfi = new FileInfo("{$this->Root}/{$this->cf}/{$file}", $this->Filters);
+			$p = $this->Root;
+			if (!empty($this->cf)) $p .= '/'.$this->cf;
+			if (!empty($file)) $p .= '/'.$file;
+			$newfi = new FileInfo($p, $this->Filters);
 			if (!$newfi->show) continue;
 			if (is_dir($this->Root.$this->cf.'/'.$file))
 			{

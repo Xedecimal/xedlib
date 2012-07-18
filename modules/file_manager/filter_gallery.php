@@ -35,10 +35,15 @@ class FilterGallery extends FilterDefault
 		else $dinfo = $fi->info;
 
 		if (substr($fi->filename, 0, 2) == 't_') $fi->show = false;
+		if (substr($fi->filename, 0, 2) == 'f_') $fi->show = false;
+
+		if (!isset($dinfo['full_width'])) $dinfo['full_width'] = 1024;
+		if (!isset($dinfo['full_height'])) $dinfo['full_height'] = 1024;
+		$fi->info['full_width'] = $dinfo['full_width'];
+		$fi->info['full_height'] = $dinfo['full_height'];
 
 		if (!isset($dinfo['thumb_width'])) $dinfo['thumb_width'] = 200;
 		if (!isset($dinfo['thumb_height'])) $dinfo['thumb_height'] = 200;
-
 		$fi->info['thumb_width'] = $dinfo['thumb_width'];
 		$fi->info['thumb_height'] = $dinfo['thumb_height'];
 
@@ -48,7 +53,7 @@ class FilterGallery extends FilterDefault
 		if ($this->Behavior->UseThumbs) $abs = "{$dir}/t_{$fi->filename}";
 		else $abs = "$dir/{$fi->filename}";
 
-		$relpath = Server::GetRelativePath($abs);
+		$relpath = Module::P($abs);
 		$path = HM::urlencode_path(dirname($relpath).'/'.basename($relpath));
 
 		if (file_exists($abs)) $fi->icon = $path;
@@ -58,7 +63,7 @@ class FilterGallery extends FilterDefault
 		if (is_dir($fi->path))
 		{
 			$fs = glob($fi->path.'/.t_image.*');
-			if (!empty($fs)) $fi->vars['icon'] = $fs[0];
+			if (!empty($fs)) $fi->vars['icon'] = Module::P($fs[0]);
 			else $fi->vars['icon'] = FileManager::GetIcon($fi);
 		}
 		return $fi;
@@ -82,7 +87,16 @@ class FilterGallery extends FilterDefault
 			foreach ($fm->files['files'] as $fiImg)
 			{
 				if (substr($fiImg->filename, 0, 2) == 't_') continue;
+				if (substr($fiImg->filename, 0, 2) == 'f_') continue;
 				$selImages[htmlspecialchars($fiImg->filename)] = new FormOption($fiImg->filename);
+			}
+
+			if ($this->Behavior->ResizeFull)
+			{
+				$new[] = new FormInput('Full Width', 'text',
+					'info[full_width]', $fi->info['full_width']);
+				$new[] = new FormInput('Full Height', 'text',
+					'info[full_height]', $fi->info['full_height']);
 			}
 
 			if ($this->Behavior->UseThumbs)
@@ -110,6 +124,11 @@ class FilterGallery extends FilterDefault
 	{
 		parent::FFUpload($file, $target);
 
+		if ($this->Behavior->ResizeFull)
+		{
+			$this->ResizeFile($target->path.'/'.$file, $target->path.'/f_'.$file,
+				$target->info['full_width'], $target->info['full_height']);
+		}
 		if ($this->Behavior->UseThumbs)
 		{
 			$this->ResizeFile($target->path.'/'.$file, $target->path.'/t_'.$file,
@@ -143,6 +162,8 @@ class FilterGallery extends FilterDefault
 		parent::FFDelete($fi, $save);
 		$thumb = $fi->dir.'/t_'.$fi->filename;
 		if (file_exists($thumb)) unlink($thumb);
+		$full = $fi->dir.'/f_'.$fi->filename;
+		if (file_exists($full)) unlink($full);
 	}
 
 	/**
@@ -153,16 +174,30 @@ class FilterGallery extends FilterDefault
 	{
 		$files = glob($path."*.*");
 		$fi = new FileInfo($path);
-		if (empty($fi->info['thumb_width']))
-			$fi->info['thumb_width'] = 200;
-		if (empty($fi->info['thumb_height']))
-			$fi->info['thumb_height'] = 200;
+
+		if ($this->Behavior->ResizeFull)
+		{
+			if (empty($fi->info['full_width'])) $fi->info['full_width'] = 1024;
+			if (empty($fi->info['full_height'])) $fi->info['full_height'] = 1024;
+		}
+
+		if ($this->Behavior->UseThumbs)
+		{
+			if (empty($fi->info['thumb_width'])) $fi->info['thumb_width'] = 200;
+			if (empty($fi->info['thumb_height'])) $fi->info['thumb_height'] = 200;
+		}
+
+		# Regenerate thumbnails.
 		foreach ($files as $file)
 		{
 			if (substr($file, 0, 2) == 't_') continue;
+			if (substr($file, 0, 2) == 'f_') continue;
+
 			$pinfo = pathinfo($file);
 			$this->ResizeFile($file, $path.'t_'.$pinfo['basename'],
 				$fi->info['thumb_width'], $fi->info['thumb_height']);
+			$this->ResizeFile($file, $path.'f_'.$pinfo['basename'],
+				$fi->info['full_width'], $fi->info['full_height']);
 		}
 	}
 
@@ -173,6 +208,8 @@ class FilterGallery extends FilterDefault
 	function FFCleanup($path)
 	{
 		$files = glob($path."t_*.*");
+		foreach ($files as $file) unlink($file);
+		$files = glob($path."f_*.*");
 		foreach ($files as $file) unlink($file);
 	}
 
@@ -213,6 +250,8 @@ class FilterGallery extends FilterDefault
 		}
 
 		if (is_dir($fi->path) && (
+			$fi->info['full_width'] != $newinfo['full_width'] ||
+			$fi->info['full_height'] != $newinfo['full_height'] ||
 			$fi->info['thumb_width'] != $newinfo['thumb_width'] ||
 			$fi->info['thumb_height'] != $newinfo['thumb_height']))
 		{
@@ -220,6 +259,8 @@ class FilterGallery extends FilterDefault
 		}
 
 		if (is_file($fi->path)) unset(
+			$newinfo['full_width'],
+			$newinfo['full_height'],
 			$newinfo['thumb_width'],
 			$newinfo['thumb_height'],
 			$newinfo['thumb']
@@ -228,14 +269,17 @@ class FilterGallery extends FilterDefault
 
 	function UpdateThumbs($fi, $info)
 	{
+		set_time_limit(60*5);
 		$dp = opendir($fi->path);
 		while ($file = readdir($dp))
 		{
 			if ($file[0] == '.') continue;
 			if (substr($file, 0, 2) == 't_') continue;
+			if (substr($file, 0, 2) == 'f_') continue;
 
 			$fir = new FileInfo($fi->path.'/'.$file);
 
+			# Resize folder thumbnail
 			if (is_dir($fi->path.'/'.$file))
 			{
 				$g = glob("{$fir->path}/._image.*");
@@ -246,11 +290,18 @@ class FilterGallery extends FilterDefault
 			}
 			else
 			{
+				$src = $fir->path;
+
+				# Resize thumbnail.
 				$w = $info['thumb_width'];
 				$h = $info['thumb_height'];
-				$src = $fir->path;
 				$dst = $fir->dir.'/t_'.$fir->filename;
 				$this->ResizeFile($src, $dst, $w, $h);
+
+				$fw = $info['full_width'];
+				$fh = $info['full_height'];
+				$fdst = $fir->dir.'/f_'.$fir->filename;
+				$this->ResizeFile($src, $fdst, $fw, $fh);
 			}
 		}
 	}
@@ -305,6 +356,7 @@ class FilterGallery extends FilterDefault
 class FilterGalleryBehavior
 {
 	public $UseThumbs = true;
+	public $ResizeFull = true;
 
 	function __construct($config)
 	{
