@@ -4,6 +4,9 @@ require_once(dirname(__FILE__).'/present/template.php');
 
 class Module
 {
+	function __construct()
+	{ $this->CheckActive($this->Name); }
+
 	static function Initialize($root_path, $repath = false)
 	{
 		global $_d;
