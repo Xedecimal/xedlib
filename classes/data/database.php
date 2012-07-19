@@ -343,7 +343,7 @@ class Database
 	static function SqlUnquote($data) { return array('val' => $data, 'opt' => SQLOPT_UNQUOTE); }
 	static function SqlBetween($from, $to) { return array('cmp' => 'BETWEEN', 'opt' => SQLOPT_UNQUOTE, 'val' => "'$from' AND '$to'"); }
 	static function SqlIs($val) { return array('cmp' => 'IS', 'opt' => SQLOPT_UNQUOTE, 'val' => $val); }
-	static function SqlNot($val) { return array('cmp' => '!=', 'val' => $val, 'opt' => SQLOPT_UNQUOTE); }
+	static function SqlNot($val) { return array('cmp' => 'NOT', 'val' => $val, 'opt' => SQLOPT_UNQUOTE); }
 	static function SqlAnd($val) { return array('inc' => 'AND', 'val' => $val, 'opt' => SQLOPT_UNQUOTE); }
 	static function SqlOr($val) { return array('inc' => 'OR', 'val' => $val, 'opt' => SQLOPT_UNQUOTE); }
 	static function SqlLess($val) { return array('cmp' => '<', 'val' => $val); }
