@@ -23,7 +23,7 @@ class User extends Module
 			'text' => 'Username',
 			'type' => 'user'
 		),
-		if (empty($GLOBALS['mods']['ModUser']->User)) return false;
+
 		'email' => array(
 			'column' => 'usr_email',
 			'text' => 'Email',
@@ -345,7 +345,6 @@ class User extends Module
 			$u = $_d['user.user'] = $item;
 		}
 
-		return $this->User;
 		return $u;
 	}
 }
