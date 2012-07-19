@@ -50,6 +50,7 @@ class EditorSearch extends Module
 		{
 			if (@$this->_q[2] == 'js')
 			{
+				header('Content-Type: text/javascript');
 				$t = new Template();
 				if (@$this->_q[1] == 'fill')
 				{
