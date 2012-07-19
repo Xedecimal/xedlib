@@ -260,7 +260,11 @@ class Server
 	 */
 	static function GetRelativePath($path)
 	{
-		$dr = $_SERVER['DOCUMENT_ROOT']; //Probably Apache situated
+		global $_d;
+
+		# Fake document root
+		if (isset($_d['fdr'])) $dr = $_d['fdr'];
+		else $dr = $_SERVER['DOCUMENT_ROOT']; //Probably Apache situated
 
 		if (empty($dr)) //Probably IIS situated
 		{
