@@ -185,7 +185,7 @@ EOF;
 	function TagSearch($t, $g, $a)
 	{
 		$tt = new Template();
-		$tt->Set('name', $this->Name);
+		$tt->Set('name', HM::CleanID($this->GetName()));
 		$tt->Set('tempurl', Module::L('temps'));
 
 		$tt->ReWrite('searchfield', array(&$this, 'TagSearchField'));
