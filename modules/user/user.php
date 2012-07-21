@@ -109,6 +109,8 @@ class User extends Module
 				mail($em, 'Forgotten Password', $body);
 			}
 		}
+
+		$this->User = @$_d['user.user'];
 	}
 
 	function Get()
