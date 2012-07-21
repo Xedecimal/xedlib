@@ -17,7 +17,8 @@ class HM
 	static function CleanID($id)
 	{
 		if (!isset($id)) return;
-		return str_replace('[', '_', str_replace(']', '', str_replace(' ', '_', $id)));
+		$reps = array('[' => '_', ']' => '', '/' => '_');
+		return str_replace(array_keys($reps), array_values($reps), $id);
 	}
 
 	static function GetAttribs($attribs)
