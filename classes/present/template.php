@@ -525,9 +525,8 @@ class Template extends LayeredOutput
 		{
 			$err = "XML Error: " . xml_error_string(xml_get_error_code($p)) .
 			" on line " . xml_get_current_line_number($p);
-			$err .= "<br/>Inside the following template ...<br/>\n";
-			$err .= U::VarInfo($str, true);
-			$err .= "<br/>\n";
+			$err .= "\r\nInside the following template ...\r\n";
+			$err .= $str;
 			Server::Error($err);
 		}
 		xml_parser_free($p);
