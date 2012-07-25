@@ -313,7 +313,7 @@ class FilterGallery extends FilterDefault
 	{
 		$img = imagecreatefromstring(file_get_contents($file));
 		$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-		imagepng($img, $dest);
+		imagejpeg($img, $dest);
 	}
 
 	/**
