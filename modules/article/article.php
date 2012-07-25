@@ -57,6 +57,7 @@ class Articles extends Module
 			foreach ($this->_articles as $a)
 			{
 				$this->_article = $a;
+				$this->_article['date'] = Date('M d, Y', Database::MyDateTimestamp($a['nws_date']));
 				$ret .= $t->GetString($g);
 			}
 			return $ret;
@@ -67,7 +68,7 @@ class Articles extends Module
 class Article extends Module
 {
 	public $Block = 'article';
-	public $Name = 'article';
+	public $Name = 'news';
 	protected $ID = 'nws_id';
 
 	protected $_template;
