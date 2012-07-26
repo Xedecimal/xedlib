@@ -22,7 +22,11 @@ class FormEmail extends Module
 		$this->_fields = array(
 			'Name' => new FormInput('Name', null, 'form[name]', null, array('class' => 'required')),
 			'Email' => new FormInput('Email', null, 'form[email]'),
-			'Message' => new FormInput('Message', 'area', 'form[message]'),
+			'City' => new FormInput('City', null, 'form[city]'),
+			'State' => new FormInput('State', null, 'form[state]'),
+			'Zip' => new FormInput('Zip', null, 'form[zip]'),
+			'Phone' => new FormInput('Phone', null, 'form[phone]'),
+			'Message' => new FormInput('Message', 'area', 'form[message]', null, array('rows' => 10, 'style' => 'width: 100%')),
 			'' => new FormInput(null, 'captcha', 'c')
 		);
 		$this->send = false;
