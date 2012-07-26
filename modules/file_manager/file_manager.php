@@ -838,7 +838,7 @@ class FileManager extends Module
 			}
 			if ($this->Behavior->UpdateButton)
 			{
-				$sub = new FormInput(null, 'submit', $this->Name.'_action', 'Save');
+				$sub = new FormInput(null, 'submit', $this->GetName(true).'_action', 'Save');
 				$this->vars['text'] = '';
 				$this->vars['field'] = $sub->Get($this->Name, false);
 				$ret .= $vp->ParseVars($guts, $this->vars);
