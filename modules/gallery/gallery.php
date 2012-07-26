@@ -96,6 +96,10 @@ class Gallery extends Module
 			$d['name'] = $this->GetCaption($fi);
 			$d['path'] = Server::GetVar('galcf', '');
 			$d['icon'] = $fi->icon;
+
+			$size = getimagesize($fi->licon);
+			$d['width'] = $size[0];
+			$d['height'] = $size[1];
 			$d['desc'] = $this->GetCaption($fi);
 
 			$out .= $vp->ParseVars($guts, $d);

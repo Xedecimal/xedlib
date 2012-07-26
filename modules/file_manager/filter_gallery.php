@@ -56,7 +56,11 @@ class FilterGallery extends FilterDefault
 		$relpath = Module::P($abs);
 		$path = HM::urlencode_path(dirname($relpath).'/'.basename($relpath));
 
-		if (file_exists($abs)) $fi->icon = $path;
+		if (file_exists($abs))
+		{
+			$fi->icon = $path;
+			$fi->licon = $abs;
+		} 
 
 		# Prepare custom folder icon
 
