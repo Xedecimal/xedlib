@@ -171,19 +171,7 @@ class Module
 				Verifying database integrity.
 				Expect many errors during this process.</p>';
 
-			foreach ($mods as $name => $mod)
-			{
-				$mod->Install();
-				#preg_match('/^mod(.*)/', strtolower($name), $m);
-				#if (!file_exists('modules/'.$m[1].'.sql')) continue;
-				#$queries = explode(';', file_get_contents('modules/'.$m[1].'.sql'));
-
-				#foreach ($queries as $q)
-				#{
-				#	$q = trim($q);
-				#	if (!empty($q)) $_d['db']->Query($q);
-				#}
-			}
+			foreach ($mods as $name => $mod) $mod->Install();
 			return true;
 		}
 	}
