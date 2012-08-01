@@ -4,7 +4,7 @@
 <div class="folders">
 <folder>
 <div class="folder">
-<a href="{{url}}"><img src="{{icon}}" alt="Icon" />
+<a href="{{url}}"><img src="{{icon}}" width="{{width}}" height="{{height}}" alt="Icon" />
 <div class="caption">{{name}}</div></a>
 </div> <!-- .folder -->
 </folder>

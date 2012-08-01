@@ -474,19 +474,19 @@ class FileManager extends Module
 	static function GetIcon($f)
 	{
 		$icons = array(
-			'folder' => Module::P('file_manager/icons/folder.png'),
-			'png' => Module::P('file_manager/icons/image.png'),
-			'jpg' => Module::P('file_manager/icons/image.png'),
-			'jpeg' => Module::P('file_manager/icons/image.png'),
-			'gif' => Module::P('file_manager/icons/image.png'),
-			'pdf' => Module::P('file_manager/icons/acrobat.png'),
-			'sql' => Module::P('file_manager/icons/db.png'),
-			'xls' => Module::P('file_manager/icons/excel.png'),
-			'doc' => Module::P('file_manager/icons/word.png'),
-			'docx' => Module::P('file_manager/icons/word.png')
+			'folder' => 'file_manager/icons/folder.png',
+			'png' => 'file_manager/icons/image.png',
+			'jpg' => 'file_manager/icons/image.png',
+			'jpeg' => 'file_manager/icons/image.png',
+			'gif' => 'file_manager/icons/image.png',
+			'pdf' => 'file_manager/icons/acrobat.png',
+			'sql' => 'file_manager/icons/db.png',
+			'xls' => 'file_manager/icons/excel.png',
+			'doc' => 'file_manager/icons/word.png',
+			'docx' => 'file_manager/icons/word.png'
 		);
 
-		if (!empty($f->vars['icon'])) return $f->vars['icon'];
+		if (!empty($f->icon)) return $f->icon;
 		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
 		else return null;
 		return $ret;

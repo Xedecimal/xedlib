@@ -67,8 +67,12 @@ class Gallery extends Module
 			$d['url'] = HM::URL($me, $du);
 
 			$d['name'] = $fi->filename;
-			$d['icon'] = $fi->vars['icon'];
+			$d['icon'] = $fi->icon;
 			$d['editor'] = Server::GetVar('editor');
+
+			$size = getimagesize($fi->licon);
+			$d['width'] = $size[0];
+			$d['height'] = $size[1];
 
 			$out .= $vp->ParseVars($guts, $d);
 		}
