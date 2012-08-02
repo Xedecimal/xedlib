@@ -125,8 +125,8 @@ class FileManager extends Module
 
 		if (empty($this->Root)) throw new Exception('Invalid root.');
 
-		$act = Server::GetVar($this->Name.'_action');
-		$this->cf = Server::GetVar($this->Name.'_cf');
+		$act = Server::GetVar($this->GetName(true).'_action');
+		$this->cf = Server::GetVar($this->GetName(true).'_cf');
 
 		# TODO: Only declare $fi once!
 
@@ -245,7 +245,7 @@ class FileManager extends Module
 		else if ($act == 'Delete')
 		{
 			if (!$this->Behavior->AllowDelete) return;
-			$sels = Server::GetVar($this->Name.'_sels');
+			$sels = Server::GetVar($this->GetName(true).'_sels');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -376,7 +376,7 @@ class FileManager extends Module
 			$this->cf .= '/';
 
 		# Append trailing slash.
-		if (substr($this->Root, -1) != '/') $this->Root .= '/';
+		#if (substr($this->Root, -1) != '/') $this->Root .= '/';
 
 		# Verify that this root exists.
 		/*if (!file_exists($this->Root.$this->cf))
@@ -457,7 +457,7 @@ class FileManager extends Module
 
 		$fi = new FileInfo($this->Root.$this->cf);
 
-		$t->Set('fn_name', $this->GetName());
+		$t->Set('fn_name', $this->GetName(true));
 		$t->Set($this->View);
 
 		global $_d;
@@ -474,19 +474,19 @@ class FileManager extends Module
 	static function GetIcon($f)
 	{
 		$icons = array(
-			'folder' => Module::P('file_manager/icons/folder.png'),
-			'png' => Module::P('file_manager/icons/image.png'),
-			'jpg' => Module::P('file_manager/icons/image.png'),
-			'jpeg' => Module::P('file_manager/icons/image.png'),
-			'gif' => Module::P('file_manager/icons/image.png'),
-			'pdf' => Module::P('file_manager/icons/acrobat.png'),
-			'sql' => Module::P('file_manager/icons/db.png'),
-			'xls' => Module::P('file_manager/icons/excel.png'),
-			'doc' => Module::P('file_manager/icons/word.png'),
-			'docx' => Module::P('file_manager/icons/word.png')
+			'folder' => 'file_manager/icons/folder.png',
+			'png' => 'file_manager/icons/image.png',
+			'jpg' => 'file_manager/icons/image.png',
+			'jpeg' => 'file_manager/icons/image.png',
+			'gif' => 'file_manager/icons/image.png',
+			'pdf' => 'file_manager/icons/acrobat.png',
+			'sql' => 'file_manager/icons/db.png',
+			'xls' => 'file_manager/icons/excel.png',
+			'doc' => 'file_manager/icons/word.png',
+			'docx' => 'file_manager/icons/word.png'
 		);
 
-		if (!empty($f->vars['icon'])) return $f->vars['icon'];
+		if (!empty($f->icon)) return $f->icon;
 		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
 		else return null;
 		return $ret;
@@ -671,7 +671,7 @@ class FileManager extends Module
 				$this->vars['url'] = HM::URL($this->Behavior->Target,
 					array($this->Name.'_cf' => $this->cf.$f->filename));
 			else
-				$this->vars['url'] = Module::P(htmlspecialchars($this->Root.$this->cf.$f->filename));
+				$this->vars['url'] = htmlspecialchars(Module::P($this->Root.$this->cf.$f->filename));
 			$this->vars['filename'] = htmlspecialchars($f->filename);
 			$this->vars['caption'] = $this->View->GetCaption($f);
 			$this->vars['fipath'] = htmlspecialchars($f->path);
@@ -838,7 +838,7 @@ class FileManager extends Module
 			}
 			if ($this->Behavior->UpdateButton)
 			{
-				$sub = new FormInput(null, 'submit', $this->Name.'_action', 'Save');
+				$sub = new FormInput(null, 'submit', $this->GetName(true).'_action', 'Save');
 				$this->vars['text'] = '';
 				$this->vars['field'] = $sub->Get($this->Name, false);
 				$ret .= $vp->ParseVars($guts, $this->vars);

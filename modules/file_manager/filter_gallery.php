@@ -38,7 +38,7 @@ class FilterGallery extends FilterDefault
 		if (substr($fi->filename, 0, 2) == 'f_') $fi->show = false;
 
 		if (!isset($dinfo['full_width'])) $dinfo['full_width'] = 1024;
-		if (!isset($dinfo['full_height'])) $dinfo['full_height'] = 1024;
+		if (!isset($dinfo['full_height'])) $dinfo['full_height'] = 768;
 		$fi->info['full_width'] = $dinfo['full_width'];
 		$fi->info['full_height'] = $dinfo['full_height'];
 
@@ -56,15 +56,28 @@ class FilterGallery extends FilterDefault
 		$relpath = Module::P($abs);
 		$path = HM::urlencode_path(dirname($relpath).'/'.basename($relpath));
 
-		if (file_exists($abs)) $fi->icon = $path;
+		if (file_exists($abs))
+		{
+			$fi->icon = $path;
+			$fi->licon = $abs;
+		} 
 
 		# Prepare custom folder icon
 
 		if (is_dir($fi->path))
 		{
 			$fs = glob($fi->path.'/.t_image.*');
-			if (!empty($fs)) $fi->vars['icon'] = Module::P($fs[0]);
-			else $fi->vars['icon'] = FileManager::GetIcon($fi);
+			if (!empty($fs))
+			{
+				$fi->icon = Module::P($fs[0]);
+				$fi->licon = $fs[0];
+			}
+			else
+			{
+				$i = FileManager::GetIcon($fi);
+				$fi->icon = Module::P($i);
+				$fi->licon = Module::L($i);
+			} 
 		}
 		return $fi;
 	}
@@ -313,7 +326,7 @@ class FilterGallery extends FilterDefault
 	{
 		$img = imagecreatefromstring(file_get_contents($file));
 		$img = FilterGallery::ResizeImg($img, $nx, $ny, $literal);
-		imagepng($img, $dest);
+		imagejpeg($img, $dest);
 	}
 
 	/**

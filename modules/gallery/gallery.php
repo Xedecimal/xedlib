@@ -67,8 +67,12 @@ class Gallery extends Module
 			$d['url'] = HM::URL($me, $du);
 
 			$d['name'] = $fi->filename;
-			$d['icon'] = $fi->vars['icon'];
+			$d['icon'] = $fi->icon;
 			$d['editor'] = Server::GetVar('editor');
+
+			$size = getimagesize($fi->licon);
+			$d['width'] = $size[0];
+			$d['height'] = $size[1];
 
 			$out .= $vp->ParseVars($guts, $d);
 		}
@@ -96,6 +100,10 @@ class Gallery extends Module
 			$d['name'] = $this->GetCaption($fi);
 			$d['path'] = Server::GetVar('galcf', '');
 			$d['icon'] = $fi->icon;
+
+			$size = getimagesize($fi->licon);
+			$d['width'] = $size[0];
+			$d['height'] = $size[1];
 			$d['desc'] = $this->GetCaption($fi);
 
 			$out .= $vp->ParseVars($guts, $d);
@@ -310,6 +318,8 @@ class GalleryAdmin extends FileManager
 	public $Name = 'admin/gallery';
 	public $Root = 'galimg';
 
+	function Auth() { return User::RequireAccess(1); }
+
 	function __construct()
 	{
 		parent::__construct();
@@ -318,7 +328,6 @@ class GalleryAdmin extends FileManager
 		$this->CheckActive($this->Name);
 
 		$this->Behavior->Target = '{{app_abs}}/'.$this->Name;
-		$this->Name = 'fmgal';
 		$this->Filters = array('FilterGallery');
 	}
 

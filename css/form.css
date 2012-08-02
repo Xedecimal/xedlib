@@ -24,4 +24,4 @@ select { padding: 1px; }
 
 .ui-button .ui-button-text, input.ui-button { padding: 0 1em; }
 
-.form-vertical fieldset li { float: none; }
+.xlform-vertical fieldset li { float: none; }

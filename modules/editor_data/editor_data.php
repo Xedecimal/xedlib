@@ -1428,5 +1428,3 @@ class EditorDataBehavior
 
 	public $Target;
 }
-
-?>

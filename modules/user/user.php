@@ -15,6 +15,7 @@ class User extends Module
 	 */
 	public $Block = 'user';
 	public $Name = 'user';
+	public $User;
 
 	public $fields = array(
 		'user' => array(
@@ -22,6 +23,7 @@ class User extends Module
 			'text' => 'Username',
 			'type' => 'user'
 		),
+
 		'email' => array(
 			'column' => 'usr_email',
 			'text' => 'Email',
@@ -42,7 +44,8 @@ class User extends Module
 
 	function __construct()
 	{
-		$this->Behavior = new ModUserBehavior();
+		$this->Behavior = new UserBehavior();
+		$this->View = new UserView();
 		$this->CheckActive($this->Name);
 
 		global $_d;
@@ -64,9 +67,7 @@ class User extends Module
 		{
 			global $rw;
 
-			$url = http_build_query(array(
-				'user_action' => 'logout'
-			));
+			$url = http_build_query(array('user_action' => 'logout'));
 			$_d['nav.links'][$this->NavLogout] = "{$rw}?$url";
 		}
 
@@ -107,6 +108,8 @@ class User extends Module
 				mail($em, 'Forgotten Password', $body);
 			}
 		}
+
+		$this->User = @$_d['user.user'];
 	}
 
 	function Get()
@@ -154,13 +157,14 @@ class User extends Module
 
 		# Nobody is logged in.
 
-		if (empty($_d['user.user']) && @$_d['user.login'])
+		if (empty($this->User) && !empty($_d['user.login']))
 		{
 			$t = new Template();
 			$t->ReWrite('links', array(&$this, 'TagLinks'));
 			$t->Rewrite('field', array(&$this, 'TagFieldLogin'));
-			//$t->Set('name', $this->Name);
 			$ret['user'] = $t->ParseFile(Module::L('user/login.xml'));
+			if (!empty($this->View->FootTemplate))
+				$ret['user'] .= $t->ParseFile($this->View->FootTemplate);
 		}
 
 		return $ret;
@@ -178,13 +182,13 @@ class User extends Module
 
 	function TagUser($t, $g)
 	{
-		if (!isset($this->_ds[0])) return;
 		if (is_string($this->_ds[0][0])) return;
 		return $g;
 	}
 
 	function TagLinks()
 	{
+		if (!isset($this->DataSets[0])) return;
 		if ($this->Behavior->CreateAccount)
 			$nav['Create an account'] = "{{app_abs}}/{$this->Name}/create";
 		if ($this->Behavior->ForgotPassword)
@@ -347,12 +351,17 @@ class User extends Module
 	}
 }
 
-class ModUserBehavior
+class UserBehavior
 {
 	public $CreateAccount = false;
 	public $ForgotPassword = false;
 	public $ForgotUsername = false;
 	public $Password = true;
+}
+
+class UserView
+{
+	public $FootTemplate;
 }
 
 class ModUserAdmin extends Module

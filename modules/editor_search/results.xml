@@ -1,6 +1,7 @@
 <div>
 <p style="font-size: large; font-weight: bold;">Results: {{count}}</p>
 <result>
+	<div class="xlform">
 	<fieldset id="result-{{id}}"><legend>{{name}}</legend>
 	<ul>
 	<result_field>
@@ -9,6 +10,7 @@
 	</ul>
 	<div class="actions"><result_button><a>{{text}}</a></result_button></div>
 	</fieldset>
+	</div>
 </result>
 «
 <page> <a href="{{url}}&amp;{{name}}_page={{num}}">{{num}}</a> </page>

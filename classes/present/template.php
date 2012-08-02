@@ -221,7 +221,7 @@ class Template extends LayeredOutput
 		{
 			if (!empty($attribs['DOCTYPE']))
 			{
-				if ($attribs['DOCTYPE'] == 'html5')
+				if ($attribs['DOCTYPE'] == '5')
 					$this->Out('<!DOCTYPE html>');
 				if ($attribs['DOCTYPE'] == 'strict')
 					$this->Out('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -525,9 +525,8 @@ class Template extends LayeredOutput
 		{
 			$err = "XML Error: " . xml_error_string(xml_get_error_code($p)) .
 			" on line " . xml_get_current_line_number($p);
-			$err .= "<br/>Inside the following template ...<br/>\n";
-			$err .= U::VarInfo($str, true);
-			$err .= "<br/>\n";
+			$err .= "\r\nInside the following template ...\r\n";
+			$err .= $str;
 			Server::Error($err);
 		}
 		xml_parser_free($p);

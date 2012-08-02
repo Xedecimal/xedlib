@@ -4,6 +4,9 @@ require_once(dirname(__FILE__).'/present/template.php');
 
 class Module
 {
+	function __construct()
+	{ $this->CheckActive($this->Name); }
+
 	static function Initialize($root_path, $repath = false)
 	{
 		global $_d;
@@ -168,19 +171,7 @@ class Module
 				Verifying database integrity.
 				Expect many errors during this process.</p>';
 
-			foreach ($mods as $name => $mod)
-			{
-				$mod->Install();
-				#preg_match('/^mod(.*)/', strtolower($name), $m);
-				#if (!file_exists('modules/'.$m[1].'.sql')) continue;
-				#$queries = explode(';', file_get_contents('modules/'.$m[1].'.sql'));
-
-				#foreach ($queries as $q)
-				#{
-				#	$q = trim($q);
-				#	if (!empty($q)) $_d['db']->Query($q);
-				#}
-			}
+			foreach ($mods as $name => $mod) $mod->Install();
 			return true;
 		}
 	}
@@ -205,10 +196,13 @@ class Module
 		return $active;
 	}
 
-	function GetName()
+	function GetName($clean = false)
 	{
-		if (is_array($this->Name)) return $this->Name[0];
-		return $this->Name;
+		if (is_array($this->Name)) $ret = $this->Name[0];
+		else $ret = $this->Name;
+
+		if ($clean) return str_replace('/', '_', $ret);
+		return $ret;
 	}
 
 	function Auth() { return true; }

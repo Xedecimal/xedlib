@@ -6,6 +6,8 @@ class Articles extends Module
 {
 	public $Block = 'articles';
 	public $Name = 'articles';
+	public $Table = 'news';
+	public $ID = 'nws_id';
 
 	protected $_template;
 
@@ -14,6 +16,18 @@ class Articles extends Module
 		global $_d;
 		$this->_template = Module::L('article/articles.xml');
 		$this->_map = array();
+
+		if (empty($this->_source))
+			$this->_source = new DataSet($_d['db'], $this->Table, $this->ID);
+	}
+
+	function Get()
+	{
+		$t = new Template($GLOBALS['_d']);
+		$t->ReWrite('articles', array($this, 'TagArticles'));
+		$t->Set('foot', @$this->_foot);
+		$t->Behavior->Bleed = false;
+		return array($this->Table => $t->ParseFile($this->_template));
 	}
 
 	function TagArticle($t, $g)
@@ -28,6 +42,7 @@ class Articles extends Module
 				$this->_article = call_user_func($v, $this->_article);
 			else $this->_article[$k] = $this->_article[$v];
 		}
+		$this->_article['target'] = $this->Table;
 		return $vp->ParseVars($g, $this->_article);
 	}
 
@@ -42,26 +57,18 @@ class Articles extends Module
 			foreach ($this->_articles as $a)
 			{
 				$this->_article = $a;
+				$this->_article['date'] = Date('M d, Y', Database::MyDateTimestamp($a['nws_date']));
 				$ret .= $t->GetString($g);
 			}
 			return $ret;
 		}
-	}
-
-	function Get()
-	{
-		$t = new Template($GLOBALS['_d']);
-		$t->ReWrite('articles', array($this, 'TagArticles'));
-		$t->Set('foot', @$this->_foot);
-		$t->Behavior->Bleed = false;
-		return array($this->Name => $t->ParseFile($this->_template));
 	}
 }
 
 class Article extends Module
 {
 	public $Block = 'article';
-	public $Name = 'article';
+	public $Name = 'news';
 	protected $ID = 'nws_id';
 
 	protected $_template;
@@ -72,10 +79,14 @@ class Article extends Module
 		$this->_template = Module::L('article/article.xml');
 		if (empty($this->_source))
 			$this->_source = new DataSet($_d['db'], $this->Name, $this->ID);
+
+		$this->CheckActive($this->Name);
 	}
 
 	function Get()
 	{
+		if (!$this->Active) return;
+
 		$t = new Template();
 		$t->ReWrite('newsdetail', array(&$this, 'TagNewsDetail'));
 		return $t->ParseFile($this->_template);
@@ -122,6 +133,7 @@ class ArticleAdmin extends Module
 
 	public $Name = 'news';
 	protected $ID = 'nws_id';
+	protected $NavAdmin = 'Admin/News';
 
 	function Auth() { return User::RequireAccess(1); }
 
@@ -142,7 +154,7 @@ class ArticleAdmin extends Module
 
 		if (!User::RequireAccess(1)) return;
 
-		$_d['nav.links']['Admin/News'] = '{{app_abs}}/'.$this->Name;
+		$_d['nav.links'][$this->NavAdmin] = '{{app_abs}}/'.$this->Name;
 	}
 
 	function Prepare()

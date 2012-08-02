@@ -14,6 +14,8 @@ class EditorSearch extends Module
 	public $Form;
 	/** @var DataSet */
 	protected $_ds;
+	
+	public $FieldName = 'name';
 
 	function __construct()
 	{
@@ -48,6 +50,7 @@ class EditorSearch extends Module
 		{
 			if (@$this->_q[2] == 'js')
 			{
+				header('Content-Type: text/javascript');
 				$t = new Template();
 				if (@$this->_q[1] == 'fill')
 				{
@@ -182,7 +185,7 @@ EOF;
 	function TagSearch($t, $g, $a)
 	{
 		$tt = new Template();
-		$tt->Set('name', $this->Name);
+		$tt->Set('name', HM::CleanID($this->GetName()));
 		$tt->Set('tempurl', Module::L('temps'));
 
 		$tt->ReWrite('searchfield', array(&$this, 'TagSearchField'));
@@ -300,7 +303,7 @@ EOF;
 				$this->item = $i;
 
 				$t->Set('res_links', U::RunCallbacks(@$_d['datasearch.cb.head_res'], $this, $i));
-				#$t->Set('name', $i[$this->FieldName]);
+				$t->Set('name', $i[$this->FieldName]);
 				$t->Set('id', $i[$this->_ds->id]);
 				$t->Set($i);
 				$ret .= $t->GetString($g);
