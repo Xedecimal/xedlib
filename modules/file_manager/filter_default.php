@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__).'/file_manager.php');
 require_once(dirname(__FILE__).'/../../classes/present/form_input.php');
 
 /**
