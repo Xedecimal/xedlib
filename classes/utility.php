@@ -174,6 +174,8 @@ class U
 		if (!empty($args['files']))
 		foreach ($args['files'] as $name => $file)
 		{
+			if (!file_exists($file['tmp_name'])) continue;
+
 			$attach = true;
 			$end = '';
 
