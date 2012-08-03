@@ -1128,7 +1128,7 @@ class FileManager extends Module
 			else
 			{
 				if (isset($defaults[0]))
-					$fname = $defaults[0];
+					$fname = 'Filter'.$defaults[0];
 				else
 					$fname = 'FilterDefault';
 				$f = new $fname($this);
