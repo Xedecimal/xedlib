@@ -123,16 +123,16 @@ class FileManager extends Module
 	{
 		if (!$this->Active) return;
 
+		if (substr($this->Root, -1) != '/') $this->Root .= '/';
+
 		if (empty($this->Root)) throw new Exception('Invalid root.');
 
 		$act = Server::GetVar($this->GetName(true).'_action');
 		$this->cf = Server::GetVar($this->GetName(true).'_cf');
 
-		# TODO: Only declare $fi once!
-
-		if (!file_exists($this->Root.'/'.$this->cf)) $fi = new FileInfo($this->Root);
-		else $fi = new FileInfo($this->Root.'/'.$this->cf);
-
+		if (!file_exists($this->Root.$this->cf)) $fi = new FileInfo($this->Root);
+		else $fi = new FileInfo($this->Root.$this->cf);
+		
 		$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 		$f->FFPrepare($fi);
 
@@ -190,7 +190,7 @@ class FileManager extends Module
 		else if ($act == 'Save')
 		{
 			if (!$this->Behavior->AllowEdit) return;
-			$info = new FileInfo($this->Root.'/'.$this->cf, $this->Filters);
+			$info = new FileInfo($this->Root.$this->cf, $this->Filters);
 			$newinfo = Server::GetVar('info');
 			$f = FileManager::GetFilter($info, $this->Root, $this->Filters);
 			$f->FFUpdated($this, $info, $newinfo);
@@ -368,7 +368,7 @@ class FileManager extends Module
 			die();
 		}
 
-		$this->cf = File::SecurePath(Server::GetState($this->Name.'_cf'));
+		$this->cf = File::SecurePath(Server::GetState($this->GetName(true).'_cf'));
 
 		if (is_dir($this->Root.$this->cf)
 			&& strlen($this->cf) > 0
@@ -523,7 +523,7 @@ class FileManager extends Module
 		if (isset($this->cf))
 		{
 			$d['uri'] = HM::URL($this->Behavior->Target,
-				array($this->Name.'_cf' => ''));
+				array($this->GetName(true).'_cf' => ''));
 			$d['name'] = $attribs['ROOT'];
 			$ret .= $vp->ParseVars($guts, $d);
 		}
@@ -538,7 +538,7 @@ class FileManager extends Module
 			if (strlen($items[$ix]) < 1) continue;
 			$cpath = (strlen($cpath) > 0 ? $cpath.'/' : null).$items[$ix];
 			$uri = HM::URL($this->Behavior->Target,
-				array($this->Name.'_cf' => $cpath));
+				array($this->GetName(true).'_cf' => $cpath));
 			$ret .= ' '.$attribs['SEP'];
 			$d['name'] = $items[$ix];
 			$d['uri'] = $uri;
@@ -607,8 +607,8 @@ class FileManager extends Module
 			}
 			else
 				$this->vars['url'] = HM::URL($this->Behavior->Target,
-					array($this->Name.'_cf' =>
-					"{$this->cf}/{$f->filename}"));
+					array($this->GetName(true).'_cf' =>
+					"{$this->cf}{$f->filename}"));
 
 			$this->vars['name'] = $f;
 			$this->vars['caption'] = $this->View->GetCaption($f);
