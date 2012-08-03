@@ -179,7 +179,7 @@ class DataSet
 					{
 						if (is_array($val))
 						{
-							$ret .= "`{$col}`";
+							$ret .= $col;
 							$ret .= $this->ProcessVal($val);
 						}
 						else
@@ -478,6 +478,7 @@ class DataSet
 	 * Quotes a table properly depending on the data source.
 	 *
 	 * @param string $name
+	 * @param string $sc Shortcut name.
 	 * @return string Quoted name.
 	 * @todo Rename this to QuoteName
 	 */
@@ -497,7 +498,7 @@ class DataSet
 		if (strpos($name, '.') > -1)
 			return preg_replace('#([^(]+)\.([^ )]+)#',
 				"{$lq}\\1{$rq}.{$lq}\\2{$rq}", $name);
-		return "{$lq}{$name}{$rq}".(!empty($sc) ? " $lq$sc$rq" : null);
+		return "{$lq}{$name}{$rq}".(!empty($sc) ? " $sc" : null);
 	}
 
 	function StripTable($name)

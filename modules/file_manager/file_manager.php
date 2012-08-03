@@ -9,7 +9,6 @@ require_once(dirname(__FILE__).'/../../classes/present/form.php');
 require_once(dirname(__FILE__).'/../../classes/present/template.php');
 
 require_once(dirname(__FILE__).'/filter_default.php');
-require_once(dirname(__FILE__).'/filter_gallery.php');
 
 /**
  * @package File Management
@@ -101,7 +100,7 @@ class FileManager extends Module
 	 *
 	 * @var array
 	 */
-	public $Filters = array('FilterDefault');
+	public $Filters = array('Default');
 
 	public $FilterConfig = array();
 
@@ -1128,7 +1127,7 @@ class FileManager extends Module
 			else
 			{
 				if (isset($defaults[0]))
-					$fname = $defaults[0];
+					$fname = 'Filter'.$defaults[0];
 				else
 					$fname = 'FilterDefault';
 				$f = new $fname($this);
