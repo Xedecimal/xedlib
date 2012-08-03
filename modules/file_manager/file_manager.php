@@ -269,7 +269,7 @@ class FileManager extends Module
 		else if ($act == 'Create')
 		{
 			if (!$this->Behavior->AllowCreateDir) return;
-			$p = $this->Root.'/'.$this->cf.'/'.Server::GetVar($this->Name.'_cname');
+			$p = $this->Root.$this->cf.Server::GetVar($this->GetName(true).'_cname');
 			mkdir($p);
 			chmod($p, 0755);
 			FilterDefault::UpdateMTime($p);
