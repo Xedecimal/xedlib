@@ -156,7 +156,7 @@ class Gallery extends Module
 		$path = Server::GetVar('galcf');
 
 		$this->FileManager->Name = $this->Name;
-		$this->FileManager->Filters = array('FilterGallery');
+		$this->FileManager->Filters = array('Gallery');
 		$this->FileManager->Root = $this->Root.$path;
 		$this->FileManager->Behavior->ShowAllFiles = true;
 		$this->FileManager->Behavior->Sort = $this->Display->Sort;
@@ -328,7 +328,7 @@ class GalleryAdmin extends FileManager
 		$this->CheckActive($this->Name);
 
 		$this->Behavior->Target = '{{app_abs}}/'.$this->Name;
-		$this->Filters = array('FilterGallery');
+		$this->Filters = array('Gallery');
 	}
 
 	function Link()
