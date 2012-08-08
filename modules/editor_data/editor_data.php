@@ -263,7 +263,7 @@ class HandlerFile extends EditorHandler
 	{
 		$vp = new VarParser();
 		$dst = $vp->ParseVars($this->target, $data);
-		if (!strpos($dst, '//') && file_exists($dst)) DelEmpty($dst);
+		if (!strpos($dst, '//') && file_exists($dst)) File::DelEmpty($dst);
 		return true;
 	}
 }

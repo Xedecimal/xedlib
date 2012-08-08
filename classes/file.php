@@ -100,7 +100,7 @@ class File
 	static function DelEmpty($dir)
 	{
 		$files = glob($dir.'/*');
-		if (count($files) < 1) { @rmdir($dir); DelEmpty(dirname($dir)); }
+		if (count($files) < 1) { @rmdir($dir); File::DelEmpty(dirname($dir)); }
 	}
 
 	/**
