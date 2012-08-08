@@ -114,6 +114,7 @@ class File
 	{
 		if (!isset($src) || !isset($dst)) return false;
 		$rpdst = realpath($dst);
+		if (empty($rpdst)) return false;
 		return substr(realpath($src), 0, strlen($rpdst)) == $rpdst;
 	}
 

@@ -185,9 +185,7 @@ class HandlerFile extends EditorHandler
 		$vp->Bleed = false;
 		$dst = $vp->ParseVars($this->target, $inserted);
 		if (!isset($this->conditions) && !file_exists($dst))
-		{
-			mkrdir($dst, 0777);
-		}
+			mkdir($dst, 0777, true);
 		else if (!empty($this->conditions))
 		{
 			foreach ($this->conditions as $col => $cond)
@@ -218,10 +216,13 @@ class HandlerFile extends EditorHandler
 		if (strpos($dst, '//') > -1) return false;
 		$vp->Bleed = false;
 		$src = $vp->ParseVars($this->target, $original);
+
 		if (!isset($this->conditions) && file_exists($src))
 		{
 			if (!file_exists(dirname($dst))) mkrdir(dirname($dst), 0777);
-			rename($src, $dst);
+			$fi = new FileInfo($src);
+			$filter = FileManager::GetFilter($fi, $this->target);
+			$filter->FFRename($fi, $dst);
 		}
 		else if (!empty($this->conditions))
 		{
@@ -231,8 +232,13 @@ class HandlerFile extends EditorHandler
 				{
 					if ($update[$col] == $val)
 					{
-						if (file_exists($src)) rename($src, $dst);
-						else mkrdir($dst, 0777);
+						if (file_exists($src))
+						{
+							$fi = new FileInfo($src);
+							$filter = FileManager::GetFilter($fi, $this->target);
+							$filter->FFRename($fi, $dst);
+						} 
+						else mkdir($dst, 0777, true);
 
 						if ($this->ownership)
 						{

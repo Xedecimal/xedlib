@@ -614,7 +614,7 @@ class FileManager extends Module
 			$this->vars['fipath'] = $f->path;
 			$this->vars['type'] = 'folders';
 			$this->vars['index'] = $ix;
-			$this->vars['icon'] = $this->GetIcon($f);
+			$this->vars['icon'] = Module::P($this->GetIcon($f));
 
 			$common = "?cf={$this->cf}&amp;editor={$this->Name}&amp;type=folders";
 
@@ -1114,7 +1114,7 @@ class FileManager extends Module
 	 * @param string $default Default filter to fall back on.
 	 * @return FilterDefault Or a derivitive.
 	 */
-	function GetFilter(&$fi, $root, $defaults)
+	static function GetFilter(&$fi, $root, $defaults = null)
 	{
 		$ft = $fi;
 
