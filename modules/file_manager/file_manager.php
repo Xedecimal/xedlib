@@ -412,11 +412,6 @@ class FileManager extends Module
 		global $me;
 		$this->vars['target'] = $this->Behavior->Target;
 
-		$ex = HM::ParseURL($this->Behavior->Target);
-		$ex['args'][$this->Name.'_action'] = 'upload';
-		$ex['args']['PHPSESSID'] = Server::GetVar('PHPSESSID');
-		$this->vars['java_target'] = HM::URL($ex['url'], $ex['args']);
-
 		$this->vars['root'] = $this->Root;
 		$this->vars['cf'] = $this->cf;
 
@@ -426,7 +421,7 @@ class FileManager extends Module
 		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
 		$this->vars['relpath'] = $relpath;
 		$this->vars['host'] = Server::GetVar('HTTP_HOST');
-		$this->vars['sid'] = Server::GetVar('PHPSESSID');
+		$this->vars['sid'] = session_id();
 		$this->vars['behavior'] = $this->Behavior;
 
 		$this->vars['folders'] = count($this->files['folders']);
