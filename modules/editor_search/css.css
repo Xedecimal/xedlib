@@ -3,3 +3,4 @@
 .field_text { vertical-align: top; }
 fieldset ul { overflow: hidden; }
 fieldset ul li { margin: 1em 2em; }
+.value { display: block; border: 1px solid #CCC; padding: 0 2px; }
