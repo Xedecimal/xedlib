@@ -1,7 +1,7 @@
 <?php
 
-require_once(__DIR__.'/../hm.php');
-require_once(__DIR__.'/../tree_node.php');
+require_once(dirname(__FILE__).'/../hm.php');
+require_once(dirname(__FILE__).'/../tree_node.php');
 
 /**
  * A select box, multiple select boxes, checkboxes, etc.
