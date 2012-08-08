@@ -269,7 +269,7 @@ class FileManager extends Module
 		else if ($act == 'Create')
 		{
 			if (!$this->Behavior->AllowCreateDir) return;
-			$p = $this->Root.$this->cf.Server::GetVar($this->GetName(true).'_cname');
+			$p = $this->Root.$this->cf.'/'.Server::GetVar($this->GetName(true).'_cname');
 			mkdir($p);
 			chmod($p, 0755);
 			FilterDefault::UpdateMTime($p);
@@ -614,7 +614,7 @@ class FileManager extends Module
 			$this->vars['fipath'] = $f->path;
 			$this->vars['type'] = 'folders';
 			$this->vars['index'] = $ix;
-			$this->vars['icon'] = Module::P($this->GetIcon($f));
+			$this->vars['icon'] = $this->GetIcon($f);
 
 			$common = "?cf={$this->cf}&amp;editor={$this->Name}&amp;type=folders";
 
