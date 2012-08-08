@@ -501,7 +501,10 @@ class FileManager extends Module
 	 */
 	function TagHeader($t, $g, $a)
 	{
-		return $g;
+		$head = '';
+		if (!empty($this->View->Header))
+			$head = "<h2>{$this->View->Header}</h2>\r\n";
+		return $head.$g;
 	}
 
 	function TagPath($t, $guts, $attribs)
@@ -611,7 +614,7 @@ class FileManager extends Module
 			$this->vars['fipath'] = $f->path;
 			$this->vars['type'] = 'folders';
 			$this->vars['index'] = $ix;
-			$this->vars['icon'] = $this->GetIcon($f);
+			$this->vars['icon'] = Module::P($this->GetIcon($f));
 
 			$common = "?cf={$this->cf}&amp;editor={$this->Name}&amp;type=folders";
 
@@ -1208,6 +1211,9 @@ class FileManagerView
 
 	public $RenameTitle = 'Rename File / Folder';
 
+	/**
+	 * @var integer
+	 */
 	public $Captions = false;
 
 	/**
