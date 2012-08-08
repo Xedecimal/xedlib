@@ -5,7 +5,7 @@
 	<fieldset id="result-{{id}}"><legend>{{name}}</legend>
 	<ul>
 	<result_field>
-		<li><label>{{text}}</label>{{val}}</li>
+		<li><label>{{text}}</label><span class="value">{{val}}</span></li>
 	</result_field>
 	</ul>
 	<div class="actions"><result_button><a>{{text}}</a></result_button></div>
@@ -13,6 +13,6 @@
 	</div>
 </result>
 «
-<page> <a href="{{url}}&amp;{{name}}_page={{num}}">{{num}}</a> </page>
+<page> <a href="{{url}}&amp;{{name}}_page={{num}}" class="a-page">{{num}}</a> </page>
 »
 </div>

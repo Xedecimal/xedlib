@@ -24,7 +24,7 @@
 <div id="div-search">
 <!-- Begin Form: {{form_name}} -->
 <form method="post" action="{{app_abs}}/{{name}}/search" id="data_search_{{name}}" class="xlform">
-<script type="text/javascript" src="editor_search/js.js"></script>
+<script type="text/javascript" src="editor_search/editor_search.js"></script>
 <fieldset>
 <legend>Select fields to search</legend>
 <table>
