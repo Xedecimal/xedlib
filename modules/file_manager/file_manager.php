@@ -676,8 +676,7 @@ class FileManager extends Module
 			$this->vars['type'] = 'files';
 			$this->vars['index'] = $ix;
 			$this->vars['info'] = $f->info;
-			if (!empty($f->icon)) $this->vars['icon'] = $f->icon;
-			else $this->vars['icon'] = '';
+			$this->vars['icon'] = Module::P($this->GetIcon($f));
 			$this->vars['ftitle'] = isset($f->info['title']) ?
 				@stripslashes($f->info['title']) : '';
 
