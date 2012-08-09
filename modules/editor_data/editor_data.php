@@ -604,7 +604,8 @@ class EditorData extends Module
 
 			if (count($this->handlers) > 0)
 			{
-				$data = $this->ds->GetOne(array($this->ds->id => $ci));
+				$q['match'][$this->ds->id] = $ci;
+				$data = $this->ds->GetOne($q);
 				$update[$this->ds->id] = $ci;
 				foreach ($this->handlers as $handler)
 				{
