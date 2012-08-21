@@ -614,7 +614,7 @@ class FileManager extends Module
 			$this->vars['fipath'] = $f->path;
 			$this->vars['type'] = 'folders';
 			$this->vars['index'] = $ix;
-			$this->vars['icon'] = Module::P($this->GetIcon($f));
+			$this->vars['icon'] = $this->GetIcon($f);
 
 			$common = "?cf={$this->cf}&amp;editor={$this->Name}&amp;type=folders";
 
@@ -1128,7 +1128,7 @@ class FileManager extends Module
 					$fname = 'Filter'.$defaults[0];
 				else
 					$fname = 'FilterDefault';
-				$f = new $fname($this);
+				$f = new $fname();
 				$f->FFGetInfo($fi);
 				return $f;
 			}

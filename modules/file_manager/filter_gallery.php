@@ -12,9 +12,9 @@ class FilterGallery extends FilterDefault
 	 */
 	public $Name = 'Gallery';
 
-	function __construct(&$fm)
+	function __construct()
 	{
-		$this->Behavior = new FilterGalleryBehavior($fm->FilterConfig);
+		$this->Behavior = new FilterGalleryBehavior();
 	}
 
 	# FileFilter implementation
@@ -60,7 +60,7 @@ class FilterGallery extends FilterDefault
 		{
 			$fi->icon = $path;
 			$fi->licon = $abs;
-		} 
+		}
 
 		# Prepare custom folder icon
 
@@ -371,10 +371,8 @@ class FilterGalleryBehavior
 	public $UseThumbs = true;
 	public $ResizeFull = true;
 
-	function __construct($config)
+	function __construct()
 	{
-		foreach ($config as $k => $v)
-			$this->$k = $v;
 	}
 }
 
