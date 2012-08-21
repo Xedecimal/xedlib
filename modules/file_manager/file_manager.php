@@ -760,7 +760,7 @@ class FileManager extends Module
 
 		if ($this->Behavior->AllowEdit && $this->Behavior->QuickCaptions)
 		{
-			$ret .= '<input type="submit" name="'.$this->Name.'_action" value="Update Captions" />';
+			$ret .= '<input type="submit" name="'.$this->GetName(true).'_action" value="Update Captions" />';
 		}
 
 		if (isset($this->curfilter))
@@ -999,7 +999,7 @@ class FileManager extends Module
 	 */
 	function GetDirectory()
 	{
-		$dp = opendir($this->Root.'/'.$this->cf);
+		$dp = opendir($this->Root.$this->cf);
 		$ret['files'] = array();
 		$ret['folders'] = array();
 
