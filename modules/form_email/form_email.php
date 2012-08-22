@@ -55,10 +55,10 @@ class FormEmail extends Module
 		$t->Behavior->Bleed = false;
 		$t->ReWrite('input', array('Form', 'TagInput'));
 		$t->ReWrite('field', array(&$this, 'TagField'));
-		$t->Set($this);
+		$t->Set('Name', $this->GetName());
 		if ($this->send)
-			return array($this->Name => $t->ParseFile($this->_template_send));
-		return array($this->Name => $t->ParseFile($this->_template));
+			return array($this->GetName() => $t->ParseFile($this->_template_send));
+		return array($this->GetName() => $t->ParseFile($this->_template));
 	}
 
 	function GenerateMail($send = false)
@@ -109,7 +109,7 @@ class FormEmail extends Module
 
 		if ($send)
 		{
-			if ($this->_attach)
+			if (@$this->_attach)
 			{
 				$args['to'] = $this->_to;
 				$args['subject'] = $this->_subject;
