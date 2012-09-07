@@ -1,5 +1,4 @@
 $(function () {
-	$('.div-mass-options').hide();
 	$('.in-sel-folders').click(function () {
 		$('.check_folder').attr('checked',
 			$(this).attr('checked') ? 'checked' : false);

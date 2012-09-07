@@ -132,7 +132,7 @@ class FileManager extends Module
 
 		if (!file_exists($this->Root.$this->cf)) $fi = new FileInfo($this->Root);
 		else $fi = new FileInfo($this->Root.$this->cf);
-		
+
 		$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 		$f->FFPrepare($fi);
 
@@ -151,20 +151,22 @@ class FileManager extends Module
 			if (Server::GetVar('cm') == 'done')
 			{
 				$target = Server::GetVar('cu');
-				$ftarget = $this->Root.$this->cf.$target;
+				$ftarget = $this->Root.'/'.$this->cf.'/'.$target;
 				$count = Server::GetVar('count'); // Amount of peices
 
 				if (file_exists($ftarget)) unlink($ftarget);
 				$fpt = fopen($ftarget, 'ab');
+
+				# Combine file pieces together and clean them up.
 				for ($ix = 0; $ix < $count+1; $ix++)
 				{
-					$src = $this->Root.$this->cf.".[$ix]_".$target;
+					$src = $this->Root.'/'.$this->cf."/.[$ix]_".$target;
 					fwrite($fpt, file_get_contents($src));
 					unlink($src);
 				}
 				fclose($fpt);
 
-				$filter->Upload($target, $fi);
+				$filter->FFUpload($target, $fi);
 				if (!empty($this->Behavior->Watchers))
 					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
 						$fi->path.$target);
