@@ -26,7 +26,7 @@ class FormEmail extends Module
 			'State' => new FormInput('State', null, 'form[state]'),
 			'Zip' => new FormInput('Zip', null, 'form[zip]'),
 			'Phone' => new FormInput('Phone', null, 'form[phone]'),
-			'Message' => new FormInput('Message', 'area', 'form[message]', null, array('rows' => 10, 'style' => 'width: 100%')),
+			'Message' => new FormInput('Message', 'area', 'form[message]', null, array('rows' => 10, 'style' => 'height: 6em; width: 100%')),
 			'' => new FormInput(null, 'captcha', 'c')
 		);
 		$this->send = false;
