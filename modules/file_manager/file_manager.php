@@ -289,8 +289,8 @@ class FileManager extends Module
 		}
 		else if ($act == 'Move To')
 		{
-			$sels = Server::GetVar($this->Name.'_sels');
-			$ct = Server::GetVar($this->Name.'_ct');
+			$sels = Server::GetVar($this->GetName(true).'_sels');
+			$ct = Server::GetVar($this->GetName(true).'_ct');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -423,7 +423,7 @@ class FileManager extends Module
 		$this->vars['fmname'] = $this->Name;
 		$this->vars['filename'] = $fi->filename;
 		$this->vars['path'] = $this->Root.$this->cf;
-		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
+		$this->vars['dirsel'] = $this->GetDirectorySelect($this->GetName(true).'_ct');
 		$this->vars['relpath'] = $relpath;
 		$this->vars['host'] = Server::GetVar('HTTP_HOST');
 		$this->vars['sid'] = Server::GetVar('PHPSESSID');
