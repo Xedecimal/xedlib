@@ -227,6 +227,17 @@ class Server
 		if (isset($HTTP_SESSION_VARS)) unset($HTTP_SESSION_VARS[$name]);
 	}
 
+	static function ExpireSession($time)
+	{
+		if (isset($_SESSION['LAST_ACTIVITY'])
+		&& (time() - $_SESSION['LAST_ACTIVITY'] > $time))
+		{
+		    session_destroy();
+		    session_unset();
+		}
+		$_SESSION['LAST_ACTIVITY'] = time(); // update last activity time stamp
+	}
+
 	static function SanitizeEnvironment()
 	{
 		if (ini_get('magic_quotes_gpc'))

@@ -100,7 +100,7 @@ class File
 	static function DelEmpty($dir)
 	{
 		$files = glob($dir.'/*');
-		if (count($files) < 1) { @rmdir($dir); DelEmpty(dirname($dir)); }
+		if (count($files) < 1) { @rmdir($dir); File::DelEmpty(dirname($dir)); }
 	}
 
 	/**
@@ -114,6 +114,7 @@ class File
 	{
 		if (!isset($src) || !isset($dst)) return false;
 		$rpdst = realpath($dst);
+		if (empty($rpdst)) return false;
 		return substr(realpath($src), 0, strlen($rpdst)) == $rpdst;
 	}
 

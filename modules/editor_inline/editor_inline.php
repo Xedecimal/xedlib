@@ -58,7 +58,7 @@ class EditorInline extends Module
 			$fm = new FileManager;
 			$fm->Active = true;
 			$fm->Behavior->Target = 'images';
-			$fm->Filters = array('FilterGallery');
+			$fm->Filters = array('Gallery');
 			$fm->Root = 'img/upload';
 			$fm->Behavior->AllowAll();
 			$fm->Prepare();

@@ -101,7 +101,7 @@ class FileManager extends Module
 	 *
 	 * @var array
 	 */
-	public $Filters = array('FilterDefault');
+	public $Filters = array('Default');
 
 	public $FilterConfig = array();
 
@@ -123,15 +123,15 @@ class FileManager extends Module
 	{
 		if (!$this->Active) return;
 
+		if (substr($this->Root, -1) != '/') $this->Root .= '/';
+
 		if (empty($this->Root)) throw new Exception('Invalid root.');
 
 		$act = Server::GetVar($this->GetName(true).'_action');
 		$this->cf = Server::GetVar($this->GetName(true).'_cf');
 
-		# TODO: Only declare $fi once!
-
-		if (!file_exists($this->Root.'/'.$this->cf)) $fi = new FileInfo($this->Root);
-		else $fi = new FileInfo($this->Root.'/'.$this->cf);
+		if (!file_exists($this->Root.$this->cf)) $fi = new FileInfo($this->Root);
+		else $fi = new FileInfo($this->Root.$this->cf);
 
 		$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 		$f->FFPrepare($fi);
@@ -151,20 +151,22 @@ class FileManager extends Module
 			if (Server::GetVar('cm') == 'done')
 			{
 				$target = Server::GetVar('cu');
-				$ftarget = $this->Root.$this->cf.$target;
+				$ftarget = $this->Root.'/'.$this->cf.'/'.$target;
 				$count = Server::GetVar('count'); // Amount of peices
 
 				if (file_exists($ftarget)) unlink($ftarget);
 				$fpt = fopen($ftarget, 'ab');
+
+				# Combine file pieces together and clean them up.
 				for ($ix = 0; $ix < $count+1; $ix++)
 				{
-					$src = $this->Root.$this->cf.".[$ix]_".$target;
+					$src = $this->Root.'/'.$this->cf."/.[$ix]_".$target;
 					fwrite($fpt, file_get_contents($src));
 					unlink($src);
 				}
 				fclose($fpt);
 
-				$filter->Upload($target, $fi);
+				$filter->FFUpload($target, $fi);
 				if (!empty($this->Behavior->Watchers))
 					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
 						$fi->path.$target);
@@ -190,7 +192,7 @@ class FileManager extends Module
 		else if ($act == 'Save')
 		{
 			if (!$this->Behavior->AllowEdit) return;
-			$info = new FileInfo($this->Root.'/'.$this->cf, $this->Filters);
+			$info = new FileInfo($this->Root.$this->cf, $this->Filters);
 			$newinfo = Server::GetVar('info');
 			$f = FileManager::GetFilter($info, $this->Root, $this->Filters);
 			$f->FFUpdated($this, $info, $newinfo);
@@ -269,7 +271,7 @@ class FileManager extends Module
 		else if ($act == 'Create')
 		{
 			if (!$this->Behavior->AllowCreateDir) return;
-			$p = $this->Root.'/'.$this->cf.'/'.Server::GetVar($this->Name.'_cname');
+			$p = $this->Root.$this->cf.'/'.Server::GetVar($this->GetName(true).'_cname');
 			mkdir($p);
 			chmod($p, 0755);
 			FilterDefault::UpdateMTime($p);
@@ -368,7 +370,7 @@ class FileManager extends Module
 			die();
 		}
 
-		$this->cf = File::SecurePath(Server::GetState($this->Name.'_cf'));
+		$this->cf = File::SecurePath(Server::GetState($this->GetName(true).'_cf'));
 
 		if (is_dir($this->Root.$this->cf)
 			&& strlen($this->cf) > 0
@@ -412,11 +414,6 @@ class FileManager extends Module
 		global $me;
 		$this->vars['target'] = $this->Behavior->Target;
 
-		$ex = HM::ParseURL($this->Behavior->Target);
-		$ex['args'][$this->Name.'_action'] = 'upload';
-		$ex['args']['PHPSESSID'] = Server::GetVar('PHPSESSID');
-		$this->vars['java_target'] = HM::URL($ex['url'], $ex['args']);
-
 		$this->vars['root'] = $this->Root;
 		$this->vars['cf'] = $this->cf;
 
@@ -426,7 +423,7 @@ class FileManager extends Module
 		$this->vars['dirsel'] = $this->GetDirectorySelect($this->GetName(true).'_ct');
 		$this->vars['relpath'] = $relpath;
 		$this->vars['host'] = Server::GetVar('HTTP_HOST');
-		$this->vars['sid'] = Server::GetVar('PHPSESSID');
+		$this->vars['sid'] = session_id();
 		$this->vars['behavior'] = $this->Behavior;
 
 		$this->vars['folders'] = count($this->files['folders']);
@@ -506,7 +503,10 @@ class FileManager extends Module
 	 */
 	function TagHeader($t, $g, $a)
 	{
-		return $g;
+		$head = '';
+		if (!empty($this->View->Header))
+			$head = "<h2>{$this->View->Header}</h2>\r\n";
+		return $head.$g;
 	}
 
 	function TagPath($t, $guts, $attribs)
@@ -523,7 +523,7 @@ class FileManager extends Module
 		if (isset($this->cf))
 		{
 			$d['uri'] = HM::URL($this->Behavior->Target,
-				array($this->Name.'_cf' => ''));
+				array($this->GetName(true).'_cf' => ''));
 			$d['name'] = $attribs['ROOT'];
 			$ret .= $vp->ParseVars($guts, $d);
 		}
@@ -538,7 +538,7 @@ class FileManager extends Module
 			if (strlen($items[$ix]) < 1) continue;
 			$cpath = (strlen($cpath) > 0 ? $cpath.'/' : null).$items[$ix];
 			$uri = HM::URL($this->Behavior->Target,
-				array($this->Name.'_cf' => $cpath));
+				array($this->GetName(true).'_cf' => $cpath));
 			$ret .= ' '.$attribs['SEP'];
 			$d['name'] = $items[$ix];
 			$d['uri'] = $uri;
@@ -607,8 +607,8 @@ class FileManager extends Module
 			}
 			else
 				$this->vars['url'] = HM::URL($this->Behavior->Target,
-					array($this->Name.'_cf' =>
-					"{$this->cf}/{$f->filename}"));
+					array($this->GetName(true).'_cf' =>
+					"{$this->cf}{$f->filename}"));
 
 			$this->vars['name'] = $f;
 			$this->vars['caption'] = $this->View->GetCaption($f);
@@ -678,8 +678,7 @@ class FileManager extends Module
 			$this->vars['type'] = 'files';
 			$this->vars['index'] = $ix;
 			$this->vars['info'] = $f->info;
-			if (!empty($f->icon)) $this->vars['icon'] = $f->icon;
-			else $this->vars['icon'] = '';
+			$this->vars['icon'] = $this->GetIcon($f);
 			$this->vars['ftitle'] = isset($f->info['title']) ?
 				@stripslashes($f->info['title']) : '';
 
@@ -763,7 +762,7 @@ class FileManager extends Module
 
 		if ($this->Behavior->AllowEdit && $this->Behavior->QuickCaptions)
 		{
-			$ret .= '<input type="submit" name="'.$this->Name.'_action" value="Update Captions" />';
+			$ret .= '<input type="submit" name="'.$this->GetName(true).'_action" value="Update Captions" />';
 		}
 
 		if (isset($this->curfilter))
@@ -1002,7 +1001,7 @@ class FileManager extends Module
 	 */
 	function GetDirectory()
 	{
-		$dp = opendir($this->Root.'/'.$this->cf);
+		$dp = opendir($this->Root.$this->cf);
 		$ret['files'] = array();
 		$ret['folders'] = array();
 
@@ -1116,7 +1115,7 @@ class FileManager extends Module
 	 * @param string $default Default filter to fall back on.
 	 * @return FilterDefault Or a derivitive.
 	 */
-	function GetFilter(&$fi, $root, $defaults)
+	static function GetFilter(&$fi, $root, $defaults = null)
 	{
 		$ft = $fi;
 
@@ -1128,10 +1127,10 @@ class FileManager extends Module
 			else
 			{
 				if (isset($defaults[0]))
-					$fname = $defaults[0];
+					$fname = 'Filter'.$defaults[0];
 				else
 					$fname = 'FilterDefault';
-				$f = new $fname($this);
+				$f = new $fname();
 				$f->FFGetInfo($fi);
 				return $f;
 			}
@@ -1213,6 +1212,9 @@ class FileManagerView
 
 	public $RenameTitle = 'Rename File / Folder';
 
+	/**
+	 * @var integer
+	 */
 	public $Captions = false;
 
 	/**

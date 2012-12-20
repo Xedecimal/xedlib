@@ -26,6 +26,7 @@ class Module
 		$_d['app_dir'] = $root_path;
 		if (!isset($_d['app_abs']))
 			$_d['app_abs'] = Server::GetRelativePath($root_path);
+
 		$_d['q'] = explode('/', $GLOBALS['rw'] =
 			Server::GetVar('rw', isset($_d['default']) ? $_d['default'] : ''));
 

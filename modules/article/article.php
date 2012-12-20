@@ -1,6 +1,6 @@
 <?php
 
-require_once('xedlib/classes/data/data_set.php');
+require_once(dirname(__FILE__).'/../../classes/data/data_set.php');
 
 class Articles extends Module
 {

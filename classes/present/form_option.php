@@ -1,5 +1,6 @@
 <?php
 
+require_once(dirname(__FILE__).'/../hm.php');
 require_once(dirname(__FILE__).'/../tree_node.php');
 
 /**
@@ -47,7 +48,7 @@ class FormOption extends TreeNode
 
 	function __tostring() { return $this->text; }
 
-	function RenderCheck($atrs)
+	function RenderCheck($atrs = null)
 	{
 		if ($this->selected) $atrs['CHECKED'] = 'checked';
 		if (!empty($this->children) || $this->group)
@@ -59,7 +60,6 @@ class FormOption extends TreeNode
 		}
 		else
 		{
-			$valu = isset($this->valu) ? ' value="'.$this->valu.'"' : null;
 			return '<input type="checkbox" value="'.$this->valu.'"'
 				.HM::GetAttribs($atrs).' /> <label for="'.@$atrs['ID'].'">'
 				.htmlspecialchars($this->text).'</label><br />';
@@ -168,18 +168,10 @@ class FormOption extends TreeNode
 		return $strout;
 	}
 
-	function ArrayToSelText($array, $sel)
-	{
-		$ret = array();
-		foreach ($array as $ix => $v)
-			$ret[] = $sel[$v]->text;
-		return implode(', ', $ret);
-	}
-
 	/**
 	* A SelOption callback, returns the value by the integer.
 	*/
-	static function CBSelect($ds, $item, $icol, $col = null)
+	static function CBSelect($ds, $item, $icol, $col)
 	{
 		if (is_array($ds->FieldInputs[$col]->attr('VALUE')))
 		foreach ($ds->FieldInputs[$col]->attr('VALUE') as $v)
@@ -191,5 +183,3 @@ class FormOption extends TreeNode
 		return $item[$icol];
 	}
 }
-
-?>

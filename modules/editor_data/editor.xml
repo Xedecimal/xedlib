@@ -1,4 +1,6 @@
-<null>
+<div class="editor-data">
+
+<script type="text/javascript" src="{{xl_abs}}/modules/editor_data/editor_data.js"></script>
 
 {{TextHeader}}
 
@@ -28,4 +30,4 @@
 </div>
 </forms>
 
-</null>
+</div> <!-- .editor-data -->

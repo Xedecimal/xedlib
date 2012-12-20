@@ -32,6 +32,8 @@ class Gallery extends Module
 	 */
 	public $Display;
 
+	public $Filter = 'Gallery';
+
 	/**
 	 * Constructor, sets default properties, behavior and display.
 	 * @param string $root Root location of images for this gallery.
@@ -95,7 +97,7 @@ class Gallery extends Module
 			if ($ix >= count($this->files['files'])-1) $d['class'] = ' last';
 			else $d['class'] = '';
 
-			$d['fullname'] = HM::urlencode_path($fi->dir.'/f_'.$fi->filename);
+			$d['fullname'] = HM::urlencode_path($fi->path);
 			$d['idx'] = $ix;
 			$d['name'] = $this->GetCaption($fi);
 			$d['path'] = Server::GetVar('galcf', '');
@@ -156,7 +158,7 @@ class Gallery extends Module
 		$path = Server::GetVar('galcf');
 
 		$this->FileManager->Name = $this->Name;
-		$this->FileManager->Filters = array('FilterGallery');
+		$this->FileManager->Filters = array($this->Filter);
 		$this->FileManager->Root = $this->Root.$path;
 		$this->FileManager->Behavior->ShowAllFiles = true;
 		$this->FileManager->Behavior->Sort = $this->Display->Sort;
@@ -229,7 +231,7 @@ class Gallery extends Module
 
 		//Gallery settings
 		$fig = new FileInfo($this->Root);
-		$this->FileManager->GetFilter($fig, $this->Root, array('FilterGallery'));
+		$this->FileManager->GetFilter($fig, $this->Root, array('Gallery'));
 		$t->Set('file_thumb_width', $fig->info['thumb_width']);
 		$t->Set('file_thumb_height', $fig->info['thumb_height']+60);
 
@@ -328,7 +330,7 @@ class GalleryAdmin extends FileManager
 		$this->CheckActive($this->Name);
 
 		$this->Behavior->Target = '{{app_abs}}/'.$this->Name;
-		$this->Filters = array('FilterGallery');
+		$this->Filters = array('Gallery');
 	}
 
 	function Link()

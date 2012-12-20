@@ -9,6 +9,7 @@ class FormEmail extends Module
 	public $Title = 'Contact Form';
 	protected $_template;
 	protected $_from = 'email';
+	protected $_from_name = 'name';
 	protected $_to = 'nobody@nowhere.com';
 	protected $_source = 'form';
 
@@ -54,10 +55,10 @@ class FormEmail extends Module
 		$t->Behavior->Bleed = false;
 		$t->ReWrite('input', array('Form', 'TagInput'));
 		$t->ReWrite('field', array(&$this, 'TagField'));
-		$t->Set($this);
+		$t->Set('Name', $this->GetName());
 		if ($this->send)
-			return array($this->Name => $t->ParseFile($this->_template_send));
-		return array($this->Name => $t->ParseFile($this->_template));
+			return array($this->GetName() => $t->ParseFile($this->_template_send));
+		return array($this->GetName() => $t->ParseFile($this->_template));
 	}
 
 	function GenerateMail($send = false)
@@ -66,8 +67,11 @@ class FormEmail extends Module
 		$t = new Template();
 		$t->use_getvar = true;
 
-		if (strpos($this->_from, '@') == false)
+		if (strpos($this->_from, '@') === false)
+		{
 			$this->_from = $this->_data[$this->_from];
+			$this->_from_name = $this->_data[$this->_from_name];
+		}
 
 		$headers[] = 'From: '.$this->_from;
 		$headers[] = 'Reply-To: '.$this->_from;
@@ -92,13 +96,31 @@ class FormEmail extends Module
 		{
 			$this->_labels[$f->atrs['NAME']] = $text;
 			$this->_inputs[$f->atrs['NAME']] = $f->atrs['NAME'];
+			if ($f->atrs['TYPE'] == 'file')
+			{
+				$this->_attach = true;
+				$file = $_FILES[$f->atrs['NAME']];
+				$this->_files[] = $file;
+			}
 		}
 
 		$t->ReWrite('field', array(&$this, 'TagEmailField'));
 		$this->body = $t->ParseFile($this->_email_template);
 
 		if ($send)
-			mail($this->_to, $this->_subject, $this->body, implode($headers, "\r\n"));
+		{
+			if (@$this->_attach)
+			{
+				$args['to'] = $this->_to;
+				$args['subject'] = $this->_subject;
+				$args['body'] = $this->body;
+				$args['files'] = $this->_files;
+				$args['from-name'] = $this->_from_name;
+				$args['from-email'] = $this->_from;
+				U::MailWithAttachment($args);
+			}
+			else mail($this->_to, $this->_subject, $this->body, implode($headers, "\r\n"));
+		}
 
 		if (!empty($this->debug))
 		{

@@ -1,4 +1,6 @@
-<form action="{{app_abs}}/{{_d.q.0}}/send" method="post" class="form-email xlform xlform-vertical validate" id="form-{{Name}}">
+<form action="{{app_abs}}/{{_d.q.0}}/send" method="post"
+	enctype="multipart/form-data" id="form-{{Name}}"
+	class="form-email xlform validate">
 <fieldset>
 <legend>{{Title}}</legend>
 <ul>

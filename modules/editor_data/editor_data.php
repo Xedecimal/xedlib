@@ -185,9 +185,7 @@ class HandlerFile extends EditorHandler
 		$vp->Bleed = false;
 		$dst = $vp->ParseVars($this->target, $inserted);
 		if (!isset($this->conditions) && !file_exists($dst))
-		{
-			mkrdir($dst, 0777);
-		}
+			mkdir($dst, 0777, true);
 		else if (!empty($this->conditions))
 		{
 			foreach ($this->conditions as $col => $cond)
@@ -218,10 +216,13 @@ class HandlerFile extends EditorHandler
 		if (strpos($dst, '//') > -1) return false;
 		$vp->Bleed = false;
 		$src = $vp->ParseVars($this->target, $original);
+
 		if (!isset($this->conditions) && file_exists($src))
 		{
 			if (!file_exists(dirname($dst))) mkrdir(dirname($dst), 0777);
-			rename($src, $dst);
+			$fi = new FileInfo($src);
+			$filter = FileManager::GetFilter($fi, $this->target);
+			$filter->FFRename($fi, $dst);
 		}
 		else if (!empty($this->conditions))
 		{
@@ -231,8 +232,13 @@ class HandlerFile extends EditorHandler
 				{
 					if ($update[$col] == $val)
 					{
-						if (file_exists($src)) rename($src, $dst);
-						else mkrdir($dst, 0777);
+						if (file_exists($src))
+						{
+							$fi = new FileInfo($src);
+							$filter = FileManager::GetFilter($fi, $this->target);
+							$filter->FFRename($fi, $dst);
+						}
+						else mkdir($dst, 0777, true);
 
 						if ($this->ownership)
 						{
@@ -263,7 +269,7 @@ class HandlerFile extends EditorHandler
 	{
 		$vp = new VarParser();
 		$dst = $vp->ParseVars($this->target, $data);
-		if (!strpos($dst, '//') && file_exists($dst)) DelEmpty($dst);
+		if (!strpos($dst, '//') && file_exists($dst)) File::DelEmpty($dst);
 		return true;
 	}
 }
@@ -598,7 +604,8 @@ class EditorData extends Module
 
 			if (count($this->handlers) > 0)
 			{
-				$data = $this->ds->GetOne(array($this->ds->id => $ci));
+				$q['match'][$this->ds->id] = $ci;
+				$data = $this->ds->GetOne($q);
 				$update[$this->ds->id] = $ci;
 				foreach ($this->handlers as $handler)
 				{
@@ -737,20 +744,6 @@ class EditorData extends Module
 		$t->Set('assoc', $this->Name);
 
 		return $t->ParseFile(Module::L('editor_data/editor.xml'));
-
-		$ret['name'] = $this->Name;
-
-		$act = Server::GetVar($this->Name.'_action');
-		$sq = Server::GetVar($this->Name.'_q');
-
-		$ret['ds'] = $this->ds;
-		if ($act != 'edit' && !empty($this->ds->DisplayColumns)
-			&& ($this->Behavior->Search && isset($sq)))
-			$ret['table'] = $this->GetTable($this->Behavior->Target, $act, $sq);
-		else $ret['table'] = null;
-		$ret['forms'] = $this->GetForms(Server::GetVar($assoc) == $this->Name ?
-			Server::GetVar('child') : null);
-		return $ret;
 	}
 
 	/**
@@ -1262,7 +1255,7 @@ class EditorData extends Module
 								case 'thumb':
 									$in->help = '<img src="'
 									.(empty($files) ? 'xedlib/images/cross.png'
-									  : $files[0]).'" />';
+									: $files[0]).'" />';
 									break;
 								case 'exists':
 									$in->help = '<img src="xedlib/images/'.
@@ -1313,8 +1306,8 @@ class EditorData extends Module
 			$frm->AddInput(
 				$frm->GetSubmitButton($this->Name.'_action', $frm->State).
 				($state == STATE_EDIT && $this->type == CONTROL_BOUND ?
-				 '<input type="submit" name="'.$this->Name.'_action" value="Cancel" />'
-				 : null)
+				'<input type="submit" name="'.$this->Name.'_action" value="Cancel" />'
+				: null)
 			);
 
 			return $frm;

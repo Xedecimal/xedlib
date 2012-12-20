@@ -1,27 +1,10 @@
 <div class="file-manager" id="{{fn_name}}">
-
-<style type="text/css">
-.file-manager th { text-align: left; }
-.file-manager .box { margin-top: 2em; }
-.file-manager .box_title { font-size: large; }
-.file-manager .icon { cursor: move; }
-</style>
-
-<header>
-<box title="Current Path Location" id="{{fn_name}}_path">
-<path root="Home" sep="&raquo;"> <a href="{{uri}}">{{name}}</a></path>
-<download></download>
-</box>
-</header>
+<style type="text/css">@import url('{{xl_abs}}/modules/file_manager/file_manager.css')</style>
 
 <form class="form-file-manager" action="{{target}}" method="post" enctype="multipart/form-data">
 
-<options>
-
-<box title="File and Folder Tasks" id="{{fn_name}}_tasks">
-
 <div class="div-mass-options"> <!-- Mass Options -->
-<p>With selected files...</p>
+<h3>With selected files...</h3>
 <behavior type="AllowMove,AllowCopy,AllowLink">
 	<behavior type="AllowMove"><input type="submit"
 		name="{{fn_name}}_action" value="Move To" /></behavior>
@@ -38,6 +21,17 @@
 <behavior type="AllowDownloadZip"><input type="submit"
 	name="{{fn_name}}_action" value="Download Selected" /></behavior>
 </div> <!-- .mass_options -->
+
+<header>
+<box title="Current Path Location" id="{{fn_name}}_path">
+<path root="Home" sep="&raquo;"> <a href="{{uri}}">{{name}}</a></path>
+<download></download>
+</box>
+</header>
+
+<options>
+
+<box title="File and Folder Tasks" id="{{fn_name}}_tasks">
 
 <search> <!-- Search -->
 <tr><td class="opt_title">
@@ -65,7 +59,7 @@
 			archive="UploadApplet.jar,commons-codec-1.3.jar,commons-httpclient-3.0.1.jar,commons-logging-1.0.4.jar"
 			width="525" height="100">
 			<param name="host" value="http://{{host}}" />
-			<param name="pathToScript" value="{{target}}?{{fn_name}}_action=Upload&amp;PHPSESSID={{sid}}" />
+			<param name="pathToScript" value="{{app_abs}}/{{target}}?{{fn_name}}_action=Upload&amp;PHPSESSID={{sid}}" />
 			<param name="path" value="{{cf}}" />
 			<param name="uploadMax" value="500000" />
 		</applet>
@@ -113,13 +107,13 @@
 
 <directory>
 		<folders>
-		<box title="Folders">
+		<h3>Folders</h3>
 			<table class="table-listing">
 				<check><tr>
 					<th>&nbsp;</th>
-					<th><label><input type="checkbox" class="in-sel-folders"
-						id="{{fn_name}}-sel-folders" />Select All</label></th>
-					<th>Caption</th>
+					<th><input type="checkbox" class="in-sel-folders"
+						id="{{fn_name}}-sel-folders" /></th>
+					<th><label for="{{fn_name}}-sel-folders">Select All Folders</label></th>
 				</tr></check>
 				<folder>
 					<tr class="tr-entry" data-path="{{fipath}}">
@@ -130,21 +124,21 @@
 							id="{{fn_name}}_sel_{{type}}_{{index}}"
 							name="{{fn_name}}_sels[]" value="{{fipath}}" />
 					</check></td>
-					<td class="folder-caption"><a href="{{url}}">{{name}}</a><br />{{caption}}</td>
+					<td class="folder-caption"><a class="a-folder" href="{{url}}" data-icon="{{icon}}">{{name}}</a><br />{{caption}}</td>
+					<quickopt><td>{{opt}}</td></quickopt>
 				</tr>
 				</folder>
 			</table>
-		</box>
 		</folders>
 
 		<files>
 		<h3>Files</h3>
 			<table class="table-listing">
 				<check><tr>
-					<td>&nbsp;</td>
-					<td><input type="checkbox" class="in-sel-files"
-						id="{{fn_name}}-sel-files" /></td>
-					<td><label for="{{fn_name}}-sel-files">Select All</label></td>
+					<th>&nbsp;</th>
+					<th><input type="checkbox" class="in-sel-files"
+						id="{{fn_name}}-sel-files" /></th>
+					<th><label for="{{fn_name}}-sel-files">Select All Files</label></th>
 				</tr></check>
 				<file>
 				<tr class="tr-entry" data-path="{{fipath}}">
