@@ -97,7 +97,7 @@ class Gallery extends Module
 			if ($ix >= count($this->files['files'])-1) $d['class'] = ' last';
 			else $d['class'] = '';
 
-			$d['fullname'] = HM::urlencode_path($fi->path);
+			$d['fullname'] = '{{app_abs}}/'.HM::urlencode_path($fi->path);
 			$d['idx'] = $ix;
 			$d['name'] = $this->GetCaption($fi);
 			$d['path'] = Server::GetVar('galcf', '');
