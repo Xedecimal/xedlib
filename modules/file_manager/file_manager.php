@@ -484,7 +484,7 @@ class FileManager extends Module
 		);
 
 		if (!empty($f->icon)) return $f->icon;
-		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
+		else if (isset($icons[$f->type])) $ret = Module::P($icons[$f->type]);
 		else return null;
 		return $ret;
 	}
