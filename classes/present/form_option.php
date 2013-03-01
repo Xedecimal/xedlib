@@ -105,7 +105,7 @@ class FormOption extends TreeNode
 				$o->children = FormOption::FromArray($item, $default, $use_keys);
 				$o->group = true;
 			}
-			else $o = new FormOption($item, $default == $item);
+			else $o = new FormOption($item, $default == $ix);
 
 			if ($use_keys) $o->valu = $o->id = $ix;
 			$opts[$use_keys ? $ix : $item] = $o;
