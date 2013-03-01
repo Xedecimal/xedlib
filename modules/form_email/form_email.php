@@ -20,14 +20,17 @@ class FormEmail extends Module
 		$this->_subject = 'Web Contact Submission';
 		$this->_template_send = Module::L('form_email/send.xml');
 		$this->_email_template = Module::L('form_email/email.xml');
+
+		$this->_data = $_POST[$this->_source];
+
 		$this->_fields = array(
-			'Name' => new FormInput('Name', null, 'form[name]', null, array('class' => 'required')),
-			'Email' => new FormInput('Email', null, 'form[email]'),
-			'City' => new FormInput('City', null, 'form[city]'),
-			'State' => new FormInput('State', null, 'form[state]'),
-			'Zip' => new FormInput('Zip', null, 'form[zip]'),
-			'Phone' => new FormInput('Phone', null, 'form[phone]'),
-			'Message' => new FormInput('Message', 'area', 'form[message]', null, array('rows' => 10, 'style' => 'width: 100%')),
+			'Name' => new FormInput('Name', null, 'form[name]', $this->_data['name'], array('class' => 'required')),
+			'Email' => new FormInput('Email', null, 'form[email]', $this->_data['email']),
+			'City' => new FormInput('City', null, 'form[city]', $this->_data['city']),
+			'State' => new FormInput('State', null, 'form[state]', $this->_data['state']),
+			'Zip' => new FormInput('Zip', null, 'form[zip]', $this->_data['zip']),
+			'Phone' => new FormInput('Phone', null, 'form[phone]', $this->_data['phone']),
+			'Message' => new FormInput('Message', 'area', 'form[message]', $this->_data['message'], array('rows' => 10, 'style' => 'width: 100%')),
 			'' => new FormInput(null, 'captcha', 'c')
 		);
 		$this->send = false;
@@ -89,11 +92,30 @@ class FormEmail extends Module
 		# Find all label text
 		foreach ($sx->xpath('//label[@for]') as $id)
 			$this->_labels[(string)$id['for']] = (string)$id;
+
 		# Find all elements with an id
 		foreach ($sx->xpath('//*[@id]') as $in)
 			$this->_inputs[(string)$in['id']] = (string)$in['name'];
+
+		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
+
+		# Process code fields.
 		foreach ($this->_fields as $text => $f)
 		{
+			preg_match($preg, $f->atrs['NAME'], $m);
+
+			if (!empty($f->atrs['CLASS']))
+			{
+				if (array_search('required', explode(' ', $f->atrs['CLASS'])) !== false)
+				{
+					if (empty($this->_data[$m[1]]))
+					{
+						$this->send = false;
+						$this->error = 'You are missing fields.';
+					}
+				}
+			}
+
 			$this->_labels[$f->atrs['NAME']] = $text;
 			$this->_inputs[$f->atrs['NAME']] = $f->atrs['NAME'];
 			if ($f->atrs['TYPE'] == 'file')
