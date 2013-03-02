@@ -6,7 +6,7 @@
 <ul>
 	<field><li style="{{style}}">{{field}}<label for="{{fid}}">{{name}}</label></li>
 </field>
-	<li class="clear"><label for="submit"></label><input type="submit" id="submit" value="Send" /></li>
+	<li class="clear"><label for="submit"></label><input type="submit" class="btn btn-primary" id="submit" value="Send" /></li>
 </ul>
 </fieldset>
 </form>

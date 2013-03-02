@@ -463,7 +463,7 @@ class FileManager extends Module
 					src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
 		$_d['fm_head'] = true;
 
-		$ret['default'] = $t->ParseFile($this->Template);
+		$ret[$this->GetName()] = $t->ParseFile($this->Template);
 
 		return $ret;
 	}
