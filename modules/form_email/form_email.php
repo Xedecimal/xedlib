@@ -110,8 +110,8 @@ class FormEmail extends Module
 				{
 					if (empty($this->_data[$m[1]]))
 					{
-						$this->send = false;
-						$this->error = 'You are missing fields.';
+						$send = false;
+						$error = 'You are missing fields.';
 					}
 				}
 			}
