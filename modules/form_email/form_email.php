@@ -100,6 +100,7 @@ class FormEmail extends Module
 		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
 
 		# Process code fields.
+		if (!empty($this->_fields))
 		foreach ($this->_fields as $text => $f)
 		{
 			preg_match($preg, $f->atrs['NAME'], $m);
