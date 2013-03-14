@@ -21,16 +21,16 @@ class FormEmail extends Module
 		$this->_template_send = Module::L('form_email/send.xml');
 		$this->_email_template = Module::L('form_email/email.xml');
 
-		$this->_data = $_POST[$this->_source];
+		$this->_data = @$_POST[$this->_source];
 
 		$this->_fields = array(
-			'Name' => new FormInput('Name', null, 'form[name]', $this->_data['name'], array('class' => 'required')),
-			'Email' => new FormInput('Email', null, 'form[email]', $this->_data['email']),
-			'City' => new FormInput('City', null, 'form[city]', $this->_data['city']),
-			'State' => new FormInput('State', null, 'form[state]', $this->_data['state']),
-			'Zip' => new FormInput('Zip', null, 'form[zip]', $this->_data['zip']),
-			'Phone' => new FormInput('Phone', null, 'form[phone]', $this->_data['phone']),
-			'Message' => new FormInput('Message', 'area', 'form[message]', $this->_data['message'], array('rows' => 10, 'style' => 'width: 100%')),
+			'Name' => new FormInput('Name', null, 'form[name]', @$this->_data['name'], array('class' => 'required')),
+			'Email' => new FormInput('Email', null, 'form[email]', @$this->_data['email']),
+			'City' => new FormInput('City', null, 'form[city]', @$this->_data['city']),
+			'State' => new FormInput('State', null, 'form[state]', @$this->_data['state']),
+			'Zip' => new FormInput('Zip', null, 'form[zip]', @$this->_data['zip']),
+			'Phone' => new FormInput('Phone', null, 'form[phone]', @$this->_data['phone']),
+			'Message' => new FormInput('Message', 'area', 'form[message]', @$this->_data['message'], array('rows' => 10, 'style' => 'width: 100%')),
 			'' => new FormInput(null, 'captcha', 'c')
 		);
 		$this->send = false;
