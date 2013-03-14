@@ -189,7 +189,7 @@ class FormEmail extends Module
 				$row['name'] = $l;
 				$row['value'] = '';
 
-				foreach ($this->_data[$m[1]] as $ix => $val) $row['value'] .= ' '.$val;
+				foreach ($this->_data[$m[1]] as $ix => $val) $row['value'] .= ($ix > 0 ? ', ' : '').$val;
 
 				$rows[] = $row;
 			}
