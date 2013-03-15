@@ -402,7 +402,7 @@ class ModUserAdmin extends Module
 		$_d['user.datasets'][0][0]->Description = 'User';
 		$_d['user.datasets'][0][0]->DisplayColumns = array(
 			'usr_name' => new DisplayColumn('Name'),
-			'usr_access' => new DisplayColumn('Access', 'socallback')
+			'usr_access' => new DisplayColumn('Access', array('FormOption', 'CBSelect'))
 		);
 		$_d['user.datasets'][0][0]->FieldInputs = array(
 			'usr_name' => new FormInput('Name'),

@@ -160,6 +160,8 @@ class Database
 				return mysql_real_escape_string($val, $this->link);
 			case DB_SL:
 				return sqlite_escape_string($val);
+			case DB_SL3:
+				return Sqlite3::escapeString($val);
 			default:
 				return addslashes($val);
 		}

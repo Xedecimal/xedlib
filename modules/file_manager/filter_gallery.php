@@ -12,9 +12,9 @@ class FilterGallery extends FilterDefault
 	 */
 	public $Name = 'Gallery';
 
-	function __construct(&$fm)
+	function __construct()
 	{
-		$this->Behavior = new FilterGalleryBehavior($fm->FilterConfig);
+		$this->Behavior = new FilterGalleryBehavior();
 	}
 
 	# FileFilter implementation
@@ -35,7 +35,8 @@ class FilterGallery extends FilterDefault
 		else $dinfo = $fi->info;
 
 		if (substr($fi->filename, 0, 2) == 't_') $fi->show = false;
-		if (substr($fi->filename, 0, 2) == 'f_') $fi->show = false;
+		if ($this->Behavior->SaveOriginals
+		&& substr($fi->filename, 0, 2) == 'f_') $fi->show = false;
 
 		if (!isset($dinfo['full_width'])) $dinfo['full_width'] = 1024;
 		if (!isset($dinfo['full_height'])) $dinfo['full_height'] = 768;
@@ -60,7 +61,7 @@ class FilterGallery extends FilterDefault
 		{
 			$fi->icon = $path;
 			$fi->licon = $abs;
-		} 
+		}
 
 		# Prepare custom folder icon
 
@@ -77,7 +78,7 @@ class FilterGallery extends FilterDefault
 				$i = FileManager::GetIcon($fi);
 				$fi->icon = Module::P($i);
 				$fi->licon = Module::L($i);
-			} 
+			}
 		}
 		return $fi;
 	}
@@ -139,7 +140,9 @@ class FilterGallery extends FilterDefault
 
 		if ($this->Behavior->ResizeFull)
 		{
-			$this->ResizeFile($target->path.'/'.$file, $target->path.'/f_'.$file,
+			$dst = $target->path.
+				($this->Behavior->SaveOriginals ? '/f_' : '/').$file;
+			$this->ResizeFile($target->path.'/'.$file, $dst,
 				$target->info['full_width'], $target->info['full_height']);
 		}
 		if ($this->Behavior->UseThumbs)
@@ -162,6 +165,13 @@ class FilterGallery extends FilterDefault
 		$thumb = $fi->dir.'/t_'.basename($fi->filename);
 		$ttarget = dirname($newname).'/t_'.basename($newname);
 		if (file_exists($thumb)) rename($thumb, $ttarget);
+
+		if ($this->SaveOriginals)
+		{
+			$full = $fi->dir.'/f_'.basename($fi->filename);
+			$ftarget = dirname($newname).'/f_'.basename($newname);
+			if (file_exists($full)) rename($full, $ftarget);
+		}
 	}
 
 	/**
@@ -176,7 +186,7 @@ class FilterGallery extends FilterDefault
 		$thumb = $fi->dir.'/t_'.$fi->filename;
 		if (file_exists($thumb)) unlink($thumb);
 		$full = $fi->dir.'/f_'.$fi->filename;
-		if (file_exists($full)) unlink($full);
+		if ($this->Behavior->SaveOriginals && file_exists($full)) unlink($full);
 	}
 
 	/**
@@ -204,13 +214,17 @@ class FilterGallery extends FilterDefault
 		foreach ($files as $file)
 		{
 			if (substr($file, 0, 2) == 't_') continue;
-			if (substr($file, 0, 2) == 'f_') continue;
+			if ($this->Behavior->SaveOriginals
+			&& substr($file, 0, 2) == 'f_') continue;
 
 			$pinfo = pathinfo($file);
 			$this->ResizeFile($file, $path.'t_'.$pinfo['basename'],
 				$fi->info['thumb_width'], $fi->info['thumb_height']);
-			$this->ResizeFile($file, $path.'f_'.$pinfo['basename'],
-				$fi->info['full_width'], $fi->info['full_height']);
+			if ($this->Behavior->ResizeFull)
+				$this->ResizeFile($file, $path
+					.($this->Behavior->SaveOriginals ? 'f_' : '')
+					.$pinfo['basename'],
+					$fi->info['full_width'], $fi->info['full_height']);
 		}
 	}
 
@@ -222,8 +236,11 @@ class FilterGallery extends FilterDefault
 	{
 		$files = glob($path."t_*.*");
 		foreach ($files as $file) unlink($file);
-		$files = glob($path."f_*.*");
-		foreach ($files as $file) unlink($file);
+		if ($this->Behavior->SaveOriginals)
+		{
+			$files = glob($path."f_*.*");
+			foreach ($files as $file) unlink($file);
+		}
 	}
 
 	/**
@@ -287,8 +304,13 @@ class FilterGallery extends FilterDefault
 		while ($file = readdir($dp))
 		{
 			if ($file[0] == '.') continue;
+			# Don't generate thumbnails for thumbnails.
 			if (substr($file, 0, 2) == 't_') continue;
-			if (substr($file, 0, 2) == 'f_') continue;
+
+			# If saving originals, don't generate thumbnails for resized larger
+			# images.
+			if ($this->Behavior->SaveOriginals
+			&& substr($file, 0, 2) == 'f_') continue;
 
 			$fir = new FileInfo($fi->path.'/'.$file);
 
@@ -313,7 +335,7 @@ class FilterGallery extends FilterDefault
 
 				$fw = $info['full_width'];
 				$fh = $info['full_height'];
-				$fdst = $fir->dir.'/f_'.$fir->filename;
+				$fdst = $fir->dir.($this->Behavior->SaveOriginals ? '/f_' : '/').$fir->filename;
 				$this->ResizeFile($src, $fdst, $fw, $fh);
 			}
 		}
@@ -370,11 +392,10 @@ class FilterGalleryBehavior
 {
 	public $UseThumbs = true;
 	public $ResizeFull = true;
+	public $SaveOriginals = true;
 
-	function __construct($config)
+	function __construct()
 	{
-		foreach ($config as $k => $v)
-			$this->$k = $v;
 	}
 }
 

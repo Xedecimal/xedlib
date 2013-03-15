@@ -132,7 +132,7 @@ class FileManager extends Module
 
 		if (!file_exists($this->Root.$this->cf)) $fi = new FileInfo($this->Root);
 		else $fi = new FileInfo($this->Root.$this->cf);
-		
+
 		$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 		$f->FFPrepare($fi);
 
@@ -151,20 +151,22 @@ class FileManager extends Module
 			if (Server::GetVar('cm') == 'done')
 			{
 				$target = Server::GetVar('cu');
-				$ftarget = $this->Root.$this->cf.$target;
+				$ftarget = $this->Root.'/'.$this->cf.'/'.$target;
 				$count = Server::GetVar('count'); // Amount of peices
 
 				if (file_exists($ftarget)) unlink($ftarget);
 				$fpt = fopen($ftarget, 'ab');
+
+				# Combine file pieces together and clean them up.
 				for ($ix = 0; $ix < $count+1; $ix++)
 				{
-					$src = $this->Root.$this->cf.".[$ix]_".$target;
+					$src = $this->Root.'/'.$this->cf."/.[$ix]_".$target;
 					fwrite($fpt, file_get_contents($src));
 					unlink($src);
 				}
 				fclose($fpt);
 
-				$filter->Upload($target, $fi);
+				$filter->FFUpload($target, $fi);
 				if (!empty($this->Behavior->Watchers))
 					U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_UPLOAD,
 						$fi->path.$target);
@@ -289,8 +291,8 @@ class FileManager extends Module
 		}
 		else if ($act == 'Move To')
 		{
-			$sels = Server::GetVar($this->Name.'_sels');
-			$ct = Server::GetVar($this->Name.'_ct');
+			$sels = Server::GetVar($this->GetName(true).'_sels');
+			$ct = Server::GetVar($this->GetName(true).'_ct');
 			if (!empty($sels))
 			foreach ($sels as $file)
 			{
@@ -418,7 +420,7 @@ class FileManager extends Module
 		$this->vars['fmname'] = $this->Name;
 		$this->vars['filename'] = $fi->filename;
 		$this->vars['path'] = $this->Root.$this->cf;
-		$this->vars['dirsel'] = $this->GetDirectorySelect($this->Name.'_ct');
+		$this->vars['dirsel'] = $this->GetDirectorySelect($this->GetName(true).'_ct');
 		$this->vars['relpath'] = $relpath;
 		$this->vars['host'] = Server::GetVar('HTTP_HOST');
 		$this->vars['sid'] = session_id();
@@ -461,7 +463,7 @@ class FileManager extends Module
 					src="{{xl_abs}}/modules/file_manager/file_manager.js"></script>';
 		$_d['fm_head'] = true;
 
-		$ret['default'] = $t->ParseFile($this->Template);
+		$ret[$this->GetName()] = $t->ParseFile($this->Template);
 
 		return $ret;
 	}
@@ -482,7 +484,7 @@ class FileManager extends Module
 		);
 
 		if (!empty($f->icon)) return $f->icon;
-		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
+		else if (isset($icons[$f->type])) $ret = Module::P($icons[$f->type]);
 		else return null;
 		return $ret;
 	}
@@ -614,7 +616,7 @@ class FileManager extends Module
 			$this->vars['fipath'] = $f->path;
 			$this->vars['type'] = 'folders';
 			$this->vars['index'] = $ix;
-			$this->vars['icon'] = Module::P($this->GetIcon($f));
+			$this->vars['icon'] = $this->GetIcon($f);
 
 			$common = "?cf={$this->cf}&amp;editor={$this->Name}&amp;type=folders";
 
@@ -676,7 +678,7 @@ class FileManager extends Module
 			$this->vars['type'] = 'files';
 			$this->vars['index'] = $ix;
 			$this->vars['info'] = $f->info;
-			$this->vars['icon'] = Module::P($this->GetIcon($f));
+			$this->vars['icon'] = $this->GetIcon($f);
 			$this->vars['ftitle'] = isset($f->info['title']) ?
 				@stripslashes($f->info['title']) : '';
 
@@ -760,7 +762,7 @@ class FileManager extends Module
 
 		if ($this->Behavior->AllowEdit && $this->Behavior->QuickCaptions)
 		{
-			$ret .= '<input type="submit" name="'.$this->Name.'_action" value="Update Captions" />';
+			$ret .= '<input type="submit" name="'.$this->GetName(true).'_action" value="Update Captions" />';
 		}
 
 		if (isset($this->curfilter))
@@ -999,7 +1001,7 @@ class FileManager extends Module
 	 */
 	function GetDirectory()
 	{
-		$dp = opendir($this->Root.'/'.$this->cf);
+		$dp = opendir($this->Root.$this->cf);
 		$ret['files'] = array();
 		$ret['folders'] = array();
 
@@ -1128,7 +1130,7 @@ class FileManager extends Module
 					$fname = 'Filter'.$defaults[0];
 				else
 					$fname = 'FilterDefault';
-				$f = new $fname($this);
+				$f = new $fname();
 				$f->FFGetInfo($fi);
 				return $f;
 			}

@@ -58,7 +58,7 @@ class EditorInline extends Module
 			$fm = new FileManager;
 			$fm->Active = true;
 			$fm->Behavior->Target = 'images';
-			$fm->Filters = array('FilterGallery');
+			$fm->Filters = array('Gallery');
 			$fm->Root = 'img/upload';
 			$fm->Behavior->AllowAll();
 			$fm->Prepare();
@@ -70,8 +70,8 @@ class EditorInline extends Module
 
 		$p_css = Module::P('editor_inline/editor_inline.css');
 		$p_js = Module::P('editor_inline/editor_inline.js');
-		$ret['head'] = <<<EOF
-<link rel="stylesheet" type="text/css" href="{$p_css}" />
+		$ret['head'] = '<link rel="stylesheet" type="text/css" href="'.$p_css.'" />';
+		$ret['js'] = <<<EOF
 <script type="text/javascript" src="{{app_abs}}/js/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="{{app_abs}}/js/ckeditor/adapters/jquery.js"></script>
 <script type="text/javascript" src="{$p_js}"></script>

@@ -1,6 +1,6 @@
 <?php
 
-require_once(__DIR__.'/../../classes/data/data_set.php');
+require_once(dirname(__FILE__).'/../../classes/data/data_set.php');
 
 class Articles extends Module
 {
@@ -38,7 +38,7 @@ class Articles extends Module
 
 		foreach ($this->_map as $k => $v)
 		{
-			if (is_array($v))
+			if (is_array($v) || is_callable($v))
 				$this->_article = call_user_func($v, $this->_article);
 			else $this->_article[$k] = $this->_article[$v];
 		}
@@ -166,7 +166,8 @@ class ArticleAdmin extends Module
 			$this->_source->Description = 'Article';
 		if (empty($this->_source->DisplayColumns))
 			$this->_source->DisplayColumns = array(
-				'nws_title' => new DisplayColumn('Title')
+				'nws_title' => new DisplayColumn('Title'),
+				'nws_date' => new DisplayColumn('Date')
 			);
 		if (empty($this->_source->FieldInputs))
 			$this->_source->FieldInputs = array(

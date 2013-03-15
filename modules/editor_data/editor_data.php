@@ -237,7 +237,7 @@ class HandlerFile extends EditorHandler
 							$fi = new FileInfo($src);
 							$filter = FileManager::GetFilter($fi, $this->target);
 							$filter->FFRename($fi, $dst);
-						} 
+						}
 						else mkdir($dst, 0777, true);
 
 						if ($this->ownership)
@@ -744,20 +744,6 @@ class EditorData extends Module
 		$t->Set('assoc', $this->Name);
 
 		return $t->ParseFile(Module::L('editor_data/editor.xml'));
-
-		$ret['name'] = $this->Name;
-
-		$act = Server::GetVar($this->Name.'_action');
-		$sq = Server::GetVar($this->Name.'_q');
-
-		$ret['ds'] = $this->ds;
-		if ($act != 'edit' && !empty($this->ds->DisplayColumns)
-			&& ($this->Behavior->Search && isset($sq)))
-			$ret['table'] = $this->GetTable($this->Behavior->Target, $act, $sq);
-		else $ret['table'] = null;
-		$ret['forms'] = $this->GetForms(Server::GetVar($assoc) == $this->Name ?
-			Server::GetVar('child') : null);
-		return $ret;
 	}
 
 	/**
@@ -1269,7 +1255,7 @@ class EditorData extends Module
 								case 'thumb':
 									$in->help = '<img src="'
 									.(empty($files) ? 'xedlib/images/cross.png'
-									  : $files[0]).'" />';
+									: $files[0]).'" />';
 									break;
 								case 'exists':
 									$in->help = '<img src="xedlib/images/'.
@@ -1320,8 +1306,8 @@ class EditorData extends Module
 			$frm->AddInput(
 				$frm->GetSubmitButton($this->Name.'_action', $frm->State).
 				($state == STATE_EDIT && $this->type == CONTROL_BOUND ?
-				 '<input type="submit" name="'.$this->Name.'_action" value="Cancel" />'
-				 : null)
+				'<input type="submit" name="'.$this->Name.'_action" value="Cancel" />'
+				: null)
 			);
 
 			return $frm;
