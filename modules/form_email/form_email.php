@@ -95,9 +95,26 @@ class FormEmail extends Module
 
 		# Find all elements with an id
 		foreach ($sx->xpath('//*[@id]') as $in)
+		{
 			$this->_inputs[(string)$in['id']] = (string)$in['name'];
+			$this->_classes[(string)$in['name']] = (string)$in['class'];
+		}
 
 		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
+
+		foreach ($this->_classes as $n => $class)
+		{
+			preg_match($preg, $n, $m);
+			# This field is required.	
+			if (array_search('required', explode(' ', $class)) !== false)
+			{
+				if (empty($this->_data[$m[1]]))
+				{
+					$send = false;
+					$error = 'You are missing fields.';
+				}
+			}
+		}
 
 		# Process code fields.
 		if (!empty($this->_fields))
