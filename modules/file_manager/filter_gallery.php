@@ -166,7 +166,7 @@ class FilterGallery extends FilterDefault
 		$ttarget = dirname($newname).'/t_'.basename($newname);
 		if (file_exists($thumb)) rename($thumb, $ttarget);
 
-		if ($this->SaveOriginals)
+		if ($this->Behavior->SaveOriginals)
 		{
 			$full = $fi->dir.'/f_'.basename($fi->filename);
 			$ftarget = dirname($newname).'/f_'.basename($newname);
