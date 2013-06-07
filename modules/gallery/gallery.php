@@ -150,6 +150,7 @@ class Gallery extends Module
 		global $me;
 
 		if (!$this->Active) return;
+		if (substr($this->Root, -1, 1) != '/') $this->Root .= '/';
 		$this->f = new FilterGallery($this->FileManager);
 
 		require_once(dirname(__FILE__).'/../file_manager/file_manager.php');
