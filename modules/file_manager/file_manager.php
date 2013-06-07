@@ -484,7 +484,7 @@ class FileManager extends Module
 		);
 
 		if (!empty($f->icon)) return $f->icon;
-		else if (isset($icons[$f->type])) $ret = Module::P($icons[$f->type]);
+		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
 		else return null;
 		return $ret;
 	}
@@ -1012,11 +1012,11 @@ class FileManager extends Module
 			if ($file[0] == '.') continue;
 
 			$p = $this->Root;
-			if (!empty($this->cf)) $p .= '/'.$this->cf;
-			if (!empty($file)) $p .= '/'.$file;
+			if (!empty($this->cf)) $p .= $this->cf;
+			if (!empty($file)) $p .= $file;
 			$newfi = new FileInfo($p, $this->Filters);
 			if (!$newfi->show) continue;
-			if (is_dir($this->Root.$this->cf.'/'.$file))
+			if (is_dir($this->Root.$this->cf.$file))
 			{
 				if ($this->Behavior->ShowFolders) $ret['folders'][] = $newfi;
 				U::Let($newfi->info['index'], $foidx++);
