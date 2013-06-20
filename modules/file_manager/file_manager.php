@@ -238,7 +238,7 @@ class FileManager extends Module
 			$fi = new FileInfo($this->Root.$this->cf, $this->Filters);
 			$name = Server::GetVar($this->GetName(true).'_rname');
 			$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
-			$f->Rename($fi, $name);
+			$f->FFRename($fi, $name);
 			$this->cf = substr($fi->path, strlen($this->Root)).'/';
 			if (!empty($this->Behavior->Watchers))
 				U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_RENAME,
