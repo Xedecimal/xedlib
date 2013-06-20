@@ -1093,14 +1093,16 @@ class FileManager extends Module
 
 		$items = explode('/', $path);
 
-		$ret = null;
+		$uri = HM::URL('', array($a['SOURCE'] => ''));
+		$ret = '<a href="'.$uri.'">'.$a['ROOT'].'</a>';
 		$cpath = '';
 
 		foreach ($items as $ix => $i)
 		{
-			if ($ix > 0) { $ret .= $a['SEP']; $text = $i; }
-			else $text = $a['ROOT'];
-			$cpath .= ($ix > 0 ? '/' : null).$i;
+			if (empty($i)) continue;
+			$ret .= $a['SEP'];
+			$text = $i;
+			$cpath .= ($ix > 0 ? '/' : null).$i.'/';
 			$uri = HM::URL('', array($a['SOURCE'] => $cpath));
 			$ret .= "<a href=\"{$uri}\">{$text}</a>";
 		}
