@@ -83,7 +83,7 @@ class FilterDefault implements FileFilter
 	{
 		$pinfo = pathinfo($newname);
 		$finfo = "{$fi->dir}/.{$fi->filename}";
-		$ddir = $pinfo['dirname'] == '.' ? $fi->dir : $pinfo['dirname'];
+		$ddir = dirname($newname) == '.' ? $fi->dir : dirname($newname);
 		if (file_exists($finfo))
 			rename($finfo, $ddir.'/.'.$pinfo['basename']);
 		rename($fi->path, $ddir.'/'.$pinfo['basename']);
