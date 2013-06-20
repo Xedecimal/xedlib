@@ -235,8 +235,8 @@ class FileManager extends Module
 		else if ($act == 'Rename')
 		{
 			if (!$this->Behavior->AllowRename) return;
-			$fi = new FileInfo($this->Root.'/'.$this->cf, $this->Filters);
-			$name = Server::GetVar($this->Name.'_rname');
+			$fi = new FileInfo($this->Root.$this->cf, $this->Filters);
+			$name = Server::GetVar($this->GetName(true).'_rname');
 			$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
 			$f->Rename($fi, $name);
 			$this->cf = substr($fi->path, strlen($this->Root)).'/';
