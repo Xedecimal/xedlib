@@ -65,7 +65,7 @@ class Gallery extends Module
 			$this->f->FFGetInfo($fi);
 
 			$du['editor'] = Server::GetVar('editor');
-			$du['galcf'] = Server::GetVar('galcf', '').'/'.$fi->filename;
+			$du['galcf'] = Server::GetVar('galcf', '').$fi->filename.'/';
 			$d['url'] = HM::URL($me, $du);
 
 			$d['name'] = $fi->filename;
@@ -320,6 +320,7 @@ class GalleryAdmin extends FileManager
 {
 	public $Name = 'admin/gallery';
 	public $Root = 'galimg';
+	public $Title = 'Gallery';
 
 	function Auth() { return User::RequireAccess(1); }
 
@@ -338,7 +339,7 @@ class GalleryAdmin extends FileManager
 	{
 		global $_d, $me;
 
-		$_d['nav.links']['Admin/Gallery'] = '{{app_abs}}/admin/gallery';
+		$_d['nav.links']['Admin/'.$this->Title] = '{{app_abs}}/'.$this->Name;
 	}
 
 	function Prepare()
