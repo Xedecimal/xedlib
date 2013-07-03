@@ -15,19 +15,19 @@
 	</box>
 </search>
 
+<forms>
+<div id="box_{{name}}_forms" class="editor_form xlform">
+<div class="box_title">{{form_title}}</div>
+{{TextFormHeader}}
+{{form_content}}
+</div>
+</forms>
+
 <if check="isset($this->vars['table'])">
 <box title="{{table_title}}">
 {{TextTableHeader}}
 {{table}}
 </box>
 </if>
-
-<forms>
-<div id="box_{{name}}_forms" class="editor_form xlform xlform-vertical">
-<div class="box_title">{{form_title}}</div>
-{{TextFormHeader}}
-{{form_content}}
-</div>
-</forms>
 
 </div> <!-- .editor-data -->
