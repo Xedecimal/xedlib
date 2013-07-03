@@ -301,6 +301,8 @@ class EditorData extends Module
 	 */
 	public $filter;
 
+	public $match = array();
+
 	/**
 	 * Order to sort items, passed to the DataSet.
 	 *
@@ -967,6 +969,7 @@ class EditorData extends Module
 
 			# Search
 
+			$q['match'] = array();
 			if (!empty($sq))
 				foreach($cols as $c)
 					$q['match'][$c] = Database::SqlOr(Database::SqlLike("%$sq%"));
@@ -974,6 +977,7 @@ class EditorData extends Module
 			$q['columns'] = $cols;
 			$q['order'] = $this->sort;
 			$q['limit'] = $this->filter;
+			$q['match'] += $this->match;
 			$items = $this->ds->Get($q);
 
 			$root = $this->BuildTree($items);
