@@ -1,5 +1,5 @@
 $(function () {
-	$('.editor-data textarea').ckeditor({
+	/*$('.editor-data textarea').ckeditor({
 		filebrowserBrowseUrl: 'inline/images'
-	});
+	});*/
 });

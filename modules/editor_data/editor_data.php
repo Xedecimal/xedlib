@@ -297,7 +297,7 @@ class EditorData extends Module
 	 * Filter to be passed to the DataSet in it's form.
 	 *
 	 * @var array
-	 * @see DataSet.WhereClause
+	 * @see DataSet.LimitClause
 	 */
 	public $filter;
 
@@ -916,7 +916,7 @@ class EditorData extends Module
 		{
 			$cols = array();
 
-			//Build columns so nothing overlaps (eg. id of this and child table)
+			# Build columns so nothing overlaps (eg. id of this and child table)
 
 			$cols[$this->ds->table.'_'.$this->ds->id] =
 				$this->ds->table.'.'.$this->ds->id;
@@ -942,11 +942,11 @@ class EditorData extends Module
 			{
 				$joins = array();
 
-				//Parent column of the child...
+				# Parent column of the child...
 				$cols[$child->ds->table.'.'.$child->child_key] =
 					$child->ds->table.'_'.$child->child_key;
 
-				//Coming from another table, we gotta join it in.
+				# Coming from another table, we gotta join it in.
 				if ($child->ds->table != $this->ds->table)
 				{
 					$joins[$child->ds->table] = "{$child->ds->table}.
@@ -1048,10 +1048,10 @@ class EditorData extends Module
 
 			$context = isset($child_id) ? $this->ds->children[$child_id] : $this;
 
-			//Don't display children that don't have a display to show.
+			# Don't display children that don't have a display to show.
 			if (empty($context->ds->DisplayColumns)) continue;
 
-			//Pad all existing columns to ensure proper width.
+			# Pad all existing columns to ensure proper width.
 			$total_cells = count($this->ds->DisplayColumns);
 			if (!empty($this->ds->children))
 			foreach ($this->ds->children as $child)
@@ -1059,7 +1059,7 @@ class EditorData extends Module
 					$total_cells += count($child->ds->DisplayColumns);
 			$row = array_pad($row, $total_cells, '&nbsp;');
 
-			//Move cursor (ix) to the first column we're displaying here.
+			# Move cursor (ix) to the first column we're displaying here.
 			if (isset($child_id))
 			{
 				if ($this->ds->children[$child_id]->ds->table != $this->ds->table)
@@ -1071,7 +1071,7 @@ class EditorData extends Module
 				}
 			}
 
-			//Show all displays for this context.
+			# Show all displays for this context.
 			if (!empty($context->ds->DisplayColumns))
 			foreach ($context->ds->DisplayColumns as $col => $disp)
 			{
@@ -1080,13 +1080,13 @@ class EditorData extends Module
 				else
 					$disp_index = $context->ds->table.'_'.$col;
 
-				//Callback mapped
+				# Callback mapped
 				if (isset($disp->callback))
 				{
 					$row[$ix++] = call_user_func_array($disp->callback,
 						array($this->ds, $cnode->data, $disp_index, $col));
 				}
-				//Regular field
+				# Regular field
 				else
 				{
 					if (array_key_exists($disp_index, $cnode->data))
