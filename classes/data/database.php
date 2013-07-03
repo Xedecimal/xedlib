@@ -186,6 +186,7 @@ class Database
 				$this->ErrorHandler = array($this, 'CheckMiError');
 				$this->func_aff = 'mysqli_affected_rows';
 				$this->link = mysqli_connect($m['host'], $m['user'], $m['pass']);
+				mysqli_set_charset($this->link, 'utf8');
 				$this->type = DB_MI;
 
 				if (!empty($this->name))
