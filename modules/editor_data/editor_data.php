@@ -1004,7 +1004,7 @@ class EditorData extends Module
 				if (!empty($child->ds->DisplayColumns))
 				foreach ($child->ds->DisplayColumns as $col => $disp)
 				{
-					$cols[$col] = "<b>{$disp->text}</b>";
+					$cols[$col] = $disp->text;
 					$atrs[] = $disp->attribs;
 				}
 			}
@@ -1023,7 +1023,7 @@ class EditorData extends Module
 				$table->AddRow($row, array('CLASS' => $class));
 			}
 
-			$ret .= $table->Get(array('CLASS' => 'editor'));
+			$ret .= $table->Get(array('CLASS' => 'editor table table-striped table-bordered'));
 		}
 		return $ret;
 	}
@@ -1313,7 +1313,7 @@ class EditorData extends Module
 			$frm->AddInput(
 				$frm->GetSubmitButton($this->Name.'_action', $frm->State).
 				($state == STATE_EDIT && $this->type == CONTROL_BOUND ?
-				'<input type="submit" name="'.$this->Name.'_action" value="Cancel" />'
+				'<input type="submit" name="'.$this->Name.'_action" value="Cancel" class="btn" />'
 				: null)
 			);
 
