@@ -985,7 +985,7 @@ class EditorData extends Module
 
 		if (isset($root))
 		{
-			$cols = array();
+			$cols = array('&nbsp;');
 			$atrs = array();
 
 			//Columns and column attributes.
@@ -1104,7 +1104,8 @@ class EditorData extends Module
 				}
 			}
 
-			#$url_defaults = array($this->assoc => $this->Name);
+			# Buttons
+
 			$url_defaults = array();
 			if (isset($child_id)) $url_defaults['child'] = $child_id;
 
@@ -1121,14 +1122,16 @@ class EditorData extends Module
 				$url_del = HM::URL($target, array_merge(array(
 					$this->Name.'_action' => 'delete',
 					$this->Name.'_ci' => $cnode->id), $url_defaults));
-				$row[] = "<a href=\"$url_edit#box_{$this->Name}_forms\"><img
+				array_unshift($row, "<a href=\"$url_edit#box_{$this->Name}_forms\"><img
 					src=\"{$_d['xl_abs']}/images/edit.png\" alt=\"Edit\"
-					title=\"".$this->View->TextEdit."\" class=\"png\" /></a>";
-				$row[] = "<a href=\"$url_del#{$this->Name}_table\"
+					title=\"".$this->View->TextEdit."\" class=\"png\" /></a>"
+				." <a href=\"$url_del#{$this->Name}_table\"
 					onclick=\"return confirm('Are you sure?')\"><img
 					src=\"{$_d['xl_abs']}/images/delete.png\" alt=\"Delete\"
-					title=\"".$this->View->TextDelete."\" class=\"png\" /></a>";
+					title=\"".$this->View->TextDelete."\" class=\"png\" /></a>");
 			}
+
+			# /Buttons
 
 			$rows[] = $row;
 
