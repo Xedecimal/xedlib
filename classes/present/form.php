@@ -290,10 +290,10 @@ class Form extends LayeredOutput
 	 */
 	function GetSubmitButton($name, $text)
 	{
-		$ret = '<input type="submit" name="'.$name.'" value="'.$text.'"';
+		$ret = '<input type="submit" name="'.$name.'" class="btn btn-primary" value="'.$text.'"';
 		if (isset($this->Validation))
 			$ret .= " onclick=\"return {$this->name}_check(1);\"";
-		return $ret.' />';
+		return $ret.' /> ';
 	}
 
 	/**
