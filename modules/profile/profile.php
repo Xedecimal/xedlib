@@ -6,7 +6,7 @@ class ModProfile extends Module
 {
 	function Auth()
 	{
-		return ModUser::RequireAccess(0);
+		return User::RequireAccess(0);
 	}
 
 	function Link()

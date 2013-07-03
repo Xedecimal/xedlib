@@ -21,16 +21,16 @@ class FormEmail extends Module
 		$this->_template_send = Module::L('form_email/send.xml');
 		$this->_email_template = Module::L('form_email/email.xml');
 
-		$this->_data = $_POST[$this->_source];
+		$this->_data = @$_POST[$this->_source];
 
 		$this->_fields = array(
-			'Name' => new FormInput('Name', null, 'form[name]', $this->_data['name'], array('class' => 'required')),
-			'Email' => new FormInput('Email', null, 'form[email]', $this->_data['email']),
-			'City' => new FormInput('City', null, 'form[city]', $this->_data['city']),
-			'State' => new FormInput('State', null, 'form[state]', $this->_data['state']),
-			'Zip' => new FormInput('Zip', null, 'form[zip]', $this->_data['zip']),
-			'Phone' => new FormInput('Phone', null, 'form[phone]', $this->_data['phone']),
-			'Message' => new FormInput('Message', 'area', 'form[message]', $this->_data['message'], array('rows' => 10, 'style' => 'width: 100%')),
+			'Name' => new FormInput('Name', null, 'form[name]', @$this->_data['name'], array('class' => 'required')),
+			'Email' => new FormInput('Email', null, 'form[email]', @$this->_data['email']),
+			'City' => new FormInput('City', null, 'form[city]', @$this->_data['city']),
+			'State' => new FormInput('State', null, 'form[state]', @$this->_data['state']),
+			'Zip' => new FormInput('Zip', null, 'form[zip]', @$this->_data['zip']),
+			'Phone' => new FormInput('Phone', null, 'form[phone]', @$this->_data['phone']),
+			'Message' => new FormInput('Message', 'area', 'form[message]', @$this->_data['message'], array('rows' => 10, 'style' => 'width: 100%')),
 			'' => new FormInput(null, 'captcha', 'c')
 		);
 		$this->send = false;
@@ -95,11 +95,29 @@ class FormEmail extends Module
 
 		# Find all elements with an id
 		foreach ($sx->xpath('//*[@id]') as $in)
+		{
 			$this->_inputs[(string)$in['id']] = (string)$in['name'];
+			$this->_classes[(string)$in['name']] = (string)$in['class'];
+		}
 
 		$preg = '/'.$this->_source.'\[([^\]]+)\]/';
 
+		foreach ($this->_classes as $n => $class)
+		{
+			preg_match($preg, $n, $m);
+			# This field is required.	
+			if (array_search('required', explode(' ', $class)) !== false)
+			{
+				if (empty($this->_data[$m[1]]))
+				{
+					$send = false;
+					$error = 'You are missing fields.';
+				}
+			}
+		}
+
 		# Process code fields.
+		if (!empty($this->_fields))
 		foreach ($this->_fields as $text => $f)
 		{
 			preg_match($preg, $f->atrs['NAME'], $m);
@@ -188,7 +206,7 @@ class FormEmail extends Module
 				$row['name'] = $l;
 				$row['value'] = '';
 
-				foreach ($this->_data[$m[1]] as $ix => $val) $row['value'] .= ' '.$val;
+				foreach ($this->_data[$m[1]] as $ix => $val) $row['value'] .= ($ix > 0 ? ', ' : '').$val;
 
 				$rows[] = $row;
 			}

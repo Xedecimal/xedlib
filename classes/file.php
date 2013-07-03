@@ -161,7 +161,7 @@ class File
 			{
 				if ($f[0] == '.') continue;
 				$ret = array_merge($ret,
-					File::Comb($path.'/'.$f, $exclude, $flags));
+					File::Comb($path.$f, $exclude, $flags));
 			}
 
 			return $ret;

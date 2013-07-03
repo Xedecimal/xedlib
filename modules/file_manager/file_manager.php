@@ -235,10 +235,10 @@ class FileManager extends Module
 		else if ($act == 'Rename')
 		{
 			if (!$this->Behavior->AllowRename) return;
-			$fi = new FileInfo($this->Root.'/'.$this->cf, $this->Filters);
-			$name = Server::GetVar($this->Name.'_rname');
+			$fi = new FileInfo($this->Root.$this->cf, $this->Filters);
+			$name = Server::GetVar($this->GetName(true).'_rname');
 			$f = FileManager::GetFilter($fi, $this->Root, $this->Filters);
-			$f->Rename($fi, $name);
+			$f->FFRename($fi, $name);
 			$this->cf = substr($fi->path, strlen($this->Root)).'/';
 			if (!empty($this->Behavior->Watchers))
 				U::RunCallbacks($this->Behavior->Watchers, FM_ACTION_RENAME,
@@ -484,7 +484,7 @@ class FileManager extends Module
 		);
 
 		if (!empty($f->icon)) return $f->icon;
-		else if (isset($icons[$f->type])) $ret = Module::P($icons[$f->type]);
+		else if (isset($icons[$f->type])) $ret = $icons[$f->type];
 		else return null;
 		return $ret;
 	}
@@ -1012,11 +1012,11 @@ class FileManager extends Module
 			if ($file[0] == '.') continue;
 
 			$p = $this->Root;
-			if (!empty($this->cf)) $p .= '/'.$this->cf;
-			if (!empty($file)) $p .= '/'.$file;
+			if (!empty($this->cf)) $p .= $this->cf;
+			if (!empty($file)) $p .= $file;
 			$newfi = new FileInfo($p, $this->Filters);
 			if (!$newfi->show) continue;
-			if (is_dir($this->Root.$this->cf.'/'.$file))
+			if (is_dir($this->Root.$this->cf.$file))
 			{
 				if ($this->Behavior->ShowFolders) $ret['folders'][] = $newfi;
 				U::Let($newfi->info['index'], $foidx++);
@@ -1093,14 +1093,16 @@ class FileManager extends Module
 
 		$items = explode('/', $path);
 
-		$ret = null;
+		$uri = HM::URL('', array($a['SOURCE'] => ''));
+		$ret = '<a href="'.$uri.'">'.$a['ROOT'].'</a>';
 		$cpath = '';
 
 		foreach ($items as $ix => $i)
 		{
-			if ($ix > 0) { $ret .= $a['SEP']; $text = $i; }
-			else $text = $a['ROOT'];
-			$cpath .= ($ix > 0 ? '/' : null).$i;
+			if (empty($i)) continue;
+			$ret .= $a['SEP'];
+			$text = $i;
+			$cpath .= ($ix > 0 ? '/' : null).$i.'/';
 			$uri = HM::URL('', array($a['SOURCE'] => $cpath));
 			$ret .= "<a href=\"{$uri}\">{$text}</a>";
 		}
